@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{\"app\\\\portfolio\\\\page.tsx -> @/components/sections/FinalCTA\":{\"id\":\"app\\\\portfolio\\\\page.tsx -> @/components/sections/FinalCTA\",\"files\":[\"static/chunks/_app-pages-browser_components_sections_FinalCTA_tsx.js\"]},\"app\\\\portfolio\\\\page.tsx -> @/components/sections/PortfolioGrid\":{\"id\":\"app\\\\portfolio\\\\page.tsx -> @/components/sections/PortfolioGrid\",\"files\":[\"static/chunks/_app-pages-browser_components_sections_PortfolioGrid_tsx.js\"]}}"
+self.__REACT_LOADABLE_MANIFEST="{}"

@@ -114,20 +114,29 @@ export default function StoryScrollytelling() {
 
     useEffect(() => {
         const ctx = gsap.context(() => {
-            // Batch animate sections
-            ScrollTrigger.batch(".fade-up", {
-                start: "top 85%",
-                onEnter: (batch) => {
-                    gsap.from(batch, {
+            // Animate each element individually for better reliability
+            const fadeElements = gsap.utils.toArray(".fade-up");
+
+            fadeElements.forEach((el: any, index) => {
+                gsap.fromTo(el,
+                    {
                         opacity: 0,
-                        y: 50,
-                        duration: 0.8,
-                        stagger: 0.1,
-                        ease: "power3.out",
-                        overwrite: true
-                    });
-                },
-                once: true
+                        y: 30  // Reduced from 50 for subtler effect
+                    },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.6, // Faster animation
+                        ease: "power2.out", // Lighter ease
+                        scrollTrigger: {
+                            trigger: el,
+                            start: "top 90%", // Trigger earlier
+                            once: true,
+                            toggleActions: "play none none none"
+                        },
+                        delay: (index % 4) * 0.05 // Subtle stagger within groups
+                    }
+                );
             });
 
         }, containerRef);
