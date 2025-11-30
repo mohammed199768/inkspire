@@ -114,13 +114,13 @@ export default function StoryScrollytelling() {
 
     useEffect(() => {
         const ctx = gsap.context(() => {
-            // Batch animate sections for better performance
+            // Batch animate sections
             ScrollTrigger.batch(".fade-up", {
                 start: "top 85%",
                 onEnter: (batch) => {
-                    gsap.to(batch, {
-                        opacity: 1,
-                        y: 0,
+                    gsap.from(batch, {
+                        opacity: 0,
+                        y: 50,
                         duration: 0.8,
                         stagger: 0.1,
                         ease: "power3.out",
@@ -155,7 +155,7 @@ export default function StoryScrollytelling() {
             {/* ABOUT US SECTION */}
             <div className="min-h-screen flex items-center py-20 px-6">
                 <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-                    <div className="fade-up opacity-0 translate-y-12">
+                    <div className="fade-up">
                         <h2 className="text-5xl md:text-7xl font-bold mb-8 leading-tight">
                             We Craft <span className="text-purple-500">Digital</span> <br /> Masterpieces.
                         </h2>
@@ -167,7 +167,7 @@ export default function StoryScrollytelling() {
                             Learn More <ArrowRight size={20} />
                         </button>
                     </div>
-                    <div className="fade-up opacity-0 translate-y-12 relative rounded-3xl overflow-hidden border border-white/10 shadow-2xl shadow-purple-900/20 aspect-video">
+                    <div className="fade-up relative rounded-3xl overflow-hidden border border-white/10 shadow-2xl shadow-purple-900/20 aspect-video">
                         <iframe
                             className="w-full h-full object-cover"
                             src=""
@@ -184,10 +184,10 @@ export default function StoryScrollytelling() {
             {/* SERVICES SECTION */}
             <div className="min-h-screen flex flex-col justify-center py-20 px-6 bg-gradient-to-b from-transparent to-black/20">
                 <div className="max-w-7xl mx-auto w-full">
-                    <h2 className="fade-up opacity-0 translate-y-12 text-4xl md:text-6xl font-bold mb-16 text-center">Our <span className="text-purple-400">Intelligent</span> Services</h2>
+                    <h2 className="fade-up text-4xl md:text-6xl font-bold mb-16 text-center">Our <span className="text-purple-400">Intelligent</span> Services</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {services.map((service, i) => (
-                            <div key={i} className="fade-up opacity-0 translate-y-12 group p-8 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-purple-500/50 transition-all duration-500 hover:-translate-y-2 cursor-pointer relative overflow-hidden">
+                            <div key={i} className="fade-up group p-8 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-purple-500/50 transition-all duration-500 hover:-translate-y-2 cursor-pointer relative overflow-hidden">
                                 <div className="absolute inset-0 bg-gradient-to-br from-purple-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                                 <div className="relative z-10">
                                     <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
@@ -204,8 +204,8 @@ export default function StoryScrollytelling() {
 
             {/* OUR WORK SECTION */}
             <div className="min-h-screen flex flex-col justify-center py-20 overflow-hidden">
-                <h2 className="fade-up opacity-0 translate-y-12 text-4xl md:text-6xl font-bold mb-12 text-center">Selected <span className="text-pink-500">Work</span></h2>
-                <div className="fade-up opacity-0 translate-y-12 w-full max-w-[1400px] mx-auto px-4">
+                <h2 className="fade-up text-4xl md:text-6xl font-bold mb-12 text-center">Selected <span className="text-pink-500">Work</span></h2>
+                <div className="fade-up w-full max-w-[1400px] mx-auto px-4">
                     <Swiper
                         effect={'coverflow'}
                         grabCursor={true}
@@ -245,10 +245,10 @@ export default function StoryScrollytelling() {
 
             {/* OUR TEAM SECTION */}
             <div className="min-h-screen flex flex-col justify-center py-20 px-6">
-                <h2 className="fade-up opacity-0 translate-y-12 text-4xl md:text-6xl font-bold mb-16 text-center">Meet The <span className="text-blue-400">Team</span></h2>
+                <h2 className="fade-up text-4xl md:text-6xl font-bold mb-16 text-center">Meet The <span className="text-blue-400">Team</span></h2>
                 <div className="flex flex-wrap justify-center gap-10 max-w-7xl mx-auto">
                     {team.map((member, i) => (
-                        <div key={i} className="fade-up opacity-0 translate-y-12 group relative w-full md:w-[350px] h-[500px] rounded-3xl overflow-hidden transition-all duration-500 opacity-50 hover:opacity-100 hover:scale-105 cursor-pointer border border-white/10">
+                        <div key={i} className="fade-up group relative w-full md:w-[350px] h-[500px] rounded-3xl overflow-hidden transition-all duration-500 opacity-50 hover:opacity-100 hover:scale-105 cursor-pointer border border-white/10">
                             <img
                                 src={member.image}
                                 alt={member.name}
@@ -281,10 +281,10 @@ export default function StoryScrollytelling() {
 
             {/* REVIEWS SECTION */}
             <div className="min-h-[80vh] flex flex-col justify-center py-20 px-6">
-                <h2 className="fade-up opacity-0 translate-y-12 text-4xl md:text-6xl font-bold mb-16 text-center">Client <span className="text-yellow-400">Stories</span></h2>
+                <h2 className="fade-up text-4xl md:text-6xl font-bold mb-16 text-center">Client <span className="text-yellow-400">Stories</span></h2>
                 <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
                     {reviews.map((review, i) => (
-                        <div key={i} className="fade-up opacity-0 translate-y-12 p-8 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300 relative">
+                        <div key={i} className="fade-up p-8 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300 relative">
                             <div className="flex gap-1 mb-6 text-yellow-400">
                                 {[1, 2, 3, 4, 5].map(s => <Star key={s} size={16} fill="currentColor" />)}
                             </div>
