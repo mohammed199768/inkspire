@@ -1,6 +1,4 @@
 {
-  "version": 2,
-  "framework": {
-    "name": "nextjs"
-  }
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs"
 }
