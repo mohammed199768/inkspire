@@ -1,26 +1,41 @@
-import type { Metadata } from "next";
-import { Inter, Outfit } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import dynamic from "next/dynamic";
+import localFont from "next/font/local";
 import "./globals.css";
-import BackgroundParticles from "@/components/ui/BackgroundParticles";
-import FloatingVectorParticles from "@/components/ui/FloatingVectorParticles";
-import Cursor from "@/components/ui/Cursor";
-import Preloader from "@/components/ui/Preloader";
+import { siteContent } from '@/data/siteContent';
 import NavbarFullMenu from "@/components/layout/NavbarFullMenu";
 import MotionLayout from "@/components/layout/MotionLayout";
 import SmoothScroll from "@/components/layout/SmoothScroll";
+import Preloader from "@/components/ui/Preloader";
 
-const inter = Inter({
-    subsets: ["latin"],
+// Optimized Font Loading with next/font/local
+const inter = localFont({
+    src: "./fonts/InterVariable.woff2",
     variable: "--font-inter",
-    display: 'swap',
-    preload: true
+    display: "swap",
+    weight: "100 900",
 });
-const outfit = Outfit({
-    subsets: ["latin"],
+
+const outfit = localFont({
+    src: [
+        { path: "./fonts/Outfit-Regular.ttf", weight: "400", style: "normal" },
+        { path: "./fonts/Outfit-Bold.ttf", weight: "700", style: "normal" },
+    ],
     variable: "--font-outfit",
-    display: 'swap',
-    preload: true
+    display: "swap",
 });
+
+const ibrand = localFont({
+    src: "./fonts/ibrand.otf",
+    variable: "--font-ibrand",
+    display: "swap",
+});
+
+// Lazy load heavy visual effects
+const FloatingVectorParticles = dynamic(() => import("@/components/ui/FloatingVectorParticles"), { ssr: false });
+const BackgroundParticles = dynamic(() => import("@/components/ui/BackgroundParticles"), { ssr: false });
+const BlobBackground = dynamic(() => import("@/components/ui/BlobBackground"), { ssr: false });
+const Cursor = dynamic(() => import("@/components/ui/Cursor"), { ssr: false });
 
 export const metadata: Metadata = {
     metadataBase: new URL('https://inkspire.studio'),
@@ -69,10 +84,13 @@ export const metadata: Metadata = {
             'max-snippet': -1,
         },
     },
-    verification: {
-        // Add your verification codes here later
-        // google: 'your-google-verification-code',
-    },
+};
+
+export const viewport: Viewport = {
+    themeColor: '#000000',
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
 };
 
 export default function RootLayout({
@@ -81,16 +99,16 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
+        <html lang="en" className={`${inter.variable} ${outfit.variable} ${ibrand.variable}`}>
             <head>
                 <link rel="icon" href="/favicon.ico" sizes="any" />
-                <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-                <meta name="theme-color" content="#000000" />
+                <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
             </head>
-            <body className="antialiased overflow-x-hidden bg-black text-white selection:bg-inkspirePurple selection:text-white">
+            <body className="antialiased overflow-x-hidden bg-black text-white selection:bg-inkspirePurple selection:text-white font-sans">
                 <Preloader />
                 <SmoothScroll>
                     <BackgroundParticles />
+                    <BlobBackground />
                     <FloatingVectorParticles />
                     <Cursor />
                     <NavbarFullMenu />

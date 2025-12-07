@@ -43,21 +43,23 @@ export default function ProcessTimeline() {
                     {siteContent.process.steps.map((step) => (
                         <div
                             key={step.id}
-                            className="process-step relative pl-12 md:pl-24"
+                            className="process-step relative pl-12 md:pl-24 group"
                         >
                             <div className="absolute left-[-5px] top-2 w-2.5 h-2.5 rounded-full bg-inkspirePurple shadow-[0_0_10px_#6b4092]" />
 
-                            <div className="flex flex-col md:flex-row md:items-baseline gap-4 md:gap-8">
-                                <span className="text-6xl md:text-8xl font-black text-white/5">
-                                    {step.id}
-                                </span>
-                                <div>
-                                    <h3 className="text-2xl md:text-4xl font-bold text-white mb-4">
-                                        {step.title}
-                                    </h3>
-                                    <p className="text-lg text-white/60 font-light max-w-xl">
-                                        {step.description}
-                                    </p>
+                            <div className="p-8 rounded-3xl hover:bg-white/5 transition-all duration-500 hover:-translate-y-1 relative overflow-hidden">
+                                <div className="flex flex-col md:flex-row md:items-baseline gap-4 md:gap-8 relative z-10">
+                                    <span className="text-6xl md:text-8xl font-black text-white/5">
+                                        {step.id}
+                                    </span>
+                                    <div>
+                                        <h3 className="text-2xl md:text-4xl font-bold text-white mb-4">
+                                            {step.title}
+                                        </h3>
+                                        <p className="text-lg text-white/60 group-hover:text-white/80 font-light max-w-xl transition-colors duration-300">
+                                            {step.description}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>

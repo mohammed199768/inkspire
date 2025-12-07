@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import gsap from "gsap";
 import { siteContent } from "@/data/siteContent";
 
@@ -73,9 +74,15 @@ export default function NavbarFullMenu() {
 
                 <Link
                     href="/"
-                    className="relative z-10 text-2xl font-bold tracking-tighter text-white interactive hover:text-inkspirePurple transition-colors"
+                    className="relative z-10 interactive hover:brightness-125 transition-all"
                 >
-                    {siteContent.global.logoText}
+                    <Image
+                        src="/logos/Inkspire logos/Untitled-2-03.webp"
+                        alt="Inkspire"
+                        width={180}
+                        height={60}
+                        className="w-auto h-10 md:h-14 object-contain"
+                    />
                 </Link>
 
                 <button

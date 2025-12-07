@@ -12,15 +12,8 @@ export const siteContent = {
         ],
     },
     hero: {
-        titleLines: [
-            ["INK", "SPIRE"],
-            ["TELLS", "YOUR", "STORY"],
-        ],
-        subtitle: "We turn raw ideas into cinematic digital experiences.",
         primaryCtaLabel: "Start Project",
         primaryCtaHref: "/contact",
-        helperTop: "We are open!",
-        helperBottom: "Book your project in advance",
         scrollLabelTop: " ",
         scrollLabelBottom: " ",
     },

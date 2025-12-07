@@ -43,7 +43,7 @@ export default function PortfolioGrid() {
         <section ref={containerRef} className="py-20 px-6">
             <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {projects.map((project) => (
-                    <div key={project.id} className="portfolio-item group relative aspect-[4/3] overflow-hidden rounded-2xl cursor-pointer">
+                    <div key={project.id} className="portfolio-item group relative aspect-[4/3] overflow-hidden rounded-2xl cursor-pointer transition-all duration-500">
                         <Image
                             src={project.image}
                             alt={project.title}

@@ -1,35 +1,66 @@
-"use client";
-
 import HeroScene from "@/components/hero/HeroScene";
-import StoryScrollytelling from "@/components/sections/StoryScrollytelling";
-import CreativeSlider from "@/components/sections/CreativeSlider";
-import ProcessTimeline from "@/components/sections/ProcessTimeline";
-import FinalCTA from "@/components/sections/FinalCTA";
-import { useScrollScenes } from "@/hooks/useScrollScenes";
-import { useCinematicTransitions } from "@/hooks/useCinematicTransitions";
+import CinematicWrapper from "@/components/layout/CinematicWrapper";
+import dynamic from "next/dynamic";
+
+// Dynamically import below-the-fold sections to drastically reduce initial JS bundle size.
+// This improves TTI (Time to Interactive) and TBT.
+const StatsSection = dynamic(() => import("@/components/sections/StatsSection"));
+const AboutSection = dynamic(() => import("@/components/sections/AboutSection"));
+const ServicesSection = dynamic(() => import("@/components/sections/ServicesSection"));
+const SelectedWorkSection = dynamic(() => import("@/components/sections/SelectedWorkSection"));
+const TeamSection = dynamic(() => import("@/components/sections/TeamSection"));
+const ClientsMarquee = dynamic(() => import("@/components/sections/ClientsMarquee"));
+const TestimonialsSection = dynamic(() => import("@/components/sections/TestimonialsSection"));
+const CreativeSlider = dynamic(() => import("@/components/sections/CreativeSlider"));
+const ProcessTimeline = dynamic(() => import("@/components/sections/ProcessTimeline"));
+const FinalCTA = dynamic(() => import("@/components/sections/FinalCTA"));
 
 export default function Home() {
-    // Initialize scroll animations for story sections
-    useScrollScenes();
-
-    // Initialize cinematic transitions between sections
-    useCinematicTransitions();
-
     return (
         <main className="flex flex-col w-full">
+            {/* Critical LCP Section - Rendered immediately */}
             <HeroScene />
-            <div className="cinematic-section">
-                <StoryScrollytelling />
-            </div>
-            <div className="cinematic-section">
-                <CreativeSlider />
-            </div>
-            <div className="cinematic-section">
-                <ProcessTimeline />
-            </div>
-            <div className="cinematic-section">
-                <FinalCTA />
-            </div>
+
+            {/* Client-side Cinematic Transitions Wrapper for subsequent sections */}
+            <CinematicWrapper>
+                <div className="cinematic-section">
+                    <StatsSection />
+                </div>
+
+                <div className="cinematic-section">
+                    <AboutSection />
+                </div>
+
+                <div className="cinematic-section">
+                    <ServicesSection />
+                </div>
+
+                <div className="cinematic-section">
+                    <SelectedWorkSection />
+                </div>
+
+                <div className="cinematic-section">
+                    <TeamSection />
+                </div>
+
+                <div className="cinematic-section">
+                    <ClientsMarquee />
+                </div>
+
+                <div className="cinematic-section">
+                    <TestimonialsSection />
+                </div>
+
+                <div className="cinematic-section">
+                    <CreativeSlider />
+                </div>
+                <div className="cinematic-section">
+                    <ProcessTimeline />
+                </div>
+                <div className="cinematic-section">
+                    <FinalCTA />
+                </div>
+            </CinematicWrapper>
         </main>
     );
 }

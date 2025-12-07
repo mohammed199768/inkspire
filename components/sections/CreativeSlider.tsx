@@ -3,6 +3,7 @@
 import { siteContent } from "@/data/siteContent";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { EffectCoverflow, Pagination, Navigation, Autoplay } from "swiper/modules";
+import Image from "next/image";
 import "swiper/css";
 import "swiper/css/effect-coverflow";
 import "swiper/css/pagination";
@@ -13,7 +14,7 @@ export default function CreativeSlider() {
     return (
         <section
             id="work"
-            className="relative py-20 px-6 md:px-12 overflow-hidden min-h-screen flex flex-col justify-center bg-gradient-to-b from-transparent to-black/30"
+            className="relative py-20 px-6 md:px-12 overflow-hidden min-h-screen flex flex-col justify-center"
         >
             <div className="max-w-7xl mx-auto w-full mb-12">
                 <h2 className="text-4xl md:text-6xl font-bold text-white mb-4 relative inline-block">
@@ -56,11 +57,17 @@ export default function CreativeSlider() {
                             key={item.id}
                             className="!w-[300px] md:!w-[600px] !h-[450px] md:!h-[600px] rounded-3xl overflow-hidden border border-white/10 bg-gray-900 shadow-2xl relative group"
                         >
-                            <img
-                                src={item.imageUrl}
-                                alt={item.title}
-                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                            />
+                            <div className="relative w-full h-full">
+                                <Image
+                                    src={item.imageUrl}
+                                    alt={item.title}
+                                    fill
+                                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                                    sizes="(max-width: 768px) 300px, 600px"
+                                // Optimization: Only priority the first image if loop wasn't issue, 
+                                // but with Swiper loop, simpler to lazy load (default).
+                                />
+                            </div>
                             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
 
                             <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
@@ -83,10 +90,10 @@ export default function CreativeSlider() {
                 </Swiper>
 
                 {/* Custom Navigation Buttons */}
-                <button className="swiper-button-prev-custom absolute left-0 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-inkspirePurple hover:border-inkspirePurple transition-all duration-300 interactive">
+                <button aria-label="Previous Slide" className="swiper-button-prev-custom absolute left-0 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-inkspirePurple hover:border-inkspirePurple transition-all duration-300 interactive">
                     <ArrowLeft size={24} />
                 </button>
-                <button className="swiper-button-next-custom absolute right-0 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-inkspirePurple hover:border-inkspirePurple transition-all duration-300 interactive">
+                <button aria-label="Next Slide" className="swiper-button-next-custom absolute right-0 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-inkspirePurple hover:border-inkspirePurple transition-all duration-300 interactive">
                     <ArrowRight size={24} />
                 </button>
             </div>

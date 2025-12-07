@@ -6,8 +6,18 @@ import { motion, AnimatePresence } from "framer-motion";
 export default function Preloader() {
     const [loading, setLoading] = useState(true);
     const [progress, setProgress] = useState(0);
+    const [particles, setParticles] = useState<{ left: string; top: string; duration: number; delay: number }[]>([]);
 
     useEffect(() => {
+        // Generate particles only on client side to avoid hydration mismatch
+        const newParticles = Array.from({ length: 20 }).map(() => ({
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+            duration: 2 + Math.random() * 2,
+            delay: Math.random() * 2,
+        }));
+        setParticles(newParticles);
+
         // Simulate loading progress
         const interval = setInterval(() => {
             setProgress((prev) => {
@@ -40,7 +50,7 @@ export default function Preloader() {
                         transition={{ duration: 0.5 }}
                     >
                         <motion.h1
-                            className="text-6xl md:text-8xl font-black tracking-tighter"
+                            className="text-6xl md:text-8xl font-black tracking-tighter brand-font"
                             animate={{
                                 backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
                             }}
@@ -79,22 +89,22 @@ export default function Preloader() {
 
                     {/* Floating Particles */}
                     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                        {[...Array(20)].map((_, i) => (
+                        {particles.map((p, i) => (
                             <motion.div
                                 key={i}
                                 className="absolute w-1 h-1 bg-purple-500 rounded-full"
                                 style={{
-                                    left: `${Math.random() * 100}%`,
-                                    top: `${Math.random() * 100}%`,
+                                    left: p.left,
+                                    top: p.top,
                                 }}
                                 animate={{
                                     y: [0, -30, 0],
                                     opacity: [0.2, 1, 0.2],
                                 }}
                                 transition={{
-                                    duration: 2 + Math.random() * 2,
+                                    duration: p.duration,
                                     repeat: Infinity,
-                                    delay: Math.random() * 2,
+                                    delay: p.delay,
                                 }}
                             />
                         ))}

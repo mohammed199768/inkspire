@@ -1,89 +1,17 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Image from "next/image";
+import { useFloatingParticles } from "@/hooks/useFloatingParticles";
 
-gsap.registerPlugin(ScrollTrigger);
+const VECTOR_IMAGES = [
+    "/vectors/Vector Smart Object-01.webp",
+    "/vectors/Vector Smart Object-02.webp"
+];
 
 export default function FloatingVectorParticles() {
-    const containerRef = useRef<HTMLDivElement>(null);
+    const { containerRef, particles, isReady } = useFloatingParticles(VECTOR_IMAGES);
 
-    useEffect(() => {
-        const container = containerRef.current;
-        if (!container) return;
-
-        const ctx = gsap.context(() => {
-            const particles = gsap.utils.toArray<HTMLDivElement>(".vector-particle");
-
-            particles.forEach((p, i) => {
-                // 3D Depth Effect Calculation
-                const depth = Math.random(); // 0 to 1, where 1 is closest
-                const scale = 0.8 + depth * 1.2; // Scale: 0.8 to 2.0
-                const blur = (1 - depth) * 10; // Blur: 0px (close) to 10px (far)
-                const opacity = 0.8 + depth * 0.2; // Opacity: 0.8 to 1.0
-
-                // Initial random position
-                gsap.set(p, {
-                    left: Math.random() * 100 + "%",
-                    top: Math.random() * 100 + "%",
-                    opacity: 0,
-                    scale: 0,
-                    filter: `blur(${blur}px)`
-                });
-
-                // Fade in
-                gsap.to(p, {
-                    opacity: opacity,
-                    scale: scale,
-                    duration: 1.5,
-                    delay: Math.random() * 0.5,
-                    ease: "power2.out"
-                });
-
-                // Simplified floating animation - less CPU intensive
-                gsap.to(p, {
-                    x: "random(-80, 80)",
-                    y: "random(-80, 80)",
-                    duration: 25 + Math.random() * 15,
-                    repeat: -1,
-                    yoyo: true,
-                    ease: "sine.inOut",
-                    delay: Math.random() * 3
-                });
-
-                // Single optimized scroll animation combining all movements
-                const verticalSpeed = 150 + depth * 300; // Reduced from 200-600 to 150-450
-                const horizontalSpeed = 80 + depth * 150; // Reduced from 100-300 to 80-230
-                const direction = i % 2 === 0 ? 1 : -1;
-                const horizontalDirection = i % 3 === 0 ? 1 : -1;
-
-                // Combine all scroll-based transforms in ONE ScrollTrigger
-                gsap.to(p, {
-                    y: direction * verticalSpeed,
-                    x: horizontalDirection * horizontalSpeed,
-                    rotation: direction * (120 + i * 20), // Reduced rotation
-                    ease: "none",
-                    scrollTrigger: {
-                        trigger: document.body,
-                        start: "top top",
-                        end: "bottom bottom",
-                        scrub: 1.2, // Single optimized scrub value
-                        invalidateOnRefresh: false // Performance boost
-                    }
-                });
-            });
-        }, containerRef);
-
-        return () => ctx.revert();
-    }, []);
-
-    // Reduced particle count for better performance
-    const particles = Array.from({ length: 5 }).map((_, i) => ({
-        id: i,
-        src: i % 2 === 0 ? "/Vector1.png" : "/Vector2.png",
-        size: 350 + Math.random() * 150 // Slightly larger but fewer particles
-    }));
+    if (!isReady) return null;
 
     return (
         <div
@@ -94,20 +22,26 @@ export default function FloatingVectorParticles() {
             {particles.map((p) => (
                 <div
                     key={p.id}
-                    className="vector-particle absolute will-change-transform"
+                    className="vector-particle absolute will-change-transform opacity-0 mix-blend-screen"
                     style={{
-                        width: `${p.size}px`,
-                        height: `${p.size}px`,
+                        width: p.size,
+                        height: p.size,
+                        left: p.left,
+                        top: p.top,
+                        transform: `rotate(${p.rotation}deg)`
                     }}
                 >
-                    <img
-                        src={p.src}
+                    <Image
+                        src={p.img}
                         alt=""
-                        className="w-full h-full object-contain mix-blend-screen"
-                        loading="lazy"
+                        fill
+                        className="object-contain drop-shadow-[0_0_50px_rgba(168,85,247,0.4)]"
+                        priority={false} // Low priority, background element
+                        sizes="(max-width: 768px) 50vw, 33vw"
                     />
                 </div>
             ))}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-black/20 pointer-events-none" />
         </div>
     );
 }

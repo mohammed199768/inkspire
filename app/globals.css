@@ -12,7 +12,8 @@ body {
   background: linear-gradient(135deg, #6b4092 0%, #404f96 100%);
   min-height: 100vh;
   overflow-x: hidden;
-  cursor: none; /* Hide default cursor for custom one */
+  cursor: none;
+  /* Hide default cursor for custom one */
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -22,8 +23,10 @@ body {
 
 /* Hide scrollbar for IE, Edge and Firefox */
 html {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
   scroll-behavior: smooth;
 }
 
@@ -31,4 +34,90 @@ html {
 ::selection {
   background: #f2e9ff;
   color: #6b4092;
+}
+
+/* IBRAND - Special brand font for "Inkspire" */
+.brand-font {
+  font-family: var(--font-ibrand), var(--font-outfit), sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+/* Hero Animations */
+@keyframes slideRight {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(20%);
+  }
+}
+
+@keyframes slideLeft {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-20%);
+  }
+}
+
+@keyframes slideDown {
+  0% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(15%);
+  }
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-slide-right {
+  animation: slideRight 20s ease-in-out infinite alternate;
+}
+
+.animate-slide-left {
+  animation: slideLeft 25s ease-in-out infinite alternate;
+}
+
+.animate-slide-down {
+  animation: slideDown 30s ease-in-out infinite alternate;
+}
+
+.animated-gradient-text {
+  background: linear-gradient(90deg,
+      #ffffff,
+      #f2e9ff,
+      #6b4092,
+      #404f96,
+      #f2e9ff,
+      #ffffff);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientShift 8s ease infinite;
+  transition: all 0.3s ease;
+}
+
+.group:hover .animated-gradient-text {
+  animation: gradientShift 2s ease infinite;
+  filter: brightness(1.2);
+  transform: scale(1.05);
 }
