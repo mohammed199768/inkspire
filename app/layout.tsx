@@ -101,7 +101,7 @@ export default function RootLayout({
     return (
         <html lang="en" className={`${inter.variable} ${outfit.variable} ${ibrand.variable}`}>
             <head>
-                <link rel="icon" href="/favicon.ico" sizes="any" />
+                <link rel="icon" href="/logos/Inkspire logos/Untitled-2-01.png" type="image/png" />
                 <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
             </head>
             <body className="antialiased overflow-x-hidden bg-black text-white selection:bg-inkspirePurple selection:text-white font-sans">

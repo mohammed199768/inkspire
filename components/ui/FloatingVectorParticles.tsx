@@ -28,7 +28,7 @@ export default function FloatingVectorParticles() {
                         height: p.size,
                         left: p.left,
                         top: p.top,
-                        transform: `rotate(${p.rotation}deg)`
+                        opacity: p.baseOpacity, // Initial opacity before animation takes over
                     }}
                 >
                     <Image
@@ -36,7 +36,7 @@ export default function FloatingVectorParticles() {
                         alt=""
                         fill
                         className="object-contain drop-shadow-[0_0_50px_rgba(168,85,247,0.4)]"
-                        priority={false} // Low priority, background element
+                        priority // High priority for LCP optimization
                         sizes="(max-width: 768px) 50vw, 33vw"
                     />
                 </div>

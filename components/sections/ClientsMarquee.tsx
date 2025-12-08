@@ -3,41 +3,49 @@
 import Image from "next/image";
 import { clients } from "@/data/staticData";
 
-export default function ClientsMarquee() {
+export default function ClientsSection() {
     return (
-        <div className="py-24 border-y border-white/5 bg-transparent relative overflow-hidden group">
-            {/* Gradient Masks (kept transparent as per design) */}
-            <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-transparent via-transparent to-transparent z-10 pointer-events-none" />
-            <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-transparent via-transparent to-transparent z-10 pointer-events-none" />
+        <section className="py-24 relative border-y border-white/5 bg-white/[0.02]">
+            <div className="container mx-auto px-4 md:px-8">
+                <div className="flex flex-wrap lg:flex-nowrap">
 
-            <div className="max-w-[100vw] overflow-hidden">
-                <div className="flex gap-20 animate-marquee whitespace-nowrap group-hover:[animation-play-state:paused] items-center">
-                    {/* Double the list for seamless loop */}
-                    {[...clients, ...clients].map((client, i) => (
-                        <div key={i} className="relative w-48 h-32 md:w-64 md:h-40 flex-shrink-0 flex items-center justify-center transition-all duration-500 hover:scale-125 cursor-pointer hover:drop-shadow-[0_0_25px_rgba(255,255,255,0.6)]">
-                            <div className="relative w-full h-full">
-                                <Image
-                                    src={client}
-                                    alt="Client Logo"
-                                    fill
-                                    className="object-contain brightness-0 invert hover:filter-none transition-all duration-500"
-                                    sizes="(max-width: 768px) 192px, 256px"
-                                />
-                            </div>
+                    {/* Left Column: Title */}
+                    <div className="w-full lg:w-1/3 mb-12 lg:mb-0 lg:pr-12 flex flex-col justify-center">
+                        <div className="relative">
+                            <h6 className="text-sm font-medium text-purple-400 uppercase tracking-[0.2em] mb-4">
+                                Partners
+                            </h6>
+                            <h3 className="text-4xl md:text-5xl font-bold leading-tight brand-font text-white">
+                                Our <br /> Clients
+                            </h3>
+                            <div className="mt-6 w-16 h-1 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full opacity-80" />
                         </div>
-                    ))}
+                    </div>
+
+                    {/* Right Column: Logos Grid */}
+                    <div className="w-full lg:w-2/3">
+                        <div className="grid grid-cols-2 md:grid-cols-4 border-t border-l border-white/5">
+                            {clients.slice(0, 16).map((client, i) => (
+                                <div
+                                    key={i}
+                                    className="group relative h-32 md:h-40 border-r border-b border-white/5 flex items-center justify-center p-6 transition-all duration-500 hover:bg-white/[0.03]"
+                                >
+                                    <div className="relative w-full h-full flex items-center justify-center grayscale group-hover:grayscale-0 transition-all duration-500">
+                                        <Image
+                                            src={client}
+                                            alt="Client Logo"
+                                            fill
+                                            className="object-contain opacity-50 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 brightness-0 invert group-hover:filter-none"
+                                            sizes="(max-width: 768px) 50vw, 25vw"
+                                        />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
                 </div>
             </div>
-            <style jsx>{`
-                @keyframes marquee {
-                    0% { transform: translateX(0); }
-                    100% { transform: translateX(-50%); }
-                }
-                .animate-marquee {
-                    animation: marquee 60s linear infinite;
-                    will-change: transform;
-                }
-            `}</style>
-        </div>
+        </section>
     );
 }

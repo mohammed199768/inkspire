@@ -11,12 +11,12 @@ export default function manifest(): MetadataRoute.Manifest {
         theme_color: '#6b4092',
         icons: [
             {
-                src: '/icon-192.png',
+                src: '/logos/Inkspire%20logos/Untitled-2-01.png',
                 sizes: '192x192',
                 type: 'image/png',
             },
             {
-                src: '/icon-512.png',
+                src: '/logos/Inkspire%20logos/Untitled-2-01.png',
                 sizes: '512x512',
                 type: 'image/png',
             },

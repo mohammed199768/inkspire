@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
 export default function Preloader() {
     const [loading, setLoading] = useState(true);
@@ -44,27 +45,32 @@ export default function Preloader() {
                 >
                     {/* Animated Logo */}
                     <motion.div
-                        className="mb-8"
-                        initial={{ scale: 0.5, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ duration: 0.5 }}
+                        className="mb-8 relative w-48 h-48 md:w-64 md:h-64"
+                        initial={{ scale: 0.5, opacity: 0, filter: "blur(10px)" }}
+                        animate={{
+                            scale: 1,
+                            opacity: 1,
+                            filter: "blur(0px)",
+                            rotate: [0, 5, -5, 0]
+                        }}
+                        transition={{
+                            duration: 0.8,
+                            rotate: {
+                                duration: 4,
+                                repeat: Infinity,
+                                ease: "easeInOut"
+                            }
+                        }}
                     >
-                        <motion.h1
-                            className="text-6xl md:text-8xl font-black tracking-tighter brand-font"
-                            animate={{
-                                backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-                            }}
-                            transition={{ duration: 3, repeat: Infinity }}
-                            style={{
-                                background: "linear-gradient(90deg, #ffffff, #f2e9ff, #6b4092, #404f96, #f2e9ff, #ffffff)",
-                                backgroundSize: "300% 300%",
-                                backgroundClip: "text",
-                                WebkitBackgroundClip: "text",
-                                WebkitTextFillColor: "transparent",
-                            }}
-                        >
-                            INKSPIRE
-                        </motion.h1>
+                        <div className="absolute inset-0 bg-purple-500/20 rounded-full blur-3xl animate-pulse" />
+                        <Image
+                            src="/logos/Inkspire%20logos/Untitled-2-01.webp"
+                            alt="Inkspire Logo"
+                            fill
+                            className="object-contain drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]"
+                            priority
+                            sizes="(max-width: 768px) 192px, 256px"
+                        />
                     </motion.div>
 
                     {/* Progress Bar */}

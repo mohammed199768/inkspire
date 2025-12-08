@@ -50,7 +50,7 @@ export const team = [
     {
         name: "Mahmoud",
         role: "Graphic Designer",
-        image: "https://images.unsplash.com/photo-1587614382346-4ec70a57e95a?auto=format&fit=crop&w=800&q=80"
+        image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=800&q=80"
     },
 ];
 
