@@ -4,16 +4,23 @@ import Image from "next/image";
 import { team } from "@/data/staticData";
 import SectionTitle from "@/components/ui/SectionTitle";
 import { useGSAPFade } from "@/hooks/useGSAPFade";
+import { usePopup } from "@/hooks/usePopup";
+import { buildPopupFromTeamMember } from "@/lib/popupMappers";
 
 export default function TeamSection() {
     const containerRef = useGSAPFade();
+    const { openPopup } = usePopup();
 
     return (
         <div ref={containerRef} className="min-h-screen flex flex-col justify-center py-20 px-6">
             <SectionTitle title="Meet The" highlight="Team" highlightColor="text-blue-400" />
             <div className="grid grid-cols-2 md:flex md:flex-wrap justify-center gap-3 md:gap-10 max-w-7xl mx-auto w-full">
                 {team.map((member, i) => (
-                    <div key={i} className="fade-up group relative w-full md:w-[350px] h-[280px] md:h-[500px] rounded-2xl md:rounded-3xl overflow-hidden transition-all duration-500 md:hover:scale-105 cursor-pointer">
+                    <div
+                        key={i}
+                        onClick={() => openPopup(buildPopupFromTeamMember(member))}
+                        className="fade-up group relative w-full md:w-[350px] h-[280px] md:h-[500px] rounded-2xl md:rounded-3xl overflow-hidden transition-all duration-500 md:hover:scale-105 cursor-pointer"
+                    >
                         <Image
                             src={member.image}
                             alt={member.name}

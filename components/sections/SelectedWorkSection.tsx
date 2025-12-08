@@ -1,5 +1,8 @@
 "use client";
 
+import { usePopup } from "@/hooks/usePopup";
+import { buildPopupFromWork } from "@/lib/popupMappers";
+
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectCoverflow, Pagination } from "swiper/modules";
@@ -12,6 +15,7 @@ import { useGSAPFade } from "@/hooks/useGSAPFade";
 
 export default function SelectedWorkSection() {
     const containerRef = useGSAPFade();
+    const { openPopup } = usePopup();
 
     return (
         <div ref={containerRef} className="min-h-screen flex flex-col justify-center py-20 overflow-hidden">
@@ -37,7 +41,15 @@ export default function SelectedWorkSection() {
                     speed={800}
                 >
                     {[1, 2, 3, 4, 5].map((num) => (
-                        <SwiperSlide key={num} className="!w-[300px] md:!w-[500px] !h-[400px] md:!h-[600px] rounded-2xl overflow-hidden transition-all duration-500 relative">
+                        <SwiperSlide
+                            key={num}
+                            onClick={() => openPopup(buildPopupFromWork({
+                                src: `https://picsum.photos/seed/${num + 10}/800/1000`,
+                                alt: `Project ${num}`,
+                                category: "Design & Development"
+                            }))}
+                            className="!w-[300px] md:!w-[500px] !h-[400px] md:!h-[600px] rounded-2xl overflow-hidden transition-all duration-500 relative cursor-pointer"
+                        >
                             <Image
                                 src={`https://picsum.photos/seed/${num + 10}/800/1000`}
                                 alt={`Work ${num}`}

@@ -2,8 +2,11 @@
 
 import Image from "next/image";
 import { clients } from "@/data/staticData";
+import { usePopup } from "@/hooks/usePopup";
+import { buildPopupFromClient } from "@/lib/popupMappers";
 
 export default function ClientsSection() {
+    const { openPopup } = usePopup();
     return (
         <section className="py-24 relative border-y border-white/5 bg-white/[0.02]">
             <div className="container mx-auto px-4 md:px-8">
@@ -28,7 +31,8 @@ export default function ClientsSection() {
                             {clients.slice(0, 16).map((client, i) => (
                                 <div
                                     key={i}
-                                    className="group relative h-32 md:h-40 border-r border-b border-white/5 flex items-center justify-center p-6 transition-all duration-500 hover:bg-white/[0.03]"
+                                    onClick={() => openPopup(buildPopupFromClient(client, i))}
+                                    className="group relative h-32 md:h-40 border-r border-b border-white/5 flex items-center justify-center p-6 transition-all duration-500 hover:bg-white/[0.03] cursor-pointer"
                                 >
                                     <div className="relative w-full h-full flex items-center justify-center grayscale group-hover:grayscale-0 transition-all duration-500">
                                         <Image

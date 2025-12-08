@@ -7,6 +7,8 @@ import NavbarFullMenu from "@/components/layout/NavbarFullMenu";
 import MotionLayout from "@/components/layout/MotionLayout";
 import SmoothScroll from "@/components/layout/SmoothScroll";
 import Preloader from "@/components/ui/Preloader";
+import { PopupProvider } from "@/hooks/usePopup";
+import InsightPopup from "@/components/popup/InsightPopup";
 
 // Optimized Font Loading with next/font/local
 const inter = localFont({
@@ -107,14 +109,17 @@ export default function RootLayout({
             <body className="antialiased overflow-x-hidden bg-black text-white selection:bg-inkspirePurple selection:text-white font-sans">
                 <Preloader />
                 <SmoothScroll>
-                    <BackgroundParticles />
-                    <BlobBackground />
-                    <FloatingVectorParticles />
-                    <Cursor />
-                    <NavbarFullMenu />
-                    <MotionLayout>
-                        {children}
-                    </MotionLayout>
+                    <PopupProvider>
+                        <BackgroundParticles />
+                        <BlobBackground />
+                        <FloatingVectorParticles />
+                        <Cursor />
+                        <NavbarFullMenu />
+                        <MotionLayout>
+                            {children}
+                        </MotionLayout>
+                        <InsightPopup />
+                    </PopupProvider>
                 </SmoothScroll>
             </body>
         </html>

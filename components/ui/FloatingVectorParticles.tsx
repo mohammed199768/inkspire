@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Image from "next/image";
 import { useFloatingParticles } from "@/hooks/useFloatingParticles";
 
@@ -23,13 +24,14 @@ export default function FloatingVectorParticles() {
                 <div
                     key={p.id}
                     className="vector-particle absolute will-change-transform opacity-0 mix-blend-screen"
-                    style={{
-                        width: p.size,
-                        height: p.size,
-                        left: p.left,
-                        top: p.top,
-                        opacity: p.baseOpacity, // Initial opacity before animation takes over
-                    }}
+                    style={
+                        {
+                            "--particle-size": p.size,
+                            "--particle-left": p.left,
+                            "--particle-top": p.top,
+                            "--particle-opacity": p.baseOpacity,
+                        } as React.CSSProperties
+                    }
                 >
                     <Image
                         src={p.img}

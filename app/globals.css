@@ -121,3 +121,12 @@ html {
   filter: brightness(1.2);
   transform: scale(1.05);
 }
+
+/* Vector Particles */
+.vector-particle {
+  width: calc(var(--particle-size) * 1px);
+  height: calc(var(--particle-size) * 1px);
+  left: var(--particle-left);
+  top: var(--particle-top);
+  opacity: var(--particle-opacity);
+}

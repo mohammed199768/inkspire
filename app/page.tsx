@@ -2,11 +2,12 @@ import HeroScene from "@/components/hero/HeroScene";
 import CinematicWrapper from "@/components/layout/CinematicWrapper";
 import dynamic from "next/dynamic";
 
+// Static imports for improved LCP and reduced layout shift for top sections
+import StatsSection from "@/components/sections/StatsSection";
+import AboutSection from "@/components/sections/AboutSection";
+import ServicesSection from "@/components/sections/ServicesSection";
+
 // Dynamically import below-the-fold sections to drastically reduce initial JS bundle size.
-// This improves TTI (Time to Interactive) and TBT.
-const StatsSection = dynamic(() => import("@/components/sections/StatsSection"));
-const AboutSection = dynamic(() => import("@/components/sections/AboutSection"));
-const ServicesSection = dynamic(() => import("@/components/sections/ServicesSection"));
 const SelectedWorkSection = dynamic(() => import("@/components/sections/SelectedWorkSection"));
 const TeamSection = dynamic(() => import("@/components/sections/TeamSection"));
 const ClientsMarquee = dynamic(() => import("@/components/sections/ClientsMarquee"));

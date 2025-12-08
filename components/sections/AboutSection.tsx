@@ -7,14 +7,14 @@ export default function AboutSection() {
     const containerRef = useGSAPFade();
 
     return (
-        <div ref={containerRef} className="min-h-screen flex items-center py-20 px-6">
-            <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-                <div className="fade-up">
+        <div ref={containerRef} className="lg:min-h-screen flex items-center py-20 px-6">
+            <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+                <div className="fade-up will-change-transform">
                     <h2 className="text-5xl md:text-7xl font-bold mb-8 leading-tight">
                         Inspired by <span className="text-purple-500">Ink</span>
                     </h2>
                     <p className="text-xl text-white mb-8 leading-relaxed font-bold">
-                        we craft brands with intentionevery line, every word, every visual.
+                        we craft brands with intention every line, every word, every visual.
                     </p>
                     <p className="text-xl text-white mb-8 leading-relaxed font-bold">
                         Inkspire is a creative studio built on intuition, emotion, and strategy.
@@ -25,14 +25,15 @@ export default function AboutSection() {
                         Learn More <ArrowRight size={20} />
                     </button>
                 </div>
-                <div className="fade-up relative rounded-3xl overflow-hidden shadow-2xl shadow-purple-900/20 aspect-video">
-                    <iframe
+                <div className="fade-up will-change-transform relative rounded-3xl overflow-hidden shadow-2xl shadow-purple-900/20 aspect-video">
+                    <video
                         className="w-full h-full object-cover"
-                        src=""
-                        title="Inkspire Studio Showreel"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                        loading="lazy"
+                        src="/1_2.mp4"
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        preload="auto"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
                 </div>

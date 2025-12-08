@@ -13,6 +13,8 @@ import {
     CheckCircle
 } from "lucide-react";
 import { useGSAPFade } from "@/hooks/useGSAPFade";
+import { usePopup } from "@/hooks/usePopup";
+import { buildPopupFromService } from "@/lib/popupMappers";
 
 const iconMap: Record<string, any> = {
     Fingerprint,
@@ -26,6 +28,7 @@ const iconMap: Record<string, any> = {
 
 export default function ServicesSection() {
     const containerRef = useGSAPFade();
+    const { openPopup } = usePopup();
 
     return (
         <div ref={containerRef} className="min-h-screen flex flex-col justify-center py-20 px-6">
@@ -36,7 +39,12 @@ export default function ServicesSection() {
                         const IconComponent = iconMap[service.icon] || CheckCircle;
 
                         return (
-                            <div key={i} className="fade-up group p-8 rounded-3xl bg-white/5 backdrop-blur-md border border-white/10 shadow-lg hover:bg-white/10 transition-all duration-500 hover:-translate-y-2 cursor-pointer relative overflow-hidden">
+
+                            <div
+                                key={i}
+                                onClick={() => openPopup(buildPopupFromService(service))}
+                                className="fade-up group p-8 rounded-3xl bg-white/5 backdrop-blur-md border border-white/10 shadow-lg hover:bg-white/10 transition-all duration-500 hover:-translate-y-2 cursor-pointer relative overflow-hidden"
+                            >
                                 <div className="absolute inset-0 bg-gradient-to-br from-purple-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                                 <div className="relative z-10">
                                     <div className="w-14 h-14 bg-white/5 rounded-2xl border border-white/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-inner">
