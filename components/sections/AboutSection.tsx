@@ -21,7 +21,7 @@ export default function AboutSection() {
                         We turn blank pages into brands with identity, businesses into stories with meaning, and social feeds into experiences people actually engage with.<br />
                         Whether you’re launching something new, leveling up your brand, or searching for content that finally feels right, you’re in the perfect place.
                     </p>
-                    <button className="px-8 py-4 bg-white/10 text-black font-bold rounded-full hover:bg-white hover:text-black transition-all duration-300 flex items-center gap-2">
+                    <button className="px-8 py-4 bg-white/10 text-white font-bold rounded-full hover:bg-white hover:text-black transition-all duration-300 flex items-center gap-2">
                         Learn More <ArrowRight size={20} />
                     </button>
                 </div>
