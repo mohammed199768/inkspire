@@ -13,6 +13,8 @@ import "swiper/css/pagination";
 import SectionTitle from "@/components/ui/SectionTitle";
 import { useGSAPFade } from "@/hooks/useGSAPFade";
 
+import { works } from "@/data/staticData";
+
 export default function SelectedWorkSection() {
     const containerRef = useGSAPFade();
     const { openPopup } = usePopup();
@@ -40,26 +42,22 @@ export default function SelectedWorkSection() {
                     loop={true}
                     speed={800}
                 >
-                    {[1, 2, 3, 4, 5].map((num) => (
+                    {works.map((work, index) => (
                         <SwiperSlide
-                            key={num}
-                            onClick={() => openPopup(buildPopupFromWork({
-                                src: `https://picsum.photos/seed/${num + 10}/800/1000`,
-                                alt: `Project ${num}`,
-                                category: "Design & Development"
-                            }))}
+                            key={index}
+                            onClick={() => openPopup(buildPopupFromWork(work))}
                             className="!w-[300px] md:!w-[500px] !h-[400px] md:!h-[600px] rounded-2xl overflow-hidden transition-all duration-500 relative cursor-pointer"
                         >
                             <Image
-                                src={`https://picsum.photos/seed/${num + 10}/800/1000`}
-                                alt={`Work ${num}`}
+                                src={work.imageUrl}
+                                alt={work.title}
                                 fill
                                 className="object-cover"
                                 sizes="(max-width: 768px) 300px, 500px"
                             />
                             <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black to-transparent z-10">
-                                <h3 className="text-2xl font-bold">Project {num}</h3>
-                                <p className="text-gray-300">Design & Development</p>
+                                <h3 className="text-2xl font-bold">{work.title}</h3>
+                                <p className="text-gray-300">{work.subtitle}</p>
                             </div>
                         </SwiperSlide>
                     ))}

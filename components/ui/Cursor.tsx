@@ -89,11 +89,11 @@ export default function Cursor() {
         <>
             <div
                 ref={cursorInnerRef}
-                className="fixed top-0 left-0 w-3 h-3 bg-inkspirePurple rounded-full pointer-events-none z-[9999] mix-blend-difference"
+                className="fixed top-0 left-0 w-3 h-3 bg-inkspirePurple rounded-full pointer-events-none z-[10001] mix-blend-difference"
             />
             <div
                 ref={cursorOuterRef}
-                className="fixed top-0 left-0 w-8 h-8 border border-inkspirePurple rounded-full pointer-events-none z-[9999] transition-opacity duration-300"
+                className="fixed top-0 left-0 w-8 h-8 border border-inkspirePurple rounded-full pointer-events-none z-[10001] transition-opacity duration-300"
             />
             <style jsx global>{`
                 * {

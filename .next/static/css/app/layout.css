@@ -636,6 +636,9 @@ video {
 .z-\[9999\] {
   z-index: 9999;
 }
+.z-\[10001\] {
+  z-index: 10001;
+}
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
@@ -784,9 +787,6 @@ video {
 .h-px {
   height: 1px;
 }
-.h-\[80vh\] {
-  height: 80vh;
-}
 .max-h-\[85vh\] {
   max-height: 85vh;
 }
@@ -856,12 +856,6 @@ video {
 .w-full {
   width: 100%;
 }
-.w-\[60vh\] {
-  width: 60vh;
-}
-.w-\[80vh\] {
-  width: 80vh;
-}
 .max-w-2xl {
   max-width: 42rem;
 }
@@ -917,11 +911,6 @@ video {
 }
 .translate-y-4 {
   --tw-translate-y: 1rem;
-  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-}
-.scale-125 {
-  --tw-scale-x: 1.25;
-  --tw-scale-y: 1.25;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 .transform {
@@ -1589,14 +1578,8 @@ video {
 .opacity-50 {
   opacity: 0.5;
 }
-.opacity-70 {
-  opacity: 0.7;
-}
 .opacity-80 {
   opacity: 0.8;
-}
-.opacity-90 {
-  opacity: 0.9;
 }
 .mix-blend-screen {
   mix-blend-mode: screen;
@@ -1677,10 +1660,6 @@ video {
 }
 .blur-\[80px\] {
   --tw-blur: blur(80px);
-  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
-}
-.blur-\[120px\] {
-  --tw-blur: blur(120px);
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
 .brightness-0 {
@@ -1785,10 +1764,13 @@ video {
 
 body {
   color: var(--foreground);
-  background: linear-gradient(135deg, #6b4092 0%, #404f96 100%);
+  background: linear-gradient(-45deg, #0d0e22, #201037, #09060f, #201037);
+  background-size: 400% 400%;
+  animation: gradientShift 25s ease infinite;
   min-height: 100vh;
   overflow-x: hidden;
   cursor: none;
+  font-family: var(--font-ibrand), var(--font-outfit), sans-serif;
   /* Hide default cursor for custom one */
 }
 

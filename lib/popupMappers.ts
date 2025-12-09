@@ -76,13 +76,14 @@ export function buildPopupFromReview(review: Review): PopupPayload {
     };
 }
 
-export function buildPopupFromWork(item: { src: string; alt?: string, category?: string }): PopupPayload {
+export function buildPopupFromWork(item: any): PopupPayload {
     return {
-        id: `work-${item.src}`,
+        id: item.id || `work-${item.imageUrl}`,
         source: "work",
-        title: item.alt || "Featured Project",
-        subtitle: item.category || "Portfolio",
-        imageUrl: item.src,
-        description: "A closer look at this featured project. We focused on delivering a high-impact visual experience.",
+        title: item.title || "Featured Project",
+        subtitle: item.subtitle || "Portfolio",
+        imageUrl: item.imageUrl || item.src,
+        description: item.description || "A closer look at this featured project.",
+        social: item.social,
     };
 }
