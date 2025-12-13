@@ -28,7 +28,7 @@ export default function AboutSection() {
                 <div className="fade-up will-change-transform relative rounded-3xl overflow-hidden shadow-2xl shadow-purple-900/20 aspect-video">
                     <video
                         className="w-full h-full object-cover"
-                        src="/1_2.mp4"
+                        src="/1_2.webm"
                         autoPlay
                         muted
                         loop

@@ -630,14 +630,14 @@ video {
 .z-50 {
   z-index: 50;
 }
+.z-\[10001\] {
+  z-index: 10001;
+}
 .z-\[100\] {
   z-index: 100;
 }
 .z-\[9999\] {
   z-index: 9999;
-}
-.z-\[10001\] {
-  z-index: 10001;
 }
 .mx-auto {
   margin-left: auto;
@@ -913,6 +913,11 @@ video {
   --tw-translate-y: 1rem;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
+.scale-110 {
+  --tw-scale-x: 1.1;
+  --tw-scale-y: 1.1;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
 .transform {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
@@ -1023,6 +1028,9 @@ video {
 .rounded-full {
   border-radius: 9999px;
 }
+.rounded-lg {
+  border-radius: 0.5rem;
+}
 .border {
   border-width: 1px;
 }
@@ -1131,6 +1139,9 @@ video {
 }
 .bg-white\/\[0\.02\] {
   background-color: rgb(255 255 255 / 0.02);
+}
+.bg-black\/20 {
+  background-color: rgb(0 0 0 / 0.2);
 }
 .bg-\[radial-gradient\(ellipse_at_center\2c _var\(--tw-gradient-stops\)\)\] {
   background-image: radial-gradient(ellipse at center, var(--tw-gradient-stops));
@@ -1276,6 +1287,10 @@ video {
   --tw-gradient-to: rgb(255 255 255 / 0)  var(--tw-gradient-to-position);
   --tw-gradient-stops: var(--tw-gradient-from), rgb(255 255 255 / 0.1) var(--tw-gradient-via-position), var(--tw-gradient-to);
 }
+.via-black\/80 {
+  --tw-gradient-to: rgb(0 0 0 / 0)  var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), rgb(0 0 0 / 0.8) var(--tw-gradient-via-position), var(--tw-gradient-to);
+}
 .to-black {
   --tw-gradient-to: #000 var(--tw-gradient-to-position);
 }
@@ -1328,6 +1343,9 @@ video {
 }
 .p-8 {
   padding: 2rem;
+}
+.p-2 {
+  padding: 0.5rem;
 }
 .px-10 {
   padding-left: 2.5rem;
@@ -1562,6 +1580,10 @@ video {
   --tw-text-opacity: 1;
   color: rgb(250 204 21 / var(--tw-text-opacity, 1));
 }
+.text-gray-200 {
+  --tw-text-opacity: 1;
+  color: rgb(229 231 235 / var(--tw-text-opacity, 1));
+}
 .antialiased {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -1662,6 +1684,10 @@ video {
   --tw-blur: blur(80px);
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
+.blur-xl {
+  --tw-blur: blur(24px);
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
 .brightness-0 {
   --tw-brightness: brightness(0);
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
@@ -1680,6 +1706,14 @@ video {
 }
 .drop-shadow-xl {
   --tw-drop-shadow: drop-shadow(0 20px 13px rgb(0 0 0 / 0.03)) drop-shadow(0 8px 5px rgb(0 0 0 / 0.08));
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
+.drop-shadow-md {
+  --tw-drop-shadow: drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06));
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
+.drop-shadow-sm {
+  --tw-drop-shadow: drop-shadow(0 1px 1px rgb(0 0 0 / 0.05));
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
 .grayscale {
@@ -1799,10 +1833,36 @@ html {
 }
 
 /* IBRAND - Special brand font for "Inkspire" */
+/* GLOBAL TYPOGRAPHY SYSTEM
+   Unifying all headings and bold text to match "Our Clients" style */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+strong,
+b,
+.font-bold,
+.font-semibold,
+.font-extrabold,
+.font-black,
 .brand-font {
   font-family: var(--font-ibrand), var(--font-outfit), sans-serif;
   font-weight: 400;
+  /* iBrand appears bold naturally; maintain Our Clients look */
   letter-spacing: 0.02em;
+}
+
+/* Ensure line-height is consistent on block-level headings */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  line-height: 1.25;
+  /* leading-tight */
 }
 
 /* Hero Animations */
@@ -2254,12 +2314,21 @@ html {
     --tw-gradient-to: transparent var(--tw-gradient-to-position);
   }
 
+  .md\:object-contain {
+    -o-object-fit: contain;
+       object-fit: contain;
+  }
+
   .md\:p-12 {
     padding: 3rem;
   }
 
   .md\:p-8 {
     padding: 2rem;
+  }
+
+  .md\:p-4 {
+    padding: 1rem;
   }
 
   .md\:px-12 {

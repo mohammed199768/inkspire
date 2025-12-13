@@ -36,7 +36,7 @@ export default function ProcessTimeline() {
         <section id="process" className="py-24 px-6 md:px-12 relative z-10">
             <div className="max-w-5xl mx-auto" ref={containerRef}>
                 <h2 className="text-4xl md:text-6xl font-bold text-white mb-20 text-center">
-                    Our Process
+                    Our Signature Approach
                 </h2>
 
                 <div className="relative border-l border-white/10 ml-4 md:ml-0 md:pl-0 space-y-16">

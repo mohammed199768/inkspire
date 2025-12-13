@@ -82,7 +82,7 @@ export default function HeroScene() {
                     priority // Logo is critical
                 />
                 <h1 className="sr-only">Inkspire Studio - {siteContent.hero.primaryCtaLabel}</h1>
-                <p className="hero-tagline mt-6 text-2xl md:text-4xl text-white/90 font-bold leading-relaxed drop-shadow-xl font-outfit">
+                <p className="hero-tagline mt-6 text-2xl md:text-4xl text-white/90 font-bold leading-relaxed drop-shadow-xl">
                     Where ideas turn into stories <br /> that move people and build brands.
                 </p>
             </div>
