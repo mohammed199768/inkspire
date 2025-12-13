@@ -159,3 +159,22 @@ h6 {
   top: var(--particle-top);
   opacity: var(--particle-opacity);
 }
+
+/* Floating 3D Image Plane Animation */
+@keyframes floaty {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+.selectedwork-plane {
+  will-change: transform;
+  animation: floaty 6s ease-in-out infinite;
+  transform-style: preserve-3d;
+}

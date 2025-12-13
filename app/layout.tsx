@@ -42,14 +42,14 @@ const Cursor = dynamic(() => import("@/components/ui/Cursor"), { ssr: false });
 export const metadata: Metadata = {
     metadataBase: new URL('https://inkspire.studio'),
     title: {
-        default: "Inkspire Studio | Cinematic Digital Experiences",
-        template: "%s | Inkspire Studio"
+        default: "Inkspire Agency | Cinematic Digital Experiences",
+        template: "%s | Inkspire Agency"
     },
     description: "We turn raw ideas into cinematic digital experiences. Expert web design, development, branding, and motion graphics in Amman, Jordan.",
     keywords: ["web design", "web development", "branding", "motion graphics", "digital agency", "creative studio", "Amman", "Jordan", "UI/UX design"],
     authors: [{ name: "Mohammad Aldomi" }],
-    creator: "Inkspire Studio",
-    publisher: "Inkspire Studio",
+    creator: "Inkspire Agency",
+    publisher: "Inkspire Agency",
     formatDetection: {
         email: false,
         address: false,
@@ -59,19 +59,19 @@ export const metadata: Metadata = {
         type: "website",
         locale: "en_US",
         url: "https://inkspire.studio",
-        title: "Inkspire Studio | Cinematic Digital Experiences",
+        title: "Inkspire Agency | Cinematic Digital Experiences",
         description: "We turn raw ideas into cinematic digital experiences. Expert web design, development, and branding.",
-        siteName: "Inkspire Studio",
+        siteName: "Inkspire Agency",
         images: [{
             url: "/og-image.jpg",
             width: 1200,
             height: 630,
-            alt: "Inkspire Studio"
+            alt: "Inkspire Agency"
         }],
     },
     twitter: {
         card: "summary_large_image",
-        title: "Inkspire Studio | Cinematic Digital Experiences",
+        title: "Inkspire Agency | Cinematic Digital Experiences",
         description: "We turn raw ideas into cinematic digital experiences.",
         images: ["/og-image.jpg"],
     },
