@@ -66,9 +66,10 @@ export default function Preloader() {
                             src="/logos/Inkspire logos/Untitled-2-01.webp"
                             alt="Inkspire Logo"
                             fill
-                            className="object-contain drop-shadow-[0_0_30px_rgba(168,85,247,0.6)]"
+                            className="object-contain drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]"
                             priority
-                            sizes="(max-width: 768px) 256px, 384px"
+                            quality={100}
+                            sizes="(max-width: 768px) 512px, 800px" // Request higher resolution for sharpness
                         />
                     </motion.div>
 

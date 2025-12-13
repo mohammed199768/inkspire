@@ -12,7 +12,7 @@ const SelectedWorkSection = dynamic(() => import("@/components/sections/Selected
 const TeamSection = dynamic(() => import("@/components/sections/TeamSection"));
 const ClientsMarquee = dynamic(() => import("@/components/sections/ClientsMarquee"));
 const TestimonialsSection = dynamic(() => import("@/components/sections/TestimonialsSection"));
-const CreativeSlider = dynamic(() => import("@/components/sections/CreativeSlider"));
+
 const ProcessTimeline = dynamic(() => import("@/components/sections/ProcessTimeline"));
 const FinalCTA = dynamic(() => import("@/components/sections/FinalCTA"));
 
@@ -52,9 +52,7 @@ export default function Home() {
                     <TestimonialsSection />
                 </div>
 
-                <div className="cinematic-section">
-                    <CreativeSlider />
-                </div>
+
                 <div className="cinematic-section">
                     <ProcessTimeline />
                 </div>

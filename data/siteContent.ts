@@ -2,7 +2,7 @@ export const siteContent = {
     global: {
         siteName: "Inkspire Studio",
         logoText: "INKSPIRE",
-        footerText: "© 2024 Inkspire Studio. All rights reserved.",
+        footerText: "© 2025 Inkspire Agency. All rights reserved.",
     },
     navigation: {
         menuItems: [
@@ -17,32 +17,7 @@ export const siteContent = {
         scrollLabelTop: " ",
         scrollLabelBottom: " ",
     },
-    storySections: [
-        {
-            id: "spark",
-            label: "01",
-            title: "The Spark",
-            description: "Every story begins with a spark. We help you find it.",
-        },
-        {
-            id: "vision",
-            label: "02",
-            title: "The Vision",
-            description: "We shape the raw idea into a visual identity.",
-        },
-        {
-            id: "motion",
-            label: "03",
-            title: "The Motion",
-            description: "We bring your brand to life with movement and timing.",
-        },
-        {
-            id: "impact",
-            label: "04",
-            title: "The Impact",
-            description: "Your story becomes an experience your audience feels.",
-        },
-    ],
+
     gallery: {
         items: [
             {
