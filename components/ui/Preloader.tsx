@@ -63,7 +63,7 @@ export default function Preloader() {
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-indigo-500/20 rounded-full blur-[60px] animate-pulse delay-75" />
 
                         <Image
-                            src="/logos/Inkspire logos/Untitled-2-01.webp"
+                            src="/logos/Inkspire logos/logo.svg"
                             alt="Inkspire Logo"
                             fill
                             className="object-contain drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]"
