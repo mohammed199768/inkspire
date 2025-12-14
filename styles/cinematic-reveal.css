@@ -1,0 +1,147 @@
+/* Cinematic Reveal Styles - v4 Clean & Bottom Aligned */
+
+/* Container */
+.re-reveal-container {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    /* Align grid to bottom */
+    padding-bottom: 0;
+}
+
+/* 
+   GRID LAYOUT 
+   - "Images down" -> align-items: flex-end in container
+   - "Cutout characters" -> No gaps imperative but using flex gap
+*/
+.re-stacks-grid {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    /* Make them stand on the bottom line */
+    gap: 20px;
+    width: 100%;
+    max-width: 1600px;
+    /* Wide enough for 4 chars */
+    height: 100%;
+    position: relative;
+    z-index: 2;
+    padding-bottom: 60px;
+    /* Lift images slightly less */
+}
+
+/* Responsive adjustment */
+@media (max-width: 768px) {
+    .re-stacks-grid {
+        flex-wrap: wrap;
+        align-content: flex-end;
+        justify-content: center;
+        gap: 10px;
+    }
+}
+
+
+/* 
+   STACK 
+   - Treated as "Cutout Characters" (صور شخصيات مفرغة)
+   - Removing "Card" styling 
+*/
+.re-stack {
+    position: relative;
+    width: 280px;
+    flex: 0 1 25%;
+    /* Flexible width */
+    aspect-ratio: 2/3;
+    /* Taller */
+    max-height: 85vh;
+    /* Don't overflow top */
+
+    overflow: visible;
+    /* Allow drop-shadows */
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+
+    /* Base Filters - Darker for unrevealed state */
+    filter: brightness(0.6) contrast(1.1) grayscale(0.2);
+
+    will-change: transform, filter, z-index;
+    transition: filter 0.2s ease-out, transform 0.2s ease-out;
+}
+
+/* Images */
+.re-stack-image {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    /* Don't crop the characters! */
+    object-position: bottom center;
+    /* Stand on floor */
+    pointer-events: none;
+    image-rendering: high-quality;
+
+    /* Ensure drop shadow works on transparent png */
+    filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.5));
+}
+
+.re-stack-base {
+    z-index: 1;
+}
+
+.re-stack-overlay {
+    z-index: 2;
+    opacity: 0;
+    will-change: opacity, mask-image;
+    filter: saturate(1.2) brightness(1.1);
+}
+
+/* 
+   GLOBAL LAYERS 
+*/
+
+/* Grain Removed */
+.re-grain {
+    display: none;
+}
+
+.re-dim-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    /* Bottom gradient to blend feet */
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0) 50%);
+    pointer-events: none;
+}
+
+.re-spotlight {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1400px;
+    height: 1400px;
+    transform: translate(calc(var(--sx, -1000px) - 50%), calc(var(--sy, -1000px) - 50%));
+    z-index: 20;
+    pointer-events: none;
+
+    background: radial-gradient(circle,
+            rgba(255, 255, 255, 0.15) 0%,
+            rgba(255, 255, 255, 0.05) 30%,
+            margin-box,
+            rgba(255, 255, 255, 0) 70%);
+
+    mix-blend-mode: overlay;
+    opacity: var(--spot-op, 0);
+    transition: opacity 0.3s ease;
+    will-change: transform, opacity;
+}

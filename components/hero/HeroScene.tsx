@@ -4,6 +4,7 @@ import { useRef } from "react";
 import Image from "next/image";
 import { siteContent } from "@/data/siteContent";
 import { useHeroAnimation } from "@/hooks/useHeroAnimation";
+import CinematicRevealGrid from "./CinematicRevealGrid";
 
 export default function HeroScene() {
     const containerRef = useRef<HTMLElement>(null);
@@ -17,45 +18,62 @@ export default function HeroScene() {
     return (
         <section
             ref={containerRef}
-            className="relative min-h-screen flex flex-col justify-center items-start px-6 md:px-24 overflow-hidden"
+            className="relative min-h-screen flex flex-col justify-end items-center px-6 md:px-24 overflow-hidden pb-0 md:pb-4"
         >
+            <CinematicRevealGrid />
 
+            {/* Wave Transition - Magic Site Gradient Match */}
+            <div className="absolute bottom-0 left-0 w-full z-20 pointer-events-none translate-y-1 h-[120px] md:h-[220px]">
+                <div
+                    className="w-full h-full"
+                    style={{
+                        background: 'linear-gradient(-45deg, #0d0e22, #201037, #09060f, #201037)',
+                        backgroundSize: '400% 400%',
+                        animation: 'gradientShift 25s ease infinite',
+                        maskImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath d='M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,261.3C960,256,1056,224,1152,197.3C1248,171,1344,149,1392,138.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z' /%3E%3C/svg%3E\")",
+                        WebkitMaskImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath d='M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,261.3C960,256,1056,224,1152,197.3C1248,171,1344,149,1392,138.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z' /%3E%3C/svg%3E\")",
+                        maskSize: '100% 100%',
+                        WebkitMaskSize: '100% 100%',
+                        maskRepeat: 'no-repeat',
+                        WebkitMaskRepeat: 'no-repeat'
+                    }}
+                />
+            </div>
 
-
-
-            {/* Main Title */}
-            <div ref={titleRef} className="relative z-10 flex flex-col items-start md:items-start max-w-3xl -mt-32">
+            {/* Main Title - Centered Bottom */}
+            <div ref={titleRef} className="relative z-30 flex flex-col items-center text-center max-w-4xl mx-auto mb-16 md:mb-20">
                 <Image
                     src="/logos/Inkspire logos/Untitled-2-03.webp"
                     alt="Inkspire Studio"
-                    width={260}
-                    height={80}
-                    className="hero-logo drop-shadow-2xl h-auto w-auto"
-                    priority // Logo is critical
+                    width={320}
+                    height={100}
+                    className="hero-logo drop-shadow-2xl h-auto w-auto mb-6"
+                    priority
                 />
                 <h1 className="sr-only">Inkspire Studio - {siteContent.hero.primaryCtaLabel}</h1>
-                <p className="hero-tagline mt-6 text-2xl md:text-4xl text-white/90 font-bold leading-relaxed drop-shadow-xl">
-                    Where ideas turn into stories <br /> that move people and build brands.
-                </p>
-            </div>
 
-            {/* CTA Button */}
-            <a
-                ref={ctaRef}
-                href={siteContent.hero.primaryCtaHref}
-                className="absolute bottom-24 right-6 md:right-12 w-24 h-24 md:w-32 md:h-32 rounded-full border-2 border-white/40 flex items-center justify-center text-white text-sm font-medium uppercase tracking-widest hover:bg-white hover:text-inkspirePurple transition-colors duration-300 interactive backdrop-blur-sm z-10"
-            >
-                <span className="text-center">{siteContent.hero.primaryCtaLabel}</span>
-            </a>
+                {/* Elevated Tagline styling */}
+                <p className="hero-tagline text-xl md:text-2xl font-semibold leading-tight drop-shadow-lg text-balance animated-gradient-text tracking-wide">
+                    Where ideas turn into stories <br className="hidden md:block" /> that move people and build brands.
+                </p>
+
+                {/* CTA Button */}
+                <a
+                    ref={ctaRef}
+                    href={siteContent.hero.primaryCtaHref}
+                    className="mt-6 w-12 h-12 md:w-16 md:h-16 rounded-full border border-white/30 flex items-center justify-center text-white text-[10px] md:text-xs font-medium uppercase tracking-widest hover:bg-white hover:text-inkspirePurple transition-colors duration-300 interactive backdrop-blur-sm"
+                >
+                    <span className="text-center">{siteContent.hero.primaryCtaLabel}</span>
+                </a>
+            </div>
 
             {/* Scroll Indicator */}
             <div
                 ref={scrollLabelRef}
-                className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/60 text-xs uppercase tracking-widest z-10"
+                className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/40 text-[10px] uppercase tracking-widest z-30"
             >
                 <span>{siteContent.hero.scrollLabelTop}</span>
-                <div className="w-[1px] h-8 bg-white/30" />
-                <span>{siteContent.hero.scrollLabelBottom}</span>
+                <div className="w-[1px] h-4 bg-white/20" />
             </div>
         </section>
     );
