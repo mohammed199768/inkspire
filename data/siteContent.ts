@@ -18,46 +18,7 @@ export const siteContent = {
         scrollLabelBottom: " ",
     },
 
-    gallery: {
-        items: [
-            {
-                id: "1",
-                title: "Reborn",
-                type: "Brand Identity",
-                imageUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop",
-            },
-            {
-                id: "2",
-                title: "Starlight",
-                type: "Web Design",
-                imageUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=2864&auto=format&fit=crop",
-            },
-            {
-                id: "3",
-                title: "Pulse",
-                type: "Motion Graphics",
-                imageUrl: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=2670&auto=format&fit=crop",
-            },
-            {
-                id: "4",
-                title: "Deep Blue",
-                type: "Cinematography",
-                imageUrl: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=2670&auto=format&fit=crop",
-            },
-            {
-                id: "5",
-                title: "Neon Drift",
-                type: "3D Art",
-                imageUrl: "https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=2670&auto=format&fit=crop",
-            },
-            {
-                id: "6",
-                title: "Void",
-                type: "Creative Direction",
-                imageUrl: "https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=2670&auto=format&fit=crop",
-            },
-        ],
-    },
+
     process: {
         steps: [
             {

@@ -40,17 +40,17 @@ export const team = [
     {
         name: "Mohammad Aldomi",
         role: "Full-stack Developer",
-        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80"
+        image: "/team/mohamed.webp"
     },
     {
         name: "Sultan",
         role: "Creative Director",
-        image: "https://images.unsplash.com/photo-1607746882042-944635dfe10e?auto=format&fit=crop&w=800&q=80"
+        image: "/team/sultan.webp"
     },
     {
         name: "Mahmoud",
         role: "Graphic Designer",
-        image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=800&q=80"
+        image: "/team/mahmoud.webp"
     },
 ];
 

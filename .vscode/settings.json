@@ -2,5 +2,6 @@
     "css.lint.unknownAtRules": "ignore",
     "scss.lint.unknownAtRules": "ignore",
     "css.lint.propertyIgnoredDueToDisplay": "ignore",
-    "css.validate": false
+    "css.validate": false,
+    "json.schemaDownload.enable": false
 }

@@ -19,57 +19,9 @@ export default function HeroScene() {
             ref={containerRef}
             className="relative min-h-screen flex flex-col justify-center items-start px-6 md:px-24 overflow-hidden"
         >
-            {/* Animated Background Images */}
-            {/* Optimized: We use CSS opacity-50 directly to ensure no flash of full brightness if JS is slow */}
-            <div className="absolute inset-0 z-0">
-                {/* Image 1 - Slides from left. High Priority for LCP. */}
-                <div className="absolute w-[50%] h-full opacity-50 -left-10 overflow-hidden animate-slide-right">
-                    {siteContent.gallery.items[0]?.imageUrl && (
-                        <Image
-                            src={siteContent.gallery.items[0].imageUrl}
-                            alt="Background Art 1"
-                            fill
-                            className="object-cover"
-                            priority
-                            sizes="50vw"
-                        />
-                    )}
-                </div>
 
-                {/* Image 2 - Slides from right. Lower priority as it's secondary. */}
-                <div className="absolute w-[50%] h-full opacity-50 -right-10 overflow-hidden animate-slide-left">
-                    {siteContent.gallery.items[1]?.imageUrl && (
-                        <Image
-                            src={siteContent.gallery.items[1].imageUrl}
-                            alt="Background Art 2"
-                            fill
-                            className="object-cover"
-                            priority={false}
-                            sizes="50vw"
-                        />
-                    )}
-                </div>
 
-                {/* Image 3 - Slower vertical movement. */}
-                <div className="absolute w-full h-[60%] opacity-30 -top-10 overflow-hidden animate-slide-down">
-                    {siteContent.gallery.items[2]?.imageUrl && (
-                        <Image
-                            src={siteContent.gallery.items[2].imageUrl}
-                            alt="Background Art 3"
-                            fill
-                            className="object-cover"
-                            priority={false}
-                            sizes="100vw"
-                        />
-                    )}
-                </div>
 
-                {/* Dark overlay to ensure text readability */}
-                <div className="absolute inset-0 bg-black/40" />
-            </div>
-
-            {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-br from-inkspirePurple/30 to-inkspireIndigo/30 z-0" />
 
             {/* Main Title */}
             <div ref={titleRef} className="relative z-10 flex flex-col items-start md:items-start max-w-3xl -mt-32">

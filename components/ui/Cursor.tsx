@@ -1,109 +1,136 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import gsap from "gsap";
+import { useEffect, useRef } from "react";
 
-export default function Cursor() {
-    const cursorInnerRef = useRef<HTMLDivElement>(null);
-    const cursorOuterRef = useRef<HTMLDivElement>(null);
-    const [isHovering, setIsHovering] = useState(false);
+export default function ArrowCursor() {
+    const cursorRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        const inner = cursorInnerRef.current;
-        const outer = cursorOuterRef.current;
+        const coarse = window.matchMedia("(pointer: coarse)").matches;
+        const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (coarse || reduce) return;
 
-        if (!inner || !outer) return;
+        const el = cursorRef.current;
+        if (!el) return;
 
-        // Center the cursor initially
-        gsap.set(inner, { xPercent: -50, yPercent: -50 });
-        gsap.set(outer, { xPercent: -50, yPercent: -50 });
+        const root = document.body;
 
-        const moveCursor = (e: MouseEvent) => {
-            // Inner cursor follows immediately
-            gsap.to(inner, {
-                x: e.clientX,
-                y: e.clientY,
-                duration: 0,
-            });
+        // state
+        let prevX = 0;
+        let prevY = 0;
+        let pointerX = 0;
+        let pointerY = 0;
 
-            // Outer cursor follows with delay (fluid effect)
-            gsap.to(outer, {
-                x: e.clientX,
-                y: e.clientY,
-                duration: 0.5,
-                ease: "power2.out",
-            });
+        let angle = 0;
+        let prevAngle = 0;
+        let angleDisplace = 0;
+
+        const degrees = 57.296;
+        const cursorSize = 20;
+
+        // init styles (same spirit as your snippet)
+        Object.assign(el.style, {
+            boxSizing: "border-box",
+            position: "fixed",
+            top: "0px",
+            left: `${-cursorSize / 2}px`,
+            zIndex: "2147483647",
+            width: `${cursorSize}px`,
+            height: `${cursorSize}px`,
+            transition: "250ms, transform 100ms",
+            userSelect: "none",
+            pointerEvents: "none",
+            opacity: "1",
+            transform: "translate3d(-9999px,-9999px,0)",
+        } as CSSStyleDeclaration);
+
+        const move = (e: MouseEvent) => {
+            prevX = pointerX;
+            prevY = pointerY;
+
+            // similar to original (pageX + rect offsets)
+            const rect = root.getBoundingClientRect();
+            pointerX = e.pageX + rect.x;
+            pointerY = e.pageY + rect.y;
+
+            const dx = prevX - pointerX;
+            const dy = prevY - pointerY;
+            const dist = Math.sqrt(dy * dy + dx * dx);
+
+            el.style.transform = `translate3d(${pointerX}px, ${pointerY}px, 0)`;
+
+            if (dist > 1) rotate(dx, dy);
+            else el.style.transform += ` rotate(${angleDisplace}deg)`;
         };
 
-        const handleMouseEnter = () => setIsHovering(true);
-        const handleMouseLeave = () => setIsHovering(false);
+        const rotate = (dx: number, dy: number) => {
+            const unsortedAngle = Math.atan(Math.abs(dy) / Math.abs(dx)) * degrees;
+            prevAngle = angle;
 
-        window.addEventListener("mousemove", moveCursor);
+            if (dx <= 0 && dy >= 0) angle = 90 - unsortedAngle + 0;
+            else if (dx < 0 && dy < 0) angle = unsortedAngle + 90;
+            else if (dx >= 0 && dy <= 0) angle = 90 - unsortedAngle + 180;
+            else if (dx > 0 && dy > 0) angle = unsortedAngle + 270;
 
-        // Add hover effect to interactive elements
-        const updateInteractiveElements = () => {
-            const links = document.querySelectorAll("a, button, .interactive, input, textarea");
-            links.forEach((link) => {
-                link.addEventListener("mouseenter", handleMouseEnter);
-                link.addEventListener("mouseleave", handleMouseLeave);
-            });
+            if (Number.isNaN(angle)) angle = prevAngle;
+            else {
+                const diff = angle - prevAngle;
+                if (diff <= -270) angleDisplace += 360 + diff;
+                else if (diff >= 270) angleDisplace += diff - 360;
+                else angleDisplace += diff;
+            }
+
+            el.style.transform += ` rotate(${angleDisplace}deg)`;
+
+            // Adjust anchor points based on rotation quadrant (copied behavior)
+            const modAngle = angleDisplace >= 0 ? angleDisplace % 360 : 360 + (angleDisplace % 360);
+
+            if (modAngle >= 45 && modAngle < 135) {
+                el.style.left = `${-cursorSize}px`;
+                el.style.top = `${-cursorSize / 2}px`;
+            } else if (modAngle >= 135 && modAngle < 225) {
+                el.style.left = `${-cursorSize / 2}px`;
+                el.style.top = `${-cursorSize}px`;
+            } else if (modAngle >= 225 && modAngle < 315) {
+                el.style.left = `0px`;
+                el.style.top = `${-cursorSize / 2}px`;
+            } else {
+                el.style.left = `${-cursorSize / 2}px`;
+                el.style.top = `0px`;
+            }
         };
 
-        updateInteractiveElements();
-
-        // Re-check for new elements periodically (for dynamic content)
-        const intervalId = setInterval(updateInteractiveElements, 1000);
+        window.addEventListener("mousemove", move, { passive: true });
 
         return () => {
-            window.removeEventListener("mousemove", moveCursor);
-            clearInterval(intervalId);
+            window.removeEventListener("mousemove", move);
         };
     }, []);
 
-    useEffect(() => {
-        const inner = cursorInnerRef.current;
-        const outer = cursorOuterRef.current;
-
-        if (isHovering) {
-            gsap.to(inner, { scale: 0, duration: 0.3 });
-            gsap.to(outer, {
-                scale: 2.5,
-                backgroundColor: "rgba(255, 255, 255, 0.2)",
-                borderColor: "transparent",
-                mixBlendMode: "difference",
-                duration: 0.3
-            });
-        } else {
-            gsap.to(inner, { scale: 1, duration: 0.3 });
-            gsap.to(outer, {
-                scale: 1,
-                backgroundColor: "transparent",
-                borderColor: "#8b5cf6", // inkspirePurple
-                mixBlendMode: "normal",
-                duration: 0.3
-            });
-        }
-    }, [isHovering]);
-
     return (
         <>
-            <div
-                ref={cursorInnerRef}
-                className="fixed top-0 left-0 w-3 h-3 bg-inkspirePurple rounded-full pointer-events-none z-[10001] mix-blend-difference"
-            />
-            <div
-                ref={cursorOuterRef}
-                className="fixed top-0 left-0 w-8 h-8 border border-inkspirePurple rounded-full pointer-events-none z-[10001] transition-opacity duration-300"
-            />
+            <div ref={cursorRef} className="curzr" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                    <path
+                        className="inner"
+                        d="M25,30a5.82,5.82,0,0,1-1.09-.17l-.2-.07-7.36-3.48a.72.72,0,0,0-.35-.08.78.78,0,0,0-.33.07L8.24,29.54a.66.66,0,0,1-.2.06,5.17,5.17,0,0,1-1,.15,3.6,3.6,0,0,1-3.29-5L12.68,4.2a3.59,3.59,0,0,1,6.58,0l9,20.74A3.6,3.6,0,0,1,25,30Z"
+                        fill="#F2F5F8"
+                    />
+                    <path
+                        className="outer"
+                        d="M16,3A2.59,2.59,0,0,1,18.34,4.6l9,20.74A2.59,2.59,0,0,1,25,29a5.42,5.42,0,0,1-.86-.15l-7.37-3.48a1.84,1.84,0,0,0-.77-.17,1.69,1.69,0,0,0-.73.16l-7.4,3.31a5.89,5.89,0,0,1-.79.12,2.59,2.59,0,0,1-2.37-3.62L13.6,4.6A2.58,2.58,0,0,1,16,3m0-2h0A4.58,4.58,0,0,0,11.76,3.8L2.84,24.33A4.58,4.58,0,0,0,7,30.75a6.08,6.08,0,0,0,1.21-.17,1.87,1.87,0,0,0,.4-.13L16,27.18l7.29,3.44a1.64,1.64,0,0,0,.39.14A6.37,6.37,0,0,0,25,31a4.59,4.59,0,0,0,4.21-6.41l-9-20.75A4.62,4.62,0,0,0,16,1Z"
+                        fill="#111920"
+                    />
+                </svg>
+            </div>
+
             <style jsx global>{`
-                * {
-                    cursor: none !important;
-                }
-                /* Restore cursor for iframes or specific areas if needed */
-                iframe {
-                    cursor: auto !important;
-                }
-            `}</style>
+        @media (pointer: fine) {
+          * {
+            cursor: none !important;
+          }
+        }
+      `}</style>
         </>
     );
 }
