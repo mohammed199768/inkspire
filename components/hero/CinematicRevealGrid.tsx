@@ -24,10 +24,11 @@ const STACKS = [
 export default function CinematicRevealGrid() {
     const { isTouch, containerRef, setStackRef } = useCinematicReveal();
 
-    if (isTouch) return null;
-
     return (
-        <div ref={containerRef} className="re-reveal-container">
+        <div
+            ref={containerRef}
+            className={`re-reveal-container ${isTouch ? 'is-touch' : ''}`}
+        >
             {/* Global Atmosphere Layers */}
             <div className="re-grain" />
             <div className="re-dim-layer" />
@@ -52,18 +53,20 @@ export default function CinematicRevealGrid() {
                             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
                         />
 
-                        {/* Overlay Image (Revealed) */}
-                        <div className="re-stack-overlay absolute inset-0 w-full h-full">
-                            <Image
-                                src={stack.overlay}
-                                alt={stack.alt}
-                                fill
-                                priority
-                                quality={95} // High quality for the reveal
-                                className="re-stack-image"
-                                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                            />
-                        </div>
+                        {/* Overlay Image (Revealed) - HIDDEN ON MOBILE */}
+                        {!isTouch && (
+                            <div className="re-stack-overlay absolute inset-0 w-full h-full">
+                                <Image
+                                    src={stack.overlay}
+                                    alt={stack.alt}
+                                    fill
+                                    priority
+                                    quality={95} // High quality for the reveal
+                                    className="re-stack-image"
+                                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                                />
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>

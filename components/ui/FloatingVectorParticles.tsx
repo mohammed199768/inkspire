@@ -10,9 +10,9 @@ const VECTOR_IMAGES = [
 ];
 
 export default function FloatingVectorParticles() {
-    const { containerRef, particles, isReady } = useFloatingParticles(VECTOR_IMAGES);
+    const { containerRef, particles, isReady, isTouch } = useFloatingParticles(VECTOR_IMAGES);
 
-    if (!isReady) return null;
+    if (!isReady || isTouch) return null;
 
     return (
         <div
@@ -24,14 +24,12 @@ export default function FloatingVectorParticles() {
                 <div
                     key={p.id}
                     className="vector-particle absolute will-change-transform opacity-0 mix-blend-screen"
-                    style={
-                        {
-                            "--particle-size": p.size,
-                            "--particle-left": p.left,
-                            "--particle-top": p.top,
-                            "--particle-opacity": p.baseOpacity,
-                        } as React.CSSProperties
-                    }
+                    style={{
+                        '--particle-size': p.size,
+                        '--particle-left': p.left,
+                        '--particle-top': p.top,
+                        '--particle-opacity': p.baseOpacity,
+                    } as React.CSSProperties}
                 >
                     <Image
                         src={p.img}

@@ -24,20 +24,7 @@ export default function HeroScene() {
 
             {/* Wave Transition - Magic Site Gradient Match */}
             <div className="absolute bottom-0 left-0 w-full z-20 pointer-events-none translate-y-1 h-[120px] md:h-[220px]">
-                <div
-                    className="w-full h-full"
-                    style={{
-                        background: 'linear-gradient(-45deg, #0d0e22, #201037, #09060f, #201037)',
-                        backgroundSize: '400% 400%',
-                        animation: 'gradientShift 25s ease infinite',
-                        maskImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath d='M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,261.3C960,256,1056,224,1152,197.3C1248,171,1344,149,1392,138.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z' /%3E%3C/svg%3E\")",
-                        WebkitMaskImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath d='M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,261.3C960,256,1056,224,1152,197.3C1248,171,1344,149,1392,138.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z' /%3E%3C/svg%3E\")",
-                        maskSize: '100% 100%',
-                        WebkitMaskSize: '100% 100%',
-                        maskRepeat: 'no-repeat',
-                        WebkitMaskRepeat: 'no-repeat'
-                    }}
-                />
+                <div className="hero-wave-container" />
             </div>
 
             {/* Main Title - Centered Bottom */}

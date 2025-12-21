@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useMemo } from "react";
+import { useIsTouchDevice } from "./useIsTouchDevice";
 
 // Reduced particle count as requested (2-4)
 const PARTICLE_COUNT = 3;
@@ -28,6 +29,7 @@ export interface ParticleConfig {
 }
 
 export function useFloatingParticles(imageSources: string[]) {
+    const isTouch = useIsTouchDevice();
     const containerRef = useRef<HTMLDivElement>(null);
     const [isReady, setIsReady] = useState(false);
 
@@ -168,6 +170,6 @@ export function useFloatingParticles(imageSources: string[]) {
         };
     }, [isReady, particles]);
 
-    return { containerRef, particles, isReady };
+    return { containerRef, particles, isReady, isTouch };
 }
 

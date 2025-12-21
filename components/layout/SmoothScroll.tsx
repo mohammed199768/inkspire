@@ -3,10 +3,14 @@
 import { useEffect, useRef } from "react";
 import Lenis from "lenis";
 
+import { useIsTouchDevice } from "@/hooks/useIsTouchDevice";
+
 export default function SmoothScroll({ children }: { children: React.ReactNode }) {
+    const isTouch = useIsTouchDevice();
     const lenisRef = useRef<Lenis | null>(null);
 
     useEffect(() => {
+        if (isTouch !== false) return;
         // Initialize Lenis for smooth scrolling
         const lenis = new Lenis({
             duration: 1.2,
@@ -29,7 +33,7 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
         return () => {
             lenis.destroy();
         };
-    }, []);
+    }, [isTouch]);
 
     return <>{children}</>;
 }

@@ -154,7 +154,7 @@ export function useCinematicReveal() {
     }, []);
 
     useEffect(() => {
-        if (typeof window === 'undefined' || isTouch) return;
+        if (typeof window === 'undefined' || isTouch !== false) return;
 
         const onMouseMove = (e: MouseEvent) => {
             stateRef.current.mouse.targetX = e.clientX;

@@ -5,12 +5,14 @@ import Particles, { initParticlesEngine } from "@tsparticles/react";
 import { loadSlim } from "@tsparticles/slim";
 import { loadImageShape } from "@tsparticles/shape-image";
 import { particlesConfig } from "@/data/particlesConfig";
+import { useIsTouchDevice } from "@/hooks/useIsTouchDevice";
 
 export default function BackgroundParticles() {
+    const isTouch = useIsTouchDevice();
     const [init, setInit] = useState(false);
 
     useEffect(() => {
-        if (init) return;
+        if (init || isTouch !== false) return;
 
         initParticlesEngine(async (engine) => {
             await loadSlim(engine);
@@ -18,9 +20,9 @@ export default function BackgroundParticles() {
         }).then(() => {
             setInit(true);
         });
-    }, [init]);
+    }, [init, isTouch]);
 
-    if (!init) return null;
+    if (!init || isTouch) return null;
 
     return (
         <div

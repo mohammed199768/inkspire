@@ -77,6 +77,21 @@
     transition: filter 0.2s ease-out, transform 0.2s ease-out;
 }
 
+/* TOUCH / MOBILE STATIC STATE 
+   - Ensure images are clear (full brightness)
+   - No transformations or transitions
+*/
+.re-reveal-container.is-touch .re-stack {
+    filter: brightness(0.95) contrast(1.05);
+    /* Slightly boosted for clarity */
+    transform: none !important;
+    transition: none !important;
+}
+
+.re-reveal-container.is-touch .re-spotlight {
+    display: none !important;
+}
+
 /* Images */
 .re-stack-image {
     position: absolute;

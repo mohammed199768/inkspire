@@ -6,6 +6,6 @@ export const metadata: Metadata = {
     openGraph: {
         title: "Contact Us | Inkspire Studio",
         description: "Let's collaborate to turn your vision into reality.",
-        images: ["/og-contact.jpg"],
+        images: ["/logos/Inkspire logos/logo1.png"],
     },
 };
