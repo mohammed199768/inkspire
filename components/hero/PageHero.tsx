@@ -37,13 +37,13 @@ export default function PageHero({ title, subtitle }: PageHeroProps) {
     return (
         <section
             ref={containerRef}
-            className="relative h-[60vh] flex flex-col justify-center items-center px-6 overflow-hidden pt-20"
+            className="cinematic-section relative h-[60vh] flex flex-col justify-center items-center px-6 overflow-hidden pt-20"
         >
             {/* Background Gradient */}
             <div className="absolute inset-0 bg-gradient-to-b from-purple-900/20 to-black z-0" />
 
             {/* Content */}
-            <div className="relative z-10 text-center max-w-4xl">
+            <div className="relative z-10 text-center max-w-4xl parallax-content">
                 <h1 ref={titleRef} className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-6">
                     <span className="animated-gradient-text">
                         {title}

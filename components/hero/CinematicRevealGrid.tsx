@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useCinematicReveal } from "@/hooks/useCinematicReveal";
+import "@/styles/cinematic-reveal.css";
 
 // Using the same 4 image pairs. 
 // If the user wants "More images", they likely need to duplicate them or provide more.
