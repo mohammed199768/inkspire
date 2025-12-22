@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import dynamic from "next/dynamic";
 import localFont from "next/font/local";
 import "./globals.css";
-import "@/styles/cinematic-reveal.css";
 import { siteContent } from '@/data/siteContent';
 import NavbarFullMenu from "@/components/layout/NavbarFullMenu";
 import MotionLayout from "@/components/layout/MotionLayout";
@@ -64,7 +63,7 @@ export const metadata: Metadata = {
         description: "We turn raw ideas into cinematic digital experiences. Expert web design, development, and branding.",
         siteName: "Inkspire Agency",
         images: [{
-            url: "/og-image.jpg",
+            url: "/logos/Inkspire logos/logo1.png",
             width: 1200,
             height: 630,
             alt: "Inkspire Agency"
