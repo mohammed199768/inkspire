@@ -106,12 +106,12 @@ export default function InsightPopup() {
 
                         {/* --- LEFT: Visual Intel --- */}
                         {currentPopup.imageUrl && (
-                            <div className="w-full md:w-[45%] h-56 sm:h-72 md:h-auto relative overflow-hidden bg-zinc-950 border-b md:border-b-0 md:border-r border-white/5">
+                            <div className="w-full md:w-[45%] h-80 sm:h-96 md:h-auto md:min-h-[600px] relative overflow-hidden bg-zinc-950 border-b md:border-b-0 md:border-r border-white/5">
                                 <Image
                                     src={currentPopup.imageUrl}
                                     alt={currentPopup.title}
                                     fill
-                                    className="object-cover opacity-80 group-hover:opacity-100 transition-all duration-1000 scale-[1.01] group-hover:scale-105"
+                                    className="object-cover object-top opacity-80 group-hover:opacity-100 transition-all duration-1000 scale-[1.01] group-hover:scale-105"
                                     quality={100}
                                     priority
                                 />

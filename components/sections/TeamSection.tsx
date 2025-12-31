@@ -25,7 +25,7 @@ export default function TeamSection() {
                             src={member.image}
                             alt={member.name}
                             fill
-                            className="object-cover transition-all duration-500 grayscale-0 opacity-100 md:grayscale md:opacity-60 md:group-hover:grayscale-0 md:group-hover:opacity-100"
+                            className="object-cover object-top transition-all duration-500 grayscale-0 opacity-100 md:grayscale md:opacity-60 md:group-hover:grayscale-0 md:group-hover:opacity-100"
                             sizes="(max-width: 768px) 50vw, 350px"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex flex-col justify-end p-4 md:p-8 translate-y-0 md:translate-y-4 md:group-hover:translate-y-0 transition-transform duration-300 z-10">

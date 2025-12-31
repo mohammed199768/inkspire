@@ -52,11 +52,7 @@ export const team = [
     },
 ];
 
-export const reviews = [
-    { name: "Sarah J.", text: "Inkspire transformed our brand completely. The attention to detail is unmatched.", company: "TechFlow" },
-    { name: "David M.", text: "The best creative team we've ever worked with. Simply stunning results.", company: "Apex Corp" },
-    { name: "Emily R.", text: "Professional, innovative, and incredibly talented. Highly recommended.", company: "Lumina" },
-];
+
 
 export const stats = [
     { val: "7+", label: "Years of Experience" },
