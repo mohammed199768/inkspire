@@ -16,10 +16,10 @@ import "@/styles/cinematic-reveal.css";
 // but ensure they look "more" (larger/fuller) by removing gaps.
 
 const STACKS = [
-    { id: 1, base: "/hero/be 1.webp", overlay: "/hero/af 1.webp", alt: "Cinematic Reveal 1" },
     { id: 2, base: "/hero/be 2.webp", overlay: "/hero/af 2.webp", alt: "Cinematic Reveal 2" },
-    { id: 3, base: "/hero/be 3.webp", overlay: "/hero/af 3.webp", alt: "Cinematic Reveal 3" },
     { id: 4, base: "/hero/be 4.webp", overlay: "/hero/af 4.webp", alt: "Cinematic Reveal 4" },
+    { id: 3, base: "/hero/be 3.webp", overlay: "/hero/af 3.webp", alt: "Cinematic Reveal 3" },
+    { id: 1, base: "/hero/be 1.webp", overlay: "/hero/af 1.webp", alt: "Cinematic Reveal 1" },
 ];
 
 export default function CinematicRevealGrid() {

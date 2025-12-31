@@ -3,10 +3,23 @@
 import React, { useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePopup } from "@/hooks/usePopup";
-import { X, Facebook, Instagram, Twitter, Linkedin, ExternalLink } from "lucide-react";
+import { X, Facebook, Instagram, Twitter, Linkedin, ExternalLink, Zap, Target, Layers } from "lucide-react";
 import Image from "next/image";
 
-// Helper to render social icons if they exist
+// --- Premium UI Support Components ---
+
+const GlassCorner = ({ position }: { position: 'tl' | 'tr' | 'bl' | 'br' }) => {
+    const classes = {
+        tl: "top-0 left-0 border-t border-l rounded-tl-2xl",
+        tr: "top-0 right-0 border-t border-r rounded-tr-2xl",
+        bl: "bottom-0 left-0 border-b border-l rounded-bl-2xl",
+        br: "bottom-0 right-0 border-b border-r rounded-br-2xl",
+    };
+    return (
+        <div className={`absolute w-8 h-8 border-white/20 z-20 pointer-events-none ${classes[position]}`} />
+    );
+};
+
 const SocialLink = ({ href, icon: Icon, label }: { href?: string; icon: any; label: string }) => {
     if (!href) return null;
     return (
@@ -14,10 +27,11 @@ const SocialLink = ({ href, icon: Icon, label }: { href?: string; icon: any; lab
             href={href}
             target="_blank"
             rel="noopener noreferrer"
-            className="p-3 bg-white/5 rounded-full hover:bg-white/15 text-white/60 hover:text-purple-400 transition-all duration-300 hover:scale-110 hover:shadow-[0_0_15px_rgba(168,85,247,0.4)] border border-transparent hover:border-purple-500/30"
+            className="group relative p-3 bg-white/5 border border-white/10 rounded-xl overflow-hidden transition-all duration-500 hover:border-purple-500/50 hover:bg-purple-500/10 shadow-lg"
             aria-label={label}
         >
-            <Icon size={20} className="stroke-[1.5]" />
+            <div className="absolute inset-0 bg-gradient-to-tr from-purple-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <Icon size={18} className="text-white/40 group-hover:text-purple-400 group-hover:scale-110 transition-all duration-500 relative z-10" />
         </a>
     );
 };
@@ -25,7 +39,6 @@ const SocialLink = ({ href, icon: Icon, label }: { href?: string; icon: any; lab
 export default function InsightPopup() {
     const { isOpen, currentPopup, closePopup } = usePopup();
 
-    // Close on ESC
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === "Escape") closePopup();
@@ -46,127 +59,162 @@ export default function InsightPopup() {
         <AnimatePresence>
             {isOpen && currentPopup && (
                 <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-8">
-                    {/* Darker Overlay with Blur */}
+
+                    {/* Cinematic Overlay */}
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        transition={{ duration: 0.4, ease: "easeInOut" }}
-                        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+                        transition={{ duration: 0.6 }}
+                        className="absolute inset-0 bg-black/90 backdrop-blur-xl"
                         onClick={closePopup}
-                    />
+                    >
+                        {/* Animated Grain/Noise for Texture */}
+                        <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-overlay" />
+                        {/* Ambient Glows */}
+                        <div className="absolute top-1/4 -left-1/4 w-[600px] h-[600px] bg-purple-900/20 rounded-full blur-[120px] pointer-events-none" />
+                        <div className="absolute bottom-1/4 -right-1/4 w-[600px] h-[600px] bg-indigo-900/20 rounded-full blur-[120px] pointer-events-none" />
+                    </motion.div>
 
-                    {/* Card container */}
+                    {/* Main Popup: Beast Mode UI */}
                     <motion.div
                         layoutId={currentPopup.id}
-                        initial={{ scale: 0.9, opacity: 0, y: 30 }}
+                        initial={{ scale: 0.9, opacity: 0, y: 40 }}
                         animate={{ scale: 1, opacity: 1, y: 0 }}
-                        exit={{ scale: 0.9, opacity: 0, y: 30 }}
-                        transition={{ type: "spring", damping: 30, stiffness: 350, mass: 0.8 }}
-                        className="relative w-full max-w-5xl max-h-[85vh] bg-black/60 backdrop-blur-3xl border border-white/10 rounded-[2rem] shadow-[0_0_60px_-15px_rgba(120,50,255,0.3)] overflow-hidden flex flex-col md:flex-row z-10 group"
+                        exit={{ scale: 0.9, opacity: 0, y: 40 }}
+                        transition={{ type: "spring", damping: 28, stiffness: 350 }}
+                        className="relative w-full max-w-6xl max-h-[90vh] bg-[#050507]/60 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-[0_0_80px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col md:flex-row z-10 group"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        {/* Decorative background glow */}
-                        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-                        <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-blue-600/10 rounded-full blur-[80px] translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+                        {/* Decorative HUD Elements */}
+                        <GlassCorner position="tl" />
+                        <GlassCorner position="tr" />
+                        <GlassCorner position="bl" />
+                        <GlassCorner position="br" />
 
-                        {/* Close Button */}
+                        {/* Animated Floating Glow Border */}
+                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 bg-gradient-to-r from-purple-500/10 via-transparent to-indigo-500/10 pointer-events-none" />
+
+                        {/* Technical Close Button */}
                         <button
                             onClick={closePopup}
-                            className="absolute top-6 right-6 z-50 p-3 bg-white/5 hover:bg-white/20 rounded-full text-white/70 hover:text-white transition-all duration-300 backdrop-blur-md border border-white/10 group-hover:rotate-90"
-                            aria-label="Close popup"
+                            aria-label="Close Case Study"
+                            className="absolute top-6 right-6 z-50 p-2 text-white/40 hover:text-white transition-all bg-white/5 hover:bg-red-500/20 border border-white/10 hover:border-red-500/40 rounded-lg group/close"
                         >
-                            <X size={20} />
+                            <X size={20} className="group-hover/close:rotate-90 transition-transform duration-500" />
                         </button>
 
-                        {/* Left Side: Image (if available) */}
+                        {/* --- LEFT: Visual Intel --- */}
                         {currentPopup.imageUrl && (
-                            <div className="w-full md:w-1/2 h-64 md:h-auto relative overflow-hidden">
+                            <div className="w-full md:w-[45%] h-72 md:h-auto relative overflow-hidden bg-zinc-950 border-r border-white/5">
                                 <Image
                                     src={currentPopup.imageUrl}
                                     alt={currentPopup.title}
                                     fill
-                                    className="object-cover transition-transform duration-700 group-hover:scale-105"
-                                    sizes="(max-width: 768px) 100vw, 50vw"
+                                    className="object-cover opacity-80 group-hover:opacity-100 transition-all duration-1000 scale-[1.01] group-hover:scale-105"
+                                    quality={100}
+                                    priority
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent md:bg-gradient-to-r md:from-black/80 md:via-transparent md:to-transparent" />
-                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 mix-blend-overlay" />
+                                {/* Dynamic Overlays */}
+                                <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#050507] via-[#050507]/40 to-transparent md:hidden" />
+                                <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-r from-transparent to-[#050507] hidden md:block" />
+
+                                {/* Technical HUD Scanning Line (Subtle) */}
+                                <div className="absolute inset-x-0 top-0 h-px bg-white/20 animate-scanline pointer-events-none opacity-40" />
                             </div>
                         )}
 
-                        {/* Right Side: Content */}
-                        <div className={`w-full ${currentPopup.imageUrl ? 'md:w-1/2' : 'w-full'} p-8 md:p-12 flex flex-col overflow-y-auto custom-scrollbar relative z-10`}>
-                            {/* Header */}
-                            <div className="mb-8 relative">
-                                {currentPopup.source && (
-                                    <motion.span
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: 0.2 }}
-                                        className="inline-flex items-center px-3 py-1 mb-4 text-[10px] font-bold tracking-[0.2em] text-purple-300 uppercase bg-purple-500/10 rounded-full border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.2)]"
-                                    >
-                                        <span className="w-1.5 h-1.5 rounded-full bg-purple-400 mr-2 animate-pulse" />
-                                        {currentPopup.source}
-                                    </motion.span>
-                                )}
-                                <motion.h2
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.3 }}
-                                    className="text-4xl md:text-5xl font-bold text-white mb-3 leading-tight brand-font"
-                                >
+                        {/* --- RIGHT: Content Core --- */}
+                        <div className={`w-full ${currentPopup.imageUrl ? 'md:w-[55%]' : 'w-full'} flex flex-col relative`}>
+
+                            {/* Technical Header Area */}
+                            <div className="px-8 pt-8 md:px-14 md:pt-14 relative z-10">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="h-px w-8 bg-purple-500" />
+                                    <span className="text-[10px] font-bold tracking-[0.4em] text-purple-400 uppercase">
+                                        Project Insight // {currentPopup.source || "Featured"}
+                                    </span>
+                                </div>
+                                <h2 className="text-4xl md:text-6xl font-bold text-white mb-2 leading-[0.9] brand-font tracking-tighter">
                                     {currentPopup.title}
-                                </motion.h2>
+                                </h2>
                                 {currentPopup.subtitle && (
-                                    <motion.p
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: 0.4 }}
-                                        className="text-xl text-white/60 font-medium font-outfit"
-                                    >
+                                    <p className="text-xl text-white/40 font-medium font-outfit uppercase tracking-widest mt-2">
                                         {currentPopup.subtitle}
-                                    </motion.p>
+                                    </p>
                                 )}
                             </div>
 
-                            {/* Divider with gradient */}
-                            <div className="w-full h-px bg-gradient-to-r from-purple-500/50 via-white/10 to-transparent mb-8" />
+                            {/* Scrollable Intelligence Body */}
+                            <div className="flex-1 overflow-y-auto px-8 md:px-14 py-8 custom-scrollbar relative z-10">
+                                <div className="text-white/70 text-lg md:text-xl leading-relaxed font-light font-sans max-w-2xl border-l-2 border-purple-500/20 pl-6 py-2">
+                                    {currentPopup.description}
+                                </div>
 
-                            {/* Body Text */}
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ delay: 0.5 }}
-                                className="flex-grow prose prose-invert prose-lg max-w-none text-white/80 leading-relaxed space-y-4 font-light text-base md:text-lg"
-                            >
-                                <p>{currentPopup.description}</p>
-                            </motion.div>
+                                {/* Dynamic Service Chips */}
+                                {currentPopup.tags && (
+                                    <div className="flex flex-wrap gap-2 mt-10">
+                                        {currentPopup.tags.map((tag, i) => (
+                                            <div key={i} className="flex items-center gap-2 px-4 py-1.5 bg-white/5 border border-white/10 rounded-full text-[11px] font-bold text-white/40 hover:text-white hover:border-purple-500/40 transition-all cursor-default group/tag backdrop-blur-sm">
+                                                <Target size={12} className="text-purple-500/60 group-hover/tag:scale-110 transition-transform" />
+                                                {tag.toUpperCase()}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
 
-                            {/* Footer / Socials */}
-                            {currentPopup.social && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.6 }}
-                                    className="mt-10 pt-8 flex items-center justify-between gap-4"
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-xs text-white/30 uppercase tracking-[0.2em] font-semibold">Connect</span>
-                                        <div className="h-px w-12 bg-white/10" />
+                            {/* Footer: Action nexus */}
+                            <div className="px-8 pb-8 md:px-14 md:pb-12 pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-8 z-20">
+
+                                <div className="flex flex-col gap-3 w-full sm:w-auto">
+                                    <span className="text-[9px] font-black text-white/20 tracking-[0.3em] uppercase">Connect Protocol</span>
+                                    <div className="flex items-center gap-2">
+                                        <SocialLink href={currentPopup.social?.facebookUrl} icon={Facebook} label="FB" />
+                                        <SocialLink href={currentPopup.social?.instagramUrl} icon={Instagram} label="IG" />
+                                        <SocialLink href={currentPopup.social?.twitterUrl} icon={Twitter} label="TW" />
+                                        <SocialLink href={currentPopup.social?.linkedinUrl} icon={Linkedin} label="LI" />
+                                        <SocialLink href={currentPopup.social?.behanceUrl} icon={ExternalLink} label="BE" />
                                     </div>
-                                    <div className="flex items-center gap-3">
-                                        <SocialLink href={currentPopup.social.facebookUrl} icon={Facebook} label="Facebook" />
-                                        <SocialLink href={currentPopup.social.instagramUrl} icon={Instagram} label="Instagram" />
-                                        <SocialLink href={currentPopup.social.twitterUrl} icon={Twitter} label="Twitter" />
-                                        <SocialLink href={currentPopup.social.linkedinUrl} icon={Linkedin} label="LinkedIn" />
-                                        <SocialLink href={currentPopup.social.behanceUrl} icon={ExternalLink} label="Behance" />
-                                    </div>
-                                </motion.div>
-                            )}
+                                </div>
+
+                                {currentPopup.projectSlug && (
+                                    <a
+                                        href={`/portfolio/${currentPopup.projectSlug}`}
+                                        className="w-full sm:w-auto relative group/btn flex items-center justify-center gap-4 px-12 py-5 bg-white text-black overflow-hidden rounded-xl"
+                                        onClick={closePopup}
+                                    >
+                                        {/* Cinematic Button Hover Effect */}
+                                        <div className="absolute inset-0 bg-purple-600 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-500 ease-out" />
+
+                                        <span className="relative z-10 font-bold text-sm uppercase tracking-wider group-hover/btn:text-white transition-colors duration-300">
+                                            Explore Full Case Study
+                                        </span>
+                                        <Layers size={18} className="relative z-10 group-hover/btn:text-white transition-colors duration-300 group-hover/btn:rotate-12 transition-transform" />
+                                    </a>
+                                )}
+                            </div>
                         </div>
+
                     </motion.div>
                 </div>
             )}
+
+            <style jsx global>{`
+                .custom-scrollbar::-webkit-scrollbar {
+                    width: 4px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-track {
+                    background: rgba(255, 255, 255, 0.02);
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb {
+                    background: rgba(168, 85, 247, 0.2);
+                    border-radius: 20px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                    background: rgba(168, 85, 247, 0.5);
+                }
+            `}</style>
         </AnimatePresence>
     );
 }

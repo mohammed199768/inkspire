@@ -1,220 +1,251 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import Image from 'next/image';
-import { Instagram, Facebook, Twitter, ExternalLink } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import styles from './WorksTunnel.module.css';
-import { works } from '@/data/staticData';
+import { projects } from '@/data/projects';
+import { usePopup } from '@/hooks/usePopup';
+import { buildPopupFromProject } from '@/lib/popupMappers';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import gsap from 'gsap';
 
+// --- UTILS ---
 function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
-interface Work {
-    id: string;
-    title: string;
-    subtitle: string;
-    description: string;
-    imageUrl: string;
-    socials?: {
-        behanceUrl?: string;
-        instagramUrl?: string;
-        facebookUrl?: string;
-        twitterUrl?: string;
-    };
-    // The actual data structure from staticData.ts has social (singular)
-    social: {
-        behanceUrl?: string;
-        instagramUrl?: string;
-        facebookUrl?: string;
-        twitterUrl?: string;
-    };
-}
+const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
+const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+function easeInOutCubic(t: number) { return t < .5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1; }
 
-const ringRadius = 600;
-const ringGap = 200; // Tighter vertical gap for continuous feel
-const imagesPerRing = 12; // Far more items per ring for density
+import { Project } from '@/types/project';
 
-// Massive duplication to fill the depth
-const massiveWorks = Array(10).fill(works).flat();
+// --- CONFIG ---
+const IMAGES_PER_RING = 6;
+const TILT_X = 12;
+const AUTO_SPEED = 0.012;
 
 const WorksTunnel: React.FC = () => {
+    const router = useRouter();
+    const { openPopup } = usePopup();
+    // --- STATE ---
+    const [isSceneVisible, setIsSceneVisible] = useState(false);
+
+    // UI Refs
     const containerRef = useRef<HTMLDivElement>(null);
-    const [selectedWork, setSelectedWork] = useState<Work | null>(null);
-    const [hoverActive, setHoverActive] = useState(false);
+    const sceneRef = useRef<HTMLDivElement>(null);
+    const stackRef = useRef<HTMLDivElement>(null);
+    const logoRef = useRef<HTMLDivElement>(null);
 
-    // Animation refs
-    const scrollTargetRef = useRef(0);
-    const scrollCurrentRef = useRef(0);
-    const hoverActiveRef = useRef(false);
+    // Animation Refs
     const requestRef = useRef<number>();
+    const timeRef = useRef(0);
+    const pSmoothRef = useRef(0);
+    const logoRotRef = useRef(0);
 
-    // Refs for DOM elements to animate
     const ringRefs = useRef<(HTMLDivElement | null)[]>([]);
-    const rotRefs = useRef<number[]>([]);
-    // Refs for panels to set initial transforms
-    const panelRefs = useRef<(HTMLDivElement | null)[][]>([]);
+    const cardRefs = useRef<(HTMLDivElement | null)[][]>([]);
 
-    useEffect(() => {
-        hoverActiveRef.current = hoverActive;
-    }, [hoverActive]);
+    const dims = useRef({
+        radius: 300,
+        ringSpacing: 280
+    });
 
-    const ringsCount = Math.ceil(massiveWorks.length / imagesPerRing);
-    const rings = Array.from({ length: ringsCount });
-
-    useEffect(() => {
-        // Initialize rotations
-        const ringsCount = Math.ceil(massiveWorks.length / imagesPerRing);
-        rotRefs.current = Array.from({ length: ringsCount }).map(() => Math.random() * 360);
-
-        // Adjust for mobile screens
-        const isMobile = window.innerWidth < 768;
-        const currentRadius = isMobile ? 350 : ringRadius;
-
-        // Initialize panel positions
-        panelRefs.current.forEach((ringPanels, ringIndex) => {
-            ringPanels.forEach((panel, panelIndex) => {
-                if (!panel) return;
-                const angle = (360 / imagesPerRing) * panelIndex;
-                // Move panel setup here to handle mobile radius
-                panel.style.transform = `rotateY(${angle}deg) translateZ(${currentRadius}px) translate(-50%, -50%)`;
-            });
-        });
-
-        const handleScroll = () => {
-            if (!containerRef.current) return;
-            const rect = containerRef.current.getBoundingClientRect();
-            // Calculate relative scroll progress
-            const progress = -rect.top;
-            scrollTargetRef.current = progress;
-        };
-
-        window.addEventListener("scroll", handleScroll, { passive: true });
-        handleScroll();
-
-        // Refresh ScrollTrigger to account for new container height
-        import('gsap/ScrollTrigger').then(({ ScrollTrigger }) => {
-            ScrollTrigger.refresh();
-        });
-
-        const animate = () => {
-            // Much smoother interpolation (0.04 instead of 0.08)
-            scrollCurrentRef.current += (scrollTargetRef.current - scrollCurrentRef.current) * 0.04;
-
-            ringRefs.current.forEach((ring, i) => {
-                if (!ring) return;
-
-                const baseY = -i * ringGap;
-                // Slower multiplier (1.2 instead of 1.5) to keep items on screen longer
-                const y = baseY + (scrollCurrentRef.current * 1.1);
-
-                const speed = hoverActiveRef.current ? 0.08 : 0.2;
-                rotRefs.current[i] += speed;
-
-                ring.style.transform = `translate3d(0, ${y}px, 0) rotateY(${rotRefs.current[i]}deg)`;
-            });
-
-            requestRef.current = requestAnimationFrame(animate);
-        };
-
-        requestRef.current = requestAnimationFrame(animate);
-
-        return () => {
-            window.removeEventListener("scroll", handleScroll);
-            if (requestRef.current) cancelAnimationFrame(requestRef.current);
-        };
+    // --- LOGIC: DUPLICATE WORKS FOR DENSITY ---
+    const massiveWorks = useMemo(() => {
+        if (!projects || projects.length === 0) return [];
+        return [...projects, ...projects, ...projects];
     }, []);
 
-    const closeOverlay = () => setSelectedWork(null);
+    const numRings = Math.ceil(massiveWorks.length / IMAGES_PER_RING);
+    const centerIndex = (numRings - 1) / 2;
+
+    const ringsData = useMemo(() => {
+        return Array.from({ length: numRings }).map((_, rIndex) => {
+            const ringStart = rIndex * IMAGES_PER_RING;
+            const ringWorks = massiveWorks.slice(ringStart, ringStart + IMAGES_PER_RING);
+            return { index: rIndex, works: ringWorks };
+        });
+    }, [numRings, massiveWorks]);
+
+    // Visibility Observer (Better performance than setState in loop)
+    useEffect(() => {
+        if (!containerRef.current) return;
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                setIsSceneVisible(entry.isIntersecting);
+            },
+            { threshold: 0 }
+        );
+        observer.observe(containerRef.current);
+        return () => observer.disconnect();
+    }, []);
+
+    // --- OVERLAY ANIMATION REMOVED (NOW USING UNIFIED POPUP) ---
+
+    useEffect(() => {
+        // Init Refs
+        ringRefs.current = ringRefs.current.slice(0, numRings);
+        cardRefs.current = cardRefs.current.slice(0, numRings);
+
+        const handleResize = () => {
+            if (typeof window === 'undefined') return;
+            const isMobile = window.innerWidth < 520;
+            dims.current.radius = isMobile ? 160 : 300;
+            dims.current.ringSpacing = isMobile ? 200 : 280;
+
+            ringRefs.current.forEach(r => {
+                if (r) r.style.setProperty('--radius', `${dims.current.radius}px`);
+            });
+        };
+        handleResize();
+        window.addEventListener('resize', handleResize);
+
+        const tick = () => {
+            if (!containerRef.current || !stackRef.current) {
+                requestRef.current = requestAnimationFrame(tick);
+                return;
+            }
+
+            const rect = containerRef.current.getBoundingClientRect();
+            const winHeight = window.innerHeight;
+            const total = rect.height - winHeight;
+
+            let p = 0;
+            if (total > 0) {
+                const scrolled = clamp(-rect.top, 0, total);
+                p = scrolled / total;
+            }
+
+            timeRef.current += AUTO_SPEED;
+            pSmoothRef.current += (p - pSmoothRef.current) * 0.04;
+
+            const t = easeInOutCubic(pSmoothRef.current);
+            const idxFloat = t * (numRings - 1);
+            const idx = Math.floor(idxFloat);
+            const frac = idxFloat - idx;
+
+            const curY = (idx - centerIndex) * dims.current.ringSpacing;
+            const nextY = ((Math.min(idx + 1, numRings - 1)) - centerIndex) * dims.current.ringSpacing;
+            const stackY = -lerp(curY, nextY, frac);
+            const globalScale = Math.min(1, window.innerWidth / 600);
+
+            stackRef.current.style.transform = `translate3d(0, ${stackY}px, 0) rotateX(${TILT_X}deg) scale(${globalScale})`;
+
+            if (logoRef.current) {
+                logoRotRef.current += 0.3;
+                const logoOffsetY = -stackY * 0.9;
+                logoRef.current.style.transform = `translate3d(-50%, calc(-50% + ${logoOffsetY}px), 0) rotateY(${logoRotRef.current}deg)`;
+            }
+
+            const scrollRot = t * 240;
+            const breathing = Math.sin(timeRef.current * 0.5) * 10;
+            const dynamicRadius = dims.current.radius + breathing + (Math.abs(p - pSmoothRef.current) * 100);
+
+            ringRefs.current.forEach((ring, r) => {
+                if (!ring) return;
+
+                const y = (r - centerIndex) * dims.current.ringSpacing;
+                const z = (r - centerIndex) * 40;
+                const dist = Math.abs(r - idxFloat);
+                let ringScale = 1;
+                if (dist < 1.5) ringScale = lerp(1.15, 1.0, dist / 1.5);
+
+                const direction = (r % 2 === 0) ? 1 : -1;
+                const finalRot = (timeRef.current * 8 * direction) + (scrollRot * direction) + (r * 10);
+
+                ring.style.transform = `translate3d(0, ${y}px, ${z}px) rotateY(${finalRot}deg) scale(${ringScale})`;
+
+                const ringCards = cardRefs.current[r];
+                if (ringCards) {
+                    ringCards.forEach((card, cIndex) => {
+                        if (!card) return;
+                        const step = 360 / IMAGES_PER_RING;
+                        const angle = cIndex * step;
+                        const rad = (finalRot + angle) * Math.PI / 180;
+                        const depth = Math.cos(rad);
+
+                        card.style.transform = `translate(-50%, -50%) rotateY(${angle}deg) translateZ(${dynamicRadius}px)`;
+
+                        if (depth < -0.2) {
+                            card.style.opacity = '0.3';
+                            card.style.zIndex = '0';
+                        } else {
+                            card.style.opacity = '1';
+                            card.style.zIndex = '10';
+                        }
+                    });
+                }
+            });
+
+            requestRef.current = requestAnimationFrame(tick);
+        };
+
+        requestRef.current = requestAnimationFrame(tick);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            if (requestRef.current) cancelAnimationFrame(requestRef.current);
+        };
+    }, [numRings, centerIndex]);
+
 
     return (
         <section ref={containerRef} className={styles.container}>
-            <div className={styles.sceneWrapper}>
-                <div className={styles.stack}>
-                    <div className={styles.centerBrand}>INKSPIRE</div>
+            <div
+                ref={sceneRef}
+                className={cn(styles.sceneWrapper, isSceneVisible ? styles.sceneActive : styles.sceneHidden)}
+            >
+                <div ref={stackRef} className={styles.stack}>
+                    <div ref={logoRef} className={styles.centerBrand}>
+                        <div className={styles.logoWrapper}>
+                            <Image
+                                src="/logos/Inkspire logos/logo.svg"
+                                alt="Inkspire Logo"
+                                fill
+                                className={styles.logoImg}
+                                priority
+                            />
+                        </div>
+                    </div>
 
-                    {rings.map((_, ringIndex) => (
+                    {ringsData.map((ring) => (
                         <div
-                            key={ringIndex}
+                            key={ring.index}
                             className={styles.ring}
-                            ref={el => { ringRefs.current[ringIndex] = el; }}
+                            ref={el => { ringRefs.current[ring.index] = el; }}
                         >
-                            {Array.from({ length: imagesPerRing }).map((__, panelIndex) => {
-                                const workIndex = ringIndex * imagesPerRing + panelIndex;
-                                if (workIndex >= massiveWorks.length) return null;
-
-                                const work = massiveWorks[workIndex] as unknown as Work;
-
-                                return (
-                                    <div
-                                        key={`${work.id}-${ringIndex}-${panelIndex}`}
-                                        className={styles.panel}
-                                        ref={el => {
-                                            if (!panelRefs.current[ringIndex]) panelRefs.current[ringIndex] = [];
-                                            panelRefs.current[ringIndex][panelIndex] = el;
-                                        }}
-                                        onMouseEnter={() => setHoverActive(true)}
-                                        onMouseLeave={() => setHoverActive(false)}
-                                        onClick={() => setSelectedWork(work)}
-                                    >
-                                        <div className={styles.thumb}>
-                                            <Image
-                                                src={work.imageUrl}
-                                                alt={work.title}
-                                                className={styles.img}
-                                                fill
-                                                sizes="220px"
-                                            />
-                                        </div>
+                            {ring.works.map((work, wIndex) => (
+                                <div
+                                    key={`${work.id}-${ring.index}-${wIndex}`}
+                                    className={styles.panel}
+                                    ref={el => {
+                                        if (!cardRefs.current[ring.index]) cardRefs.current[ring.index] = [];
+                                        cardRefs.current[ring.index][wIndex] = el;
+                                    }}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        openPopup(buildPopupFromProject(work));
+                                    }}
+                                >
+                                    <div className={styles.thumb}>
+                                        <Image
+                                            src={work.coverImage || "/works/placeholder.webp"}
+                                            alt={work.title}
+                                            className={styles.img}
+                                            fill
+                                            sizes="(max-width: 768px) 90vw, 1200px"
+                                            quality={95}
+                                            priority={ring.index < 3}
+                                        />
                                     </div>
-                                );
-                            })}
+                                </div>
+                            ))}
                         </div>
                     ))}
                 </div>
-            </div>
-
-            {/* Premium Overlay */}
-            <div
-                className={cn(styles.overlay, selectedWork && styles.overlayActive)}
-                onClick={(e) => e.target === e.currentTarget && closeOverlay()}
-            >
-                {selectedWork && (
-                    <div className={styles.card}>
-                        <h2 className={styles.cardTitle}>{selectedWork.title}</h2>
-                        <div className={styles.cardSubtitle}>{selectedWork.subtitle}</div>
-                        <p className={styles.cardDesc}>{selectedWork.description}</p>
-
-                        <div className={styles.socials}>
-                            {selectedWork.social?.behanceUrl && selectedWork.social.behanceUrl !== "#" && (
-                                <a href={selectedWork.social.behanceUrl} target="_blank" rel="noopener noreferrer" className={styles.socialBtn} title="Behance">
-                                    <ExternalLink size={20} />
-                                </a>
-                            )}
-                            {selectedWork.social?.instagramUrl && selectedWork.social.instagramUrl !== "#" && (
-                                <a href={selectedWork.social.instagramUrl} target="_blank" rel="noopener noreferrer" className={styles.socialBtn} title="Instagram">
-                                    <Instagram size={20} />
-                                </a>
-                            )}
-                            {selectedWork.social?.facebookUrl && selectedWork.social.facebookUrl !== "#" && (
-                                <a href={selectedWork.social.facebookUrl} target="_blank" rel="noopener noreferrer" className={styles.socialBtn} title="Facebook">
-                                    <Facebook size={20} />
-                                </a>
-                            )}
-                            {selectedWork.social?.twitterUrl && selectedWork.social.twitterUrl !== "#" && (
-                                <a href={selectedWork.social.twitterUrl} target="_blank" rel="noopener noreferrer" className={styles.socialBtn} title="Twitter">
-                                    <Twitter size={20} />
-                                </a>
-                            )}
-                        </div>
-
-                        <button className={styles.closeBtn} onClick={closeOverlay}>
-                            Close Project
-                        </button>
-                    </div>
-                )}
             </div>
         </section>
     );

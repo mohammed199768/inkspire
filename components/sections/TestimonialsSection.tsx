@@ -8,63 +8,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import { X, ChevronLeft, ChevronRight, Info } from "lucide-react";
 
 // Data Structure
-const HIGHLIGHTS = [
-    {
-        id: "h1",
-        name: "Brand Identity",
-        sub: "Inkspire • Studio",
-        avatar: "/reels/3.webp",
-        stories: [
-            { type: "image", src: "/reels/3.webp", tag: "Creative Direction" },
-            { type: "image", src: "/reels/4.webp", tag: "Visual Language" },
-        ]
-    },
-    {
-        id: "h2",
-        name: "Web Experience",
-        sub: "Amman • Jordan",
-        avatar: "/reels/5.webp",
-        stories: [
-            { type: "image", src: "/reels/5.webp", tag: "Modern UI/UX" },
-            { type: "image", src: "/reels/6.webp", tag: "Interactive Motion" },
-        ]
-    },
-    {
-        id: "h3",
-        name: "Client Success",
-        sub: "Global Projects",
-        avatar: "/reels/7.webp",
-        stories: [
-            { type: "image", src: "/reels/7.webp", tag: "Strategic Growth" },
-            { type: "image", src: "/reels/8.webp", tag: "Digital Transformation" },
-        ]
-    },
-    {
-        id: "h4",
-        name: "Agency Life",
-        sub: "Inkspire Team",
-        avatar: "/reels/9.webp",
-        stories: [
-            { type: "image", src: "/reels/9.webp", tag: "Our Studio" },
-            { type: "image", src: "/reels/10.webp", tag: "Team Synergy" },
-        ]
-    },
-    {
-        id: "h5",
-        name: "Latest Work",
-        sub: "December 2025",
-        avatar: "/reels/11.webp",
-        stories: [
-            { type: "image", src: "/reels/11.webp", tag: "Modern Aesthetics" },
-            { type: "image", src: "/reels/12.webp", tag: "Final Masterpiece" },
-        ]
-    }
-];
+import { useRouter } from "next/navigation";
+import { HIGHLIGHTS } from "@/data/stories";
 
 const IMG_DURATION = 4500;
 
 export default function TestimonialsSection() {
     const containerRef = useGSAPFade();
+    const router = useRouter();
     const [activeClient, setActiveClient] = useState<number | null>(null);
     const [activeStory, setActiveStory] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
@@ -200,12 +151,10 @@ export default function TestimonialsSection() {
                                 {HIGHLIGHTS[activeClient].stories.map((_, i) => (
                                     <div key={i} className="flex-1 h-[2px] md:h-[3px] bg-white/20 rounded-full overflow-hidden backdrop-blur-sm">
                                         <div
-                                            className={`h-full bg-white transition-all linear shadow-[0_0_8px_rgba(255,255,255,0.4)]`}
-                                            style={{
-                                                width: i < activeStory ? "100%" : i === activeStory ? "100%" : "0%",
-                                                transitionDuration: i === activeStory ? (isPaused ? "99999s" : `${IMG_DURATION}ms`) : "0ms",
-                                                opacity: i <= activeStory ? 1 : 0.3
-                                            }}
+                                            className={`h-full bg-white transition-all linear shadow-[0_0_8px_rgba(255,255,255,0.4)]
+                                                ${i <= activeStory ? 'w-full opacity-100' : 'w-0 opacity-30'}
+                                                ${i === activeStory ? (isPaused ? 'duration-[99999s]' : 'duration-[4500ms]') : 'duration-0'}
+                                            `}
                                         />
                                     </div>
                                 ))}
@@ -249,8 +198,8 @@ export default function TestimonialsSection() {
                             />
                         </div>
 
-                        {/* Tag Overlay */}
-                        <div className="absolute bottom-[env(safe-area-inset-bottom,30px)] left-0 right-0 z-40 text-center px-4 mb-4 md:mb-8">
+                        {/* Tag & Action Overlay */}
+                        <div className="absolute bottom-[env(safe-area-inset-bottom,30px)] left-0 right-0 z-40 flex flex-col items-center gap-4 px-4 mb-4 md:mb-8">
                             <motion.div
                                 key={`tag-${activeClient}-${activeStory}`}
                                 initial={{ opacity: 0, y: 15 }}
@@ -261,6 +210,23 @@ export default function TestimonialsSection() {
                                     {HIGHLIGHTS[activeClient].stories[activeStory].tag}
                                 </span>
                             </motion.div>
+
+                            {HIGHLIGHTS[activeClient].projectSlug && (
+                                <motion.button
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        const slug = HIGHLIGHTS[activeClient].projectSlug;
+                                        closeStories();
+                                        router.push(`/portfolio/${slug}`);
+                                    }}
+                                    className="flex items-center gap-2 px-8 py-4 bg-white text-black rounded-full font-bold text-sm hover:scale-105 active:scale-95 transition-all shadow-[0_15px_40px_rgba(255,255,255,0.2)]"
+                                >
+                                    <Info size={18} />
+                                    View Project
+                                </motion.button>
+                            )}
                         </div>
                     </motion.div>
 

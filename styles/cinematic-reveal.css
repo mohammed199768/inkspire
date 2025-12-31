@@ -25,28 +25,19 @@
 .re-stacks-grid {
     display: flex;
     justify-content: center;
-    align-items: flex-end;
     /* Make them stand on the bottom line */
-    gap: 20px;
+    gap: 0px;
     width: 100%;
-    max-width: 1600px;
+    max-width: 100%;
     /* Wide enough for 4 chars */
     height: 100%;
     position: relative;
     z-index: 2;
-    padding-bottom: 60px;
+    padding-bottom: 0px;
     /* Lift images slightly less */
 }
 
-/* Responsive adjustment */
-@media (max-width: 768px) {
-    .re-stacks-grid {
-        flex-wrap: wrap;
-        align-content: flex-end;
-        justify-content: center;
-        gap: 10px;
-    }
-}
+
 
 
 /* 
@@ -54,18 +45,27 @@
    - Treated as "Cutout Characters" (صور شخصيات مفرغة)
    - Removing "Card" styling 
 */
+/* 
+   STACK 
+   - Treated as "Cutout Characters" (صور شخصيات مفرغة)
+   - Removing "Card" styling 
+*/
 .re-stack {
     position: relative;
-    width: 280px;
-    flex: 0 1 25%;
-    /* Flexible width */
+    width: 28vw;
+    /* Make them BIG (Width driven) */
+    max-width: 500px;
+    min-width: 300px;
+    flex: 0 0 auto;
+
+    /* Force Overlap but slightly less ("Avengers Style") */
+    margin-left: -0.8vw;
+    margin-right: -0.8vw;
+
     aspect-ratio: 2/3;
-    /* Taller */
-    max-height: 85vh;
-    /* Don't overflow top */
+    max-height: 90vh;
 
     overflow: visible;
-    /* Allow drop-shadows */
     border-radius: 0;
     background: transparent;
     box-shadow: none;
@@ -77,6 +77,33 @@
     transition: filter 0.2s ease-out, transform 0.2s ease-out;
 }
 
+/* Extra spacing for middle gap (between 2nd and 3rd) 
+   AND lift the LEFT side images (assumed 1 & 2) up.
+*/
+.re-stack:nth-child(1) {
+    margin-bottom: 4vh;
+}
+
+/* Move 4 (2nd) away from 2 (1st) */
+.re-stack:nth-child(2) {
+    margin-right: 0.5vw;
+    margin-bottom: 5vh;
+    margin-left: 1.5vw;
+}
+
+.re-stack:nth-child(3) {
+    margin-left: 0.5vw;
+}
+
+/* Pull 1 (4th) closer to 3 (3rd) and Lower it */
+/* Pull 1 (4th) closer to 3 (3rd) but KEEP VISIBLE */
+.re-stack:nth-child(4) {
+    margin-left: -2vw;
+    /* Reduced from -4vw */
+    margin-bottom: 0;
+    /* Reset from -2vh to fix disappearance */
+}
+
 /* TOUCH / MOBILE STATIC STATE 
    - Ensure images are clear (full brightness)
    - No transformations or transitions
@@ -86,28 +113,110 @@
     /* Slightly boosted for clarity */
     transform: none !important;
     transition: none !important;
+
+    /* Reset margins for mobile grid */
+    margin: 0 !important;
+    /* Force reset */
+    width: 48%;
+    /* 2x2 tight grid */
+    max-width: none;
+    min-width: 0;
+
+    /* Mobile Height Constraint */
+    aspect-ratio: 3/4;
+    height: auto;
+    max-height: 35vh;
 }
 
-.re-reveal-container.is-touch .re-spotlight {
-    display: none !important;
-}
+/* --- RESPONSIVE IMAGE REDUCTION STRATEGY --- */
 
-/* Images */
-.re-stack-image {
-    position: absolute;
-    bottom: 0;
-    left: 0;
+/* Base Grid: Default is 4 images (Desktop > 1400px) */
+.re-stacks-grid {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
     width: 100%;
     height: 100%;
-    object-fit: contain;
-    /* Don't crop the characters! */
-    object-position: bottom center;
-    /* Stand on floor */
-    pointer-events: none;
-    image-rendering: high-quality;
+    position: relative;
+    z-index: 2;
+    padding-bottom: 0px;
+    gap: 0;
+}
 
-    /* Ensure drop shadow works on transparent png */
-    filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.5));
+/* 
+   MEDIUM DESKTOP (1024px - 1400px) - DISABLED: User wants full 4 images on desktop
+   
+   @media (max-width: 1400px) {
+       .re-stack:nth-child(4) {
+           display: none !important;
+       }
+   }
+*/
+
+/* 
+   TABLET / SMALL LAPTOP (768px - 1024px)
+   - Show 2 Images (Hide 3rd & 4th)
+*/
+@media (max-width: 1024px) {
+
+    .re-stack:nth-child(3),
+    .re-stack:nth-child(4) {
+        display: none !important;
+    }
+
+    /* Reset margins for clean 2-image layout */
+    .re-stack {
+        margin: 0 !important;
+        /* No overlap needed for just 2 */
+        width: 35vw;
+        /* Wider to fill space */
+        max-width: 400px;
+    }
+
+    .re-stacks-grid {
+        gap: 20px;
+        /* Clean gap */
+    }
+}
+
+/* 
+   MOBILE (< 768px)
+   - Show 1 Image (Hide 2nd, 3rd, 4th)
+*/
+@media (max-width: 768px) {
+
+    .re-stack:nth-child(2),
+    .re-stack:nth-child(3),
+    .re-stack:nth-child(4) {
+        display: none !important;
+    }
+
+    .re-stacks-grid {
+        /* Standard Center Bottom */
+        align-items: flex-end;
+        padding-bottom: 0px;
+        position: relative;
+        height: 100%;
+        max-height: 50vh;
+        /* Don't take full screen */
+        bottom: 0;
+    }
+
+    .re-stack {
+        margin: 0 !important;
+        width: 80vw;
+        /* Big single hero */
+        max-width: none;
+        height: auto;
+        aspect-ratio: 1/1.2;
+        /* Taller portrait feel */
+    }
+
+    .re-stack-image {
+        width: 100%;
+        left: 0;
+        transform: none;
+    }
 }
 
 .re-stack-base {
@@ -117,6 +226,12 @@
 .re-stack-overlay {
     z-index: 2;
     opacity: 0;
+    /* Ensure the overlay container matches the stack size so mask works */
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
     will-change: opacity, mask-image;
     filter: saturate(1.2) brightness(1.1);
 }

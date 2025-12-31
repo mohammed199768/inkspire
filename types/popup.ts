@@ -15,6 +15,7 @@ export interface PopupPayload {
     subtitle?: string; // Role, Company, or Service Category
     description?: string;
     imageUrl?: string;
+    projectSlug?: string;
     social?: PopupSocialLinks;
     // Optional extra fields for specific rendering logic
     date?: string;

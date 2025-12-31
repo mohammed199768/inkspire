@@ -20,14 +20,16 @@ export function useHeroAnimation(
             const tagline = titleRef.current?.querySelector(".hero-tagline");
 
             if (logo || tagline) {
-                // Ensure they start invisible to avoid flash, although React might have rendered them visible.
-                // ideally CSS has them opacity-0, but we'll handle it here.
-                tl.from([logo, tagline], {
-                    y: 60,
-                    opacity: 0,
-                    duration: 0.8,
-                    stagger: 0.15,
-                });
+                // Ensure they start invisible to avoid flash
+                const elements = [logo, tagline].filter(Boolean);
+                if (elements.length > 0) {
+                    tl.from(elements, {
+                        y: 60,
+                        opacity: 0,
+                        duration: 0.8,
+                        stagger: 0.15,
+                    });
+                }
             }
 
             // CTA - quicker entrance

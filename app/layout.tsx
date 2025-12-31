@@ -35,7 +35,7 @@ const ibrand = localFont({
 
 // Lazy load heavy visual effects
 const FloatingVectorParticles = dynamic(() => import("@/components/ui/FloatingVectorParticles"), { ssr: false });
-const BackgroundParticles = dynamic(() => import("@/components/ui/BackgroundParticles"), { ssr: false });
+
 
 const Cursor = dynamic(() => import("@/components/ui/Cursor"), { ssr: false });
 
@@ -110,8 +110,6 @@ export default function RootLayout({
                 <Preloader />
                 <SmoothScroll>
                     <PopupProvider>
-                        <BackgroundParticles />
-
                         <FloatingVectorParticles />
                         <Cursor />
                         <NavbarFullMenu />

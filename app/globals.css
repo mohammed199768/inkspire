@@ -24,12 +24,18 @@ body {
 }
 
 /* Hide scrollbar for IE, Edge and Firefox */
+/* Hide scrollbar for IE, Edge and Firefox */
 html {
   -ms-overflow-style: none;
   /* IE and Edge */
-  scrollbar-width: none;
-  /* Firefox */
   scroll-behavior: smooth;
+}
+
+@supports (scrollbar-width: none) {
+  html {
+    scrollbar-width: none;
+    /* Firefox */
+  }
 }
 
 /* Magic Wave Transition Styling */

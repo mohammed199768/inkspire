@@ -1,23 +1,25 @@
 "use client";
 
-import { usePopup } from "@/hooks/usePopup";
-import { buildPopupFromWork } from "@/lib/popupMappers";
-
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectCreative, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/effect-creative";
 import "swiper/css/pagination";
-import "swiper/css/pagination";
 import SectionTitle from "@/components/ui/SectionTitle";
 import { useGSAPFade } from "@/hooks/useGSAPFade";
+import { usePopup } from "@/hooks/usePopup";
+import { buildPopupFromProject } from "@/lib/popupMappers";
 
-import { works } from "@/data/staticData";
+import { projects } from "@/data/projects";
 
 export default function SelectedWorkSection() {
     const containerRef = useGSAPFade();
     const { openPopup } = usePopup();
+
+    // Use a subset of projects for Selected Work
+    const selectedWorks = projects.slice(0, 6);
 
     return (
         <div ref={containerRef} className="min-h-screen flex flex-col justify-center py-20 overflow-hidden">
@@ -52,19 +54,19 @@ export default function SelectedWorkSection() {
                     loop={true}
                     speed={1000}
                 >
-                    {works.map((work, index) => (
+                    {selectedWorks.map((work, index) => (
                         <SwiperSlide
                             key={index}
-                            onClick={() => openPopup(buildPopupFromWork(work))}
+                            onClick={() => openPopup(buildPopupFromProject(work))}
                             className="!w-[85vw] md:!w-[1100px] !h-[50vh] md:!h-[650px] relative cursor-pointer"
                         >
                             {/* Floating Plane Wrapper */}
                             <div className="selectedwork-plane w-full h-full relative">
                                 <Image
-                                    src={work.imageUrl}
+                                    src={work.coverImage || "/works/placeholder.webp"}
                                     alt={work.title}
                                     fill
-                                    className="object-cover rounded-md" // Subtle rounding for aesthetics, optional per user 'no hard card look'
+                                    className="object-cover rounded-md"
                                     sizes="(max-width: 768px) 90vw, 1200px"
                                     quality={95}
                                     priority={index < 3}

@@ -1,9 +1,10 @@
 .container {
     position: relative;
     width: 100%;
+    /* 500vh to ensure long scroll duration as requested */
     height: 500vh;
-    /* Better balance for the current ring count */
     background: transparent;
+    z-index: 10;
 }
 
 .sceneWrapper {
@@ -11,114 +12,158 @@
     top: 0;
     width: 100%;
     height: 100vh;
-    perspective: 1400px;
+    perspective: 1200px;
+    /* Slightly deeper perspective for floating assets */
+    perspective-origin: 50% 50%;
     overflow: hidden;
     background: transparent;
     display: flex;
     align-items: center;
     justify-content: center;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+
+.sceneActive {
+    pointer-events: auto;
+    opacity: 1;
+}
+
+.sceneHidden {
+    pointer-events: none;
+    opacity: 0;
 }
 
 .stack {
-    position: absolute;
-    top: 50%;
-    left: 50%;
+    position: relative;
+    width: 0;
+    height: 0;
     transform-style: preserve-3d;
-    transform: translate(-50%, -50%);
+    will-change: transform;
 }
 
 .ring {
     position: absolute;
+    top: 0;
+    left: 0;
     transform-style: preserve-3d;
+    will-change: transform;
+    --radius: 300px;
+}
+
+/* The Ring Outline - Very subtle for floating look */
+.ring::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: calc(var(--radius) * 2.2);
+    height: calc(var(--radius) * 2.2);
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 1px solid rgba(112, 0, 255, 0.1);
+    pointer-events: none;
 }
 
 .panel {
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 220px;
-    /* Larger Panels */
-    height: 150px;
+    /* Increased size slightly for floating assets */
+    width: 200px;
+    height: 200px;
     transform-style: preserve-3d;
+    backface-visibility: visible;
     cursor: pointer;
-    opacity: 0.5;
-    filter: grayscale(1) saturate(0.55) contrast(0.9) brightness(0.8);
-    transition: opacity 0.4s cubic-bezier(0.23, 1, 0.32, 1),
-        filter 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    will-change: transform, opacity;
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.panel:hover {
-    opacity: 1;
-    filter: grayscale(0) saturate(1.25) contrast(1.06);
-    z-index: 50;
-}
-
+/* Floating Wrapper: No more card/background/border */
 .thumb {
     width: 100%;
     height: 100%;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.55);
-    transform-origin: center center;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-    will-change: transform;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    overflow: visible;
+    /* Allow drop shadows to bleed out */
 }
 
-.panel:hover .thumb {
-    transform: scale(1.2);
-    box-shadow: 0 30px 100px rgba(0, 0, 0, 0.9), 0 0 30px rgba(168, 85, 247, 0.3);
-    border-color: rgba(168, 85, 247, 0.6);
-}
+/* REMOVED: .thumb::after grayscale overlay for max transparency/clarity */
 
 .img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    display: block;
+    object-fit: contain;
+    /* Don't crop transparent art */
+    transition: transform 0.5s ease, filter 0.5s ease;
+    /* Clean drop shadow to help floating assets stand out */
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
 }
 
+/* Active / Hover States */
+.panel:hover {
+    z-index: 100 !important;
+}
+
+.panel:hover .thumb {
+    transform: scale(1.2) translateZ(40px);
+}
+
+.panel:hover .img {
+    transform: scale(1.05);
+    /* Purple glow on hover for the image itself */
+    filter: drop-shadow(0 0 25px rgba(112, 0, 255, 0.4));
+}
+
+.panel:active .thumb {
+    transform: scale(0.95);
+}
+
+/* Central Element (Logo/Brand) */
 .centerBrand {
     position: absolute;
-    left: 0;
-    top: 0;
+    left: 50%;
+    top: 50%;
     transform-style: preserve-3d;
-    transform: translate3d(-50%, -50%, 350px);
+    transform: translate(-50%, -50%);
+    width: 200px;
+    height: 200px;
+    display: grid;
+    place-items: center;
+    z-index: 50;
     pointer-events: none;
-    text-align: center;
-    font-weight: 950;
-    letter-spacing: 0.4em;
-    font-size: clamp(24px, 5vw, 60px);
-    /* Reduced size */
-    color: rgba(255, 255, 255, 0.9);
-    text-shadow:
-        0 0 20px rgba(168, 85, 247, 0.4),
-        0 0 50px rgba(168, 85, 247, 0.2),
-        0 0 100px rgba(168, 85, 247, 0.1);
-    padding: 20px 40px;
-    border-radius: 20px;
-    background: rgba(0, 0, 0, 0.4);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(168, 85, 247, 0.2);
-    white-space: nowrap;
-    text-transform: uppercase;
+    will-change: transform;
 }
 
-/* Overlay Styles */
+.logoWrapper {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    filter: drop-shadow(0 0 30px rgba(112, 0, 255, 0.3));
+}
+
+.logoImg {
+    object-fit: contain;
+}
+
+/* ========================================= */
+/* OVERLAY STYLES (Glassmorphism)            */
+/* ========================================= */
 .overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(5, 5, 5, 0.9);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 9999;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
 }
 
 .overlayActive {
@@ -127,65 +172,50 @@
 }
 
 .card {
-    background: linear-gradient(145deg, #0a0a0a, #111);
+    background: rgba(20, 20, 20, 0.6);
     padding: 60px;
     border-radius: 32px;
-    max-width: 700px;
-    /* Much bigger card */
+    max-width: 800px;
     width: 90%;
     color: #fff;
-    box-shadow: 0 50px 150px rgba(0, 0, 0, 1), 0 0 40px rgba(168, 85, 247, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transform: scale(0.8) translateY(60px);
-    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    border: 1px solid rgba(112, 0, 255, 0.2);
+    box-shadow: 0 50px 150px rgba(0, 0, 0, 0.8),
+        0 0 60px rgba(112, 0, 255, 0.1);
+    transform: scale(0.9) translateY(40px);
+    opacity: 0;
     position: relative;
     max-height: 90vh;
     overflow-y: auto;
     overflow-x: hidden;
 }
 
-.card::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(168, 85, 247, 0.05) 0%, transparent 70%);
-    pointer-events: none;
-}
-
-.overlayActive .card {
-    transform: scale(1) translateY(0);
-}
-
 .cardTitle {
     margin: 0 0 12px;
-    font-size: clamp(32px, 5vw, 48px);
+    font-size: clamp(32px, 5vw, 64px);
     font-weight: 900;
-    line-height: 1.1;
-    background: linear-gradient(to right, #fff, #a855f7);
+    line-height: 1.0;
+    background: linear-gradient(135deg, #fff 0%, #7000ff 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
 }
 
 .cardSubtitle {
-    margin: 0 0 20px;
-    font-size: 14px;
-    color: #a855f7;
-    /* Purple */
+    margin: 0 0 24px;
+    font-size: 16px;
+    color: #ff00cc;
     text-transform: uppercase;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.2em;
     font-weight: 600;
 }
 
 .cardDesc {
     margin: 0 0 40px;
-    color: rgba(255, 255, 255, 0.75);
+    color: rgba(255, 255, 255, 0.8);
     line-height: 1.8;
     font-size: 18px;
     font-weight: 300;
+    max-width: 90%;
 }
 
 .socials {
@@ -198,66 +228,72 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.03);
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.05);
     color: #fff;
     transition: all 0.3s ease;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .socialBtn:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: #7000ff;
     transform: translateY(-4px);
-    border-color: rgba(255, 255, 255, 0.2);
-    color: #a855f7;
+    border-color: #7000ff;
+    color: #fff;
+    box-shadow: 0 10px 20px rgba(112, 0, 255, 0.3);
 }
 
 .closeBtn {
     width: 100%;
-    padding: 14px;
+    padding: 18px;
     border: none;
     background: #fff;
     color: #000;
     cursor: pointer;
-    border-radius: 12px;
-    font-weight: 700;
+    border-radius: 16px;
+    font-weight: 800;
     transition: all 0.3s ease;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.1em;
+    font-size: 14px;
 }
 
 .closeBtn:hover {
-    background: #e2e2e2;
+    background: #ff00cc;
+    color: #fff;
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(255, 0, 204, 0.3);
 }
 
 @media (max-width: 768px) {
+    .container {
+        height: 350vh;
+    }
+
     .panel {
-        width: 110px;
-        height: 75px;
+        width: 140px;
+        height: 140px;
     }
 
     .card {
-        padding: 30px 20px;
+        padding: 30px 24px;
         width: 95%;
-        border-radius: 20px;
+        border-radius: 24px;
     }
 
     .cardTitle {
-        font-size: 24px;
+        font-size: 32px;
     }
 
     .cardDesc {
-        font-size: 15px;
-        margin-bottom: 25px;
+        font-size: 16px;
+        margin-bottom: 30px;
     }
 
     .centerBrand {
-        letter-spacing: 0.2em;
-        padding: 12px 20px;
-        font-size: 20px;
+        width: 120px;
+        height: 120px;
     }
 }

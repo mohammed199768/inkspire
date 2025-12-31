@@ -76,6 +76,26 @@ export function buildPopupFromReview(review: Review): PopupPayload {
     };
 }
 
+import { Project } from "@/types/project";
+
+export function buildPopupFromProject(project: Project): PopupPayload {
+    return {
+        id: project.id,
+        source: "work",
+        title: project.title,
+        subtitle: project.subtitle || "Project",
+        description: project.description || "A closer look at this featured project.",
+        imageUrl: project.coverImage || "/works/placeholder.webp",
+        projectSlug: project.slug,
+        social: project.links ? {
+            behanceUrl: project.links.behance || undefined,
+            instagramUrl: project.links.instagram || undefined,
+            facebookUrl: project.links.facebook || undefined,
+            twitterUrl: project.links.twitter || undefined,
+        } : undefined
+    };
+}
+
 export function buildPopupFromWork(item: any): PopupPayload {
     return {
         id: item.id || `work-${item.imageUrl}`,
@@ -84,6 +104,7 @@ export function buildPopupFromWork(item: any): PopupPayload {
         subtitle: item.subtitle || "Portfolio",
         imageUrl: item.imageUrl || item.src,
         description: item.description || "A closer look at this featured project.",
+        projectSlug: item.slug,
         social: item.social,
     };
 }

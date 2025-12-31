@@ -53,9 +53,9 @@ export default function Home() {
                 </div>
 
 
-                <div className="cinematic-section">
+                {/* <div className="cinematic-section">
                     <ProcessTimeline />
-                </div>
+                </div> */}
                 <div className="cinematic-section">
                     <FinalCTA />
                 </div>
