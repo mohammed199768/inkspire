@@ -106,7 +106,7 @@ export default function InsightPopup() {
 
                         {/* --- LEFT: Visual Intel --- */}
                         {currentPopup.imageUrl && (
-                            <div className="w-full md:w-[45%] h-72 md:h-auto relative overflow-hidden bg-zinc-950 border-r border-white/5">
+                            <div className="w-full md:w-[45%] h-56 sm:h-72 md:h-auto relative overflow-hidden bg-zinc-950 border-b md:border-b-0 md:border-r border-white/5">
                                 <Image
                                     src={currentPopup.imageUrl}
                                     alt={currentPopup.title}
@@ -125,38 +125,38 @@ export default function InsightPopup() {
                         )}
 
                         {/* --- RIGHT: Content Core --- */}
-                        <div className={`w-full ${currentPopup.imageUrl ? 'md:w-[55%]' : 'w-full'} flex flex-col relative`}>
+                        <div className={`w-full ${currentPopup.imageUrl ? 'md:w-[55%]' : 'w-full'} flex flex-col relative min-h-0`}>
 
                             {/* Technical Header Area */}
-                            <div className="px-8 pt-8 md:px-14 md:pt-14 relative z-10">
+                            <div className="px-6 pt-10 md:px-14 md:pt-14 relative z-10">
                                 <div className="flex items-center gap-3 mb-4">
-                                    <div className="h-px w-8 bg-purple-500" />
-                                    <span className="text-[10px] font-bold tracking-[0.4em] text-purple-400 uppercase">
+                                    <div className="h-px w-6 md:w-8 bg-purple-500" />
+                                    <span className="text-[9px] md:text-[10px] font-bold tracking-[0.3em] md:tracking-[0.4em] text-purple-400 uppercase">
                                         Project Insight // {currentPopup.source || "Featured"}
                                     </span>
                                 </div>
-                                <h2 className="text-4xl md:text-6xl font-bold text-white mb-2 leading-[0.9] brand-font tracking-tighter">
+                                <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white mb-2 leading-[1] md:leading-[0.9] brand-font tracking-tighter">
                                     {currentPopup.title}
                                 </h2>
                                 {currentPopup.subtitle && (
-                                    <p className="text-xl text-white/40 font-medium font-outfit uppercase tracking-widest mt-2">
+                                    <p className="text-sm md:text-xl text-white/40 font-medium font-outfit uppercase tracking-[0.15em] md:tracking-widest mt-1 md:mt-2">
                                         {currentPopup.subtitle}
                                     </p>
                                 )}
                             </div>
 
                             {/* Scrollable Intelligence Body */}
-                            <div className="flex-1 overflow-y-auto px-8 md:px-14 py-8 custom-scrollbar relative z-10">
-                                <div className="text-white/70 text-lg md:text-xl leading-relaxed font-light font-sans max-w-2xl border-l-2 border-purple-500/20 pl-6 py-2">
+                            <div className="flex-1 overflow-y-auto px-6 md:px-14 py-6 md:py-8 custom-scrollbar relative z-10">
+                                <div className="text-white/70 text-base md:text-xl leading-relaxed font-light font-sans max-w-2xl border-l-2 border-purple-500/20 pl-4 md:pl-6 py-2">
                                     {currentPopup.description}
                                 </div>
 
                                 {/* Dynamic Service Chips */}
                                 {currentPopup.tags && (
-                                    <div className="flex flex-wrap gap-2 mt-10">
+                                    <div className="flex flex-wrap gap-2 mt-8 md:mt-10">
                                         {currentPopup.tags.map((tag, i) => (
-                                            <div key={i} className="flex items-center gap-2 px-4 py-1.5 bg-white/5 border border-white/10 rounded-full text-[11px] font-bold text-white/40 hover:text-white hover:border-purple-500/40 transition-all cursor-default group/tag backdrop-blur-sm">
-                                                <Target size={12} className="text-purple-500/60 group-hover/tag:scale-110 transition-transform" />
+                                            <div key={i} className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-1.5 bg-white/5 border border-white/10 rounded-full text-[10px] md:text-[11px] font-bold text-white/40 hover:text-white hover:border-purple-500/40 transition-all cursor-default group/tag backdrop-blur-sm">
+                                                <Target size={10} className="text-purple-500/60 group-hover/tag:scale-110 transition-transform" />
                                                 {tag.toUpperCase()}
                                             </div>
                                         ))}
@@ -165,9 +165,9 @@ export default function InsightPopup() {
                             </div>
 
                             {/* Footer: Action nexus */}
-                            <div className="px-8 pb-8 md:px-14 md:pb-12 pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-8 z-20">
+                            <div className="px-6 pb-8 md:px-14 md:pb-12 pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-6 md:gap-8 z-20 mt-auto">
 
-                                <div className="flex flex-col gap-3 w-full sm:w-auto">
+                                <div className="flex flex-col gap-3 w-full sm:w-auto items-center sm:items-start">
                                     <span className="text-[9px] font-black text-white/20 tracking-[0.3em] uppercase">Connect Protocol</span>
                                     <div className="flex items-center gap-2">
                                         <SocialLink href={currentPopup.social?.facebookUrl} icon={Facebook} label="FB" />
@@ -181,16 +181,16 @@ export default function InsightPopup() {
                                 {currentPopup.projectSlug && (
                                     <a
                                         href={`/portfolio/${currentPopup.projectSlug}`}
-                                        className="w-full sm:w-auto relative group/btn flex items-center justify-center gap-4 px-12 py-5 bg-white text-black overflow-hidden rounded-xl"
+                                        className="w-full sm:w-auto relative group/btn flex items-center justify-center gap-3 px-8 py-4 md:px-12 md:py-5 bg-white text-black overflow-hidden rounded-xl transition-all duration-300 active:scale-95"
                                         onClick={closePopup}
                                     >
                                         {/* Cinematic Button Hover Effect */}
                                         <div className="absolute inset-0 bg-purple-600 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-500 ease-out" />
 
-                                        <span className="relative z-10 font-bold text-sm uppercase tracking-wider group-hover/btn:text-white transition-colors duration-300">
+                                        <span className="relative z-10 font-bold text-xs md:text-sm uppercase tracking-wider group-hover/btn:text-white transition-colors duration-300">
                                             Explore Full Case Study
                                         </span>
-                                        <Layers size={18} className="relative z-10 group-hover/btn:text-white transition-colors duration-300 group-hover/btn:rotate-12 transition-transform" />
+                                        <Layers size={16} className="relative z-10 group-hover/btn:text-white transition-colors duration-300 group-hover/btn:rotate-12 transition-transform" />
                                     </a>
                                 )}
                             </div>
