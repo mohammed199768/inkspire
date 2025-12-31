@@ -106,21 +106,21 @@ export default function ProjectPage() {
         <main className="relative min-h-screen bg-[#020204] text-white selection:bg-purple-500/40 overflow-x-hidden">
 
             {/* --- Global Decorative Layer --- */}
-            <div className="fixed inset-0 pointer-events-none z-0">
+            <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
                 <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] mix-blend-soft-light" />
-                <motion.div style={{ y: y1 }} className="absolute -top-[10%] -right-[5%] w-[800px] h-[800px] bg-purple-900/10 rounded-full blur-[150px]" />
-                <motion.div style={{ y: y2 }} className="absolute top-[40%] -left-[10%] w-[600px] h-[600px] bg-indigo-900/10 rounded-full blur-[120px]" />
+                <motion.div style={{ y: y1 }} className="absolute -top-[10%] -right-[5%] w-[300px] h-[300px] md:w-[800px] md:h-[800px] bg-purple-900/10 rounded-full blur-[80px] md:blur-[150px]" />
+                <motion.div style={{ y: y2 }} className="absolute top-[40%] -left-[10%] w-[250px] h-[250px] md:w-[600px] md:h-[600px] bg-indigo-900/10 rounded-full blur-[60px] md:blur-[120px]" />
             </div>
 
             {/* --- TOP HUD: Navigation & Progress --- */}
-            <nav className="fixed top-0 left-0 w-full z-[100] px-6 py-8 flex justify-between items-center pointer-events-none">
+            <nav className="fixed top-24 md:top-0 left-0 w-full z-[40] px-6 py-4 md:py-8 flex justify-between items-center pointer-events-none">
                 <motion.div
                     initial={{ opacity: 0, x: -50 }}
                     animate={{ opacity: 1, x: 0 }}
                     className="pointer-events-auto"
                 >
                     <Link href="/portfolio" className="flex items-center gap-4 group">
-                        <div className="w-12 h-12 flex items-center justify-center border border-white/10 rounded-full bg-black/20 backdrop-blur-md group-hover:border-purple-500/50 group-hover:bg-purple-500/10 transition-all duration-500">
+                        <div className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center border border-white/10 rounded-full bg-black/40 backdrop-blur-md group-hover:border-purple-500/50 group-hover:bg-purple-500/10 transition-all duration-500">
                             <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
                         </div>
                         <span className="text-[10px] font-black uppercase tracking-[0.4em] hidden md:block">Exit Archive</span>
@@ -135,9 +135,9 @@ export default function ProjectPage() {
                     <button
                         title="Share Project"
                         aria-label="Share Project"
-                        className="w-12 h-12 flex items-center justify-center border border-white/10 rounded-full bg-black/20 backdrop-blur-md hover:border-purple-500/50 hover:bg-purple-500/10 transition-all"
+                        className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center border border-white/10 rounded-full bg-black/40 backdrop-blur-md hover:border-purple-500/50 hover:bg-purple-500/10 transition-all shadow-xl"
                     >
-                        <Share2 size={18} />
+                        <Share2 size={16} className="md:w-[18px] md:h-[18px]" />
                     </button>
                 </motion.div>
             </nav>
@@ -154,7 +154,7 @@ export default function ProjectPage() {
                             className="h-1 bg-purple-500 mb-8 md:mb-10"
                         />
                         <div className="space-y-4">
-                            <RevealText delay={0.2} className="text-5xl sm:text-7xl md:text-8xl lg:text-[10rem] font-black brand-font leading-[0.9] md:leading-[0.82] tracking-tighter italic uppercase">
+                            <RevealText delay={0.2} className="text-4xl sm:text-6xl md:text-8xl lg:text-[10rem] font-black brand-font leading-[0.9] md:leading-[0.82] tracking-tighter italic uppercase break-words">
                                 {title}
                             </RevealText>
                             {subtitle && (
@@ -334,7 +334,7 @@ export default function ProjectPage() {
             </div>
 
             {/* Aesthetic Fine Grain Global */}
-            <div className="fixed inset-0 pointer-events-none opacity-[0.2] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-soft-light z-[1000]" />
+            <div className="fixed inset-0 pointer-events-none opacity-[0.2] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-soft-light z-0" />
         </main>
     );
 }

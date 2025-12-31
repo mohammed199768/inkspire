@@ -66,7 +66,7 @@ export default function InsightPopup() {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.6 }}
-                        className="absolute inset-0 bg-black/90 backdrop-blur-xl"
+                        className="absolute inset-0 bg-black/90 backdrop-blur-xl overflow-hidden"
                         onClick={closePopup}
                     >
                         {/* Animated Grain/Noise for Texture */}
