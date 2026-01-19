@@ -57,10 +57,10 @@ export default function ContactCommandCenter() {
                     <span className="w-2.5 h-2.5 rounded-full bg-green-400 animate-pulse shadow-[0_0_10px_rgba(74,222,128,0.5)]"></span>
                     SYSTEMS READY / ACCEPTING MISSIONS
                 </div>
-                <h1 className="text-cinematic-xl font-black mb-8 leading-none bg-clip-text text-transparent bg-gradient-to-br from-white via-purple-100 to-white/20">
+                <h1 className="text-cinematic-xl font-black mb-6 leading-none bg-clip-text text-transparent bg-gradient-to-br from-white via-purple-100 to-white/20">
                     LET'S TALK <br /> <span className="text-purple-500">FUTURE.</span>
                 </h1>
-                <p className="text-gray-400 text-xl md:text-2xl max-w-xl leading-relaxed font-light">
+                <p className="text-gray-400 max-w-xl leading-relaxed font-light" style={{ fontSize: 'var(--fs-body)' }}>
                     Ready to build something impossible? Fill out the intel below and we'll initiate the launch sequence.
                 </p>
             </motion.div>
@@ -83,7 +83,7 @@ export default function ContactCommandCenter() {
                                 <input 
                                     type="text" 
                                     placeholder="Enter your name..."
-                                    className="w-full bg-transparent border-b border-white/10 py-5 text-2xl md:text-3xl focus:outline-none focus:border-purple-500 transition-all placeholder:text-white/5 font-light"
+                                    className="w-full bg-transparent border-b border-white/10 py-4 text-xl md:text-2xl focus:outline-none focus:border-purple-500 transition-all placeholder:text-white/5 font-light"
                                     onFocus={() => setActiveField('name')}
                                     onBlur={() => setActiveField(null)}
                                     value={formState.name}
@@ -97,7 +97,7 @@ export default function ContactCommandCenter() {
                                 <input 
                                     type="email" 
                                     placeholder="your@intel.com"
-                                    className="w-full bg-transparent border-b border-white/10 py-5 text-2xl md:text-3xl focus:outline-none focus:border-purple-500 transition-all placeholder:text-white/5 font-light"
+                                    className="w-full bg-transparent border-b border-white/10 py-4 text-xl md:text-2xl focus:outline-none focus:border-purple-500 transition-all placeholder:text-white/5 font-light"
                                     onFocus={() => setActiveField('email')}
                                     onBlur={() => setActiveField(null)}
                                     value={formState.email}
@@ -129,7 +129,7 @@ export default function ContactCommandCenter() {
                             <textarea 
                                 rows={5}
                                 placeholder="Describe the mission parameters and objectives..."
-                                className="w-full bg-white/[0.03] border border-white/10 rounded-2xl p-6 text-xl md:text-2xl focus:outline-none focus:border-purple-500 focus:bg-white/[0.06] transition-all placeholder:text-white/5 resize-none shadow-2xl font-light"
+                                className="w-full bg-white/[0.03] border border-white/10 rounded-2xl p-6 text-lg md:text-xl focus:outline-none focus:border-purple-500 focus:bg-white/[0.06] transition-all placeholder:text-white/5 resize-none shadow-2xl font-light"
                                 onFocus={() => setActiveField('msg')}
                                 onBlur={() => setActiveField(null)}
                                 value={formState.message}

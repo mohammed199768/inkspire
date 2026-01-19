@@ -20,6 +20,10 @@ export default function ClientsSection() {
     const { openPopup } = usePopup();
     const isTouch = useIsTouchDevice(); // Hook to detect mobile/tablet
 
+    // Safari detection for performance and rendering optimization
+    const isSafari = typeof navigator !== 'undefined' && 
+                     /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
     return (
         <section className="min-h-[100dvh] w-full flex items-center bg-white/[0.02] border-y border-white/5 relative overflow-visible">
 
@@ -83,14 +87,17 @@ export default function ClientsSection() {
                                             <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-1000 ease-in-out skew-x-12" />
                                         </div>
                                         <div className={`relative z-10 w-full h-full flex items-center justify-center transition-all duration-500 ease-out group-hover:scale-110 group-hover:-translate-y-2
-                                            ${client.projectSlug
+                                            ${isSafari ? 'opacity-40 group-hover:opacity-100' : ''}
+                                            ${!isSafari ? (client.projectSlug
                                                 ? 'grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100'
-                                                : 'grayscale opacity-20 group-hover:grayscale-0 group-hover:opacity-60'}`}>
+                                                : 'grayscale opacity-20 group-hover:grayscale-0 group-hover:opacity-60') : ''}`}>
                                             <Image
                                                 src={client.logo}
                                                 alt={client.name || "Client Logo"}
                                                 fill
-                                                className="object-contain transition-all duration-500 brightness-0 invert group-hover:brightness-[2]"
+                                                className={`object-contain transition-all duration-500 ${
+                                                    isSafari ? 'safari-logo-fix' : 'brightness-0 invert group-hover:brightness-[2]'
+                                                }`}
                                                 sizes="(max-width: 768px) 50vw, 25vw"
                                             />
                                         </div>

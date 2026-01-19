@@ -154,7 +154,16 @@ export function useCinematicReveal() {
     }, []);
 
     useEffect(() => {
-        if (typeof window === 'undefined' || isTouch !== false) return;
+        if (typeof window === 'undefined') return;
+
+        // Enhanced Guard: Disable reveal on Tablet/Mobile or Touch-only devices
+        const isSmallScreen = window.innerWidth <= 1024;
+        const isTouchUI = window.matchMedia("(pointer: coarse)").matches || window.matchMedia("(hover: none)").matches;
+
+        if (isSmallScreen || isTouchUI || isTouch) {
+            // Treat as static state
+            return;
+        }
 
         const onMouseMove = (e: MouseEvent) => {
             stateRef.current.mouse.targetX = e.clientX;
@@ -181,8 +190,11 @@ export function useCinematicReveal() {
         };
     }, [isTouch, updateRects, animate]);
 
+    // Flag to disable the entire interactive reveal
+    const isDisabled = isTouch === true || (typeof window !== 'undefined' && window.innerWidth <= 1024);
+
     return {
-        isTouch,
+        isTouch: isDisabled,
         containerRef,
         setStackRef
     };

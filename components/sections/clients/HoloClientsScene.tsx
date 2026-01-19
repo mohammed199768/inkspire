@@ -18,6 +18,17 @@ import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { RGBShiftShader } from 'three/examples/jsm/shaders/RGBShiftShader.js';
 
+// --- VISUAL CONFIG ---
+const GLOW_CONFIG = {
+    enabled: true,
+    color: "rgba(168, 85, 247, 0.45)", // Subtle Purple
+    cardAccent: "#a0a0ff",             // Indigo Accent
+    bloomThreshold: 0.9,               // High threshold = less glow
+    bloomStrength: 0.35,              // Subdued glow
+    bloomRadius: 0.25,
+    maxPixelRatio: 1.25
+};
+
 export default function HoloClientsScene() {
     const containerRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLDivElement>(null);
@@ -68,7 +79,12 @@ export default function HoloClientsScene() {
             powerPreference: "high-performance" 
         });
         renderer.setSize(width, height);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+
+        // Safari Detection
+        const isSafari = typeof navigator !== 'undefined' && /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+        // Performance first
+        renderer.setPixelRatio(isSafari ? Math.min(window.devicePixelRatio, 1.2) : Math.min(window.devicePixelRatio, 1.25));
         renderer.toneMapping = THREE.ReinhardToneMapping;
         canvasRef.current.appendChild(renderer.domElement);
 
@@ -76,6 +92,9 @@ export default function HoloClientsScene() {
         const observer = new IntersectionObserver(
             ([entry]) => {
                 isVisible.current = entry.isIntersecting;
+                if (entry.isIntersecting && !reqIdRef.current) {
+                    animate();
+                }
             },
             { threshold: 0 }
         );
@@ -86,12 +105,16 @@ export default function HoloClientsScene() {
         const renderPass = new RenderPass(scene, camera);
         composer.addPass(renderPass);
 
-        // Bloom (Glow)
-        // Fix: Cast directly to any to bypass conflicting type definitions (0-2 vs 4 args)
-        const bloomPass = new (UnrealBloomPass as any)(new THREE.Vector2(width, height), 1.5, 0.4, 0.85);
-        bloomPass.threshold = 0;
-        bloomPass.strength = 1.2; 
-        bloomPass.radius = 0.5;
+        // Bloom (Glow) - Recalibrated to remove white over-burn
+        const bloomPass = new (UnrealBloomPass as any)(
+            new THREE.Vector2(width, height), 
+            GLOW_CONFIG.bloomStrength, 
+            GLOW_CONFIG.bloomRadius, 
+            GLOW_CONFIG.bloomThreshold
+        );
+        bloomPass.threshold = GLOW_CONFIG.bloomThreshold;
+        bloomPass.strength = GLOW_CONFIG.bloomStrength;
+        bloomPass.radius = GLOW_CONFIG.bloomRadius;
         composer.addPass(bloomPass);
 
         // Film Grain
@@ -119,16 +142,16 @@ export default function HoloClientsScene() {
             const draw = (img?: HTMLImageElement) => {
                 ctx.clearRect(0,0,512,512);
 
-                // 1. Neon Frame
-                ctx.shadowBlur = 20;
-                ctx.shadowColor = color;
+                // 1. Neon Frame - Subtle Purple
+                ctx.shadowBlur = 4;
+                ctx.shadowColor = GLOW_CONFIG.color;
                 ctx.strokeStyle = color;
-                ctx.lineWidth = 10;
-                ctx.strokeRect(50, 100, 412, 312); // Adjusted frame size
+                ctx.lineWidth = 6;
+                ctx.strokeRect(50, 100, 412, 312);
 
                 // 2. Content
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = 'white';
+                ctx.shadowBlur = 3;
+                ctx.shadowColor = GLOW_CONFIG.color;
                 ctx.fillStyle = 'white';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
@@ -216,9 +239,10 @@ export default function HoloClientsScene() {
             const screenMat = new THREE.MeshBasicMaterial({
                 map: tex,
                 transparent: true,
-                opacity: 0.85,
+                opacity: isSafari ? 0.7 : 0.85,
                 blending: THREE.AdditiveBlending,
                 side: THREE.FrontSide,
+                alphaTest: 0.5,
                 depthWrite: false
             });
             const screen = new THREE.Mesh(geometry, screenMat);
@@ -263,14 +287,17 @@ export default function HoloClientsScene() {
 
         // --- 7. ANIMATION LOOP ---
         const animate = () => {
-            reqIdRef.current = requestAnimationFrame(animate); 
+            if (isVisible.current) {
+                reqIdRef.current = requestAnimationFrame(animate); 
+            }
             
             if (!isVisible.current) return;
 
             const state = sceneRefs.current;
             if(!state) return;
 
-            const time = Date.now() * 0.001;
+            const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+            const time = (Date.now() * 0.001) * (prefersReducedMotion ? 0.3 : 1);
 
             // Update Slates Physics
             state.slates.forEach(group => {

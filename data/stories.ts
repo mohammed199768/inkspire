@@ -1,70 +1,65 @@
+/**
+ * UNIFIED STORY DATA LAYER
+ * All cinematic moments are now unified into a single master narrative.
+ */
+
+export interface StoryMoment {
+    type: "image" | "video";
+    src: string;
+    tag: string;
+}
+
 export interface Story {
     id: string;
     name: string;
     sub: string;
     avatar: string;
     projectSlug: string | null;
-    stories: {
-        type: "image" | "video";
-        src: string;
-        tag: string;
-    }[];
+    stories: StoryMoment[];
 }
 
+// Internal Master Narrative Structure (Semantic organization)
+const MASTER_ODYSSEY_MOMENTS: StoryMoment[] = [
+    // --- CHAPTER 1: BRAND IDENTITY ---
+    { type: "image", src: "/reels/3.webp", tag: "Brand Identity // Creative Direction" },
+    { type: "image", src: "/reels/4.webp", tag: "Brand Identity // Visual Language" },
+
+    // --- CHAPTER 2: WEB EXPERIENCE ---
+    { type: "image", src: "/reels/5.webp", tag: "Web Experience // Modern UI/UX" },
+    { type: "image", src: "/reels/6.webp", tag: "Web Experience // Interactive Motion" },
+
+    // --- CHAPTER 3: CLIENT SUCCESS ---
+    { type: "image", src: "/reels/7.webp", tag: "Client Success // Strategic Growth" },
+    { type: "image", src: "/reels/8.webp", tag: "Client Success // Digital Transformation" },
+
+    // --- CHAPTER 4: AGENCY LIFE ---
+    { type: "image", src: "/reels/9.webp", tag: "Agency Life // Our Studio" },
+    { type: "image", src: "/reels/10.webp", tag: "Agency Life // Team Synergy" },
+
+    // --- CHAPTER 5: LATEST WORK ---
+    { type: "image", src: "/reels/11.webp", tag: "Latest Work // Modern Aesthetics" },
+    { type: "image", src: "/reels/12.webp", tag: "Latest Work // Final Masterpiece" },
+];
+
+/**
+ * EXPORTED HIGHLIGHTS
+ * Optimized for UI rendering: Containing exactly ONE master story.
+ * This naturally triggers the UI to show a single prominent story bubble.
+ */
 export const HIGHLIGHTS: Story[] = [
     {
-        id: "h1",
-        name: "Brand Identity",
-        sub: "Inkspire • Studio",
+        id: "inkspire-master-story",
+        name: "Inkspire Stories",
+        sub: "The Full Odyssey",
         avatar: "/reels/3.webp",
-        projectSlug: "neon-cybernetic",
-        stories: [
-            { type: "image", src: "/reels/3.webp", tag: "Creative Direction" },
-            { type: "image", src: "/reels/4.webp", tag: "Visual Language" },
-        ]
-    },
-    {
-        id: "h2",
-        name: "Web Experience",
-        sub: "Amman • Jordan",
-        avatar: "/reels/5.webp",
-        projectSlug: "abstract-flow",
-        stories: [
-            { type: "image", src: "/reels/5.webp", tag: "Modern UI/UX" },
-            { type: "image", src: "/reels/6.webp", tag: "Interactive Motion" },
-        ]
-    },
-    {
-        id: "h3",
-        name: "Client Success",
-        sub: "Global Projects",
-        avatar: "/reels/7.webp",
         projectSlug: null,
-        stories: [
-            { type: "image", src: "/reels/7.webp", tag: "Strategic Growth" },
-            { type: "image", src: "/reels/8.webp", tag: "Digital Transformation" },
-        ]
-    },
-    {
-        id: "h4",
-        name: "Agency Life",
-        sub: "Inkspire Team",
-        avatar: "/reels/9.webp",
-        projectSlug: null,
-        stories: [
-            { type: "image", src: "/reels/9.webp", tag: "Our Studio" },
-            { type: "image", src: "/reels/10.webp", tag: "Team Synergy" },
-        ]
-    },
-    {
-        id: "h5",
-        name: "Latest Work",
-        sub: "December 2025",
-        avatar: "/reels/11.webp",
-        projectSlug: "urban-glitch",
-        stories: [
-            { type: "image", src: "/reels/11.webp", tag: "Modern Aesthetics" },
-            { type: "image", src: "/reels/12.webp", tag: "Final Masterpiece" },
-        ]
+        stories: MASTER_ODYSSEY_MOMENTS
     }
 ];
+
+// Semantic Source of Truth
+export const INKSPIRE_STORY = {
+    id: "inkspire-odyssey",
+    title: "Inkspire Stories",
+    chapters: MASTER_ODYSSEY_MOMENTS
+};

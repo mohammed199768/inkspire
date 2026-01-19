@@ -8,8 +8,26 @@ interface NineDimensionsBackgroundProps {
     targetShapeIndex: number;
 }
 
+// --- PERFORMANCE PROFILES ---
+const getProfile = () => {
+    if (typeof window === 'undefined') return { mode: 'desktop', count: 3000, pixelRatio: 1.5, updateStep: 1, postFX: true };
+    
+    const w = window.innerWidth;
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    
+    if (prefersReduced) return { mode: 'mobile', count: 0, pixelRatio: 1, updateStep: 1, postFX: false };
+    
+    if (w < 768) {
+        return { mode: 'mobile', count: 0, pixelRatio: 1, updateStep: 1, postFX: false }; // Disabled on small mobile
+    } else if (w <= 1024) {
+        return { mode: 'tablet', count: 1200, pixelRatio: 1.0, updateStep: 2, postFX: false }; // Lite profile for Tablet
+    }
+    return { mode: 'desktop', count: 3000, pixelRatio: 1.5, updateStep: 1, postFX: true }; // Full quality
+};
+
 export default function NineDimensionsBackground({ targetShapeIndex }: NineDimensionsBackgroundProps) {
     const containerRef = useRef<HTMLDivElement>(null);
+    const PROFILE = useRef(getProfile());
     
     // Refs for cleanup
     const sceneRef = useRef<THREE.Scene | null>(null);
@@ -18,8 +36,9 @@ export default function NineDimensionsBackground({ targetShapeIndex }: NineDimen
     const meshRef = useRef<THREE.InstancedMesh | null>(null);
     const shapesRef = useRef<number[][]>([]);
     const reqIdRef = useRef<number | null>(null);
+    const frameCountRef = useRef(0);
     
-    // Animation state refs (to avoid re-renders)
+    // Animation state refs
     const isVisible = useRef(true);
     const currentShapeIndexRef = useRef(0);
     const targetShapeIndexRef = useRef(0);
@@ -27,6 +46,8 @@ export default function NineDimensionsBackground({ targetShapeIndex }: NineDimen
 
     useEffect(() => {
         if (!containerRef.current) return;
+        const profile = PROFILE.current;
+        if (profile.count === 0) return;
 
         // --- 1. SETUP ---
         const scene = new THREE.Scene();
@@ -37,20 +58,29 @@ export default function NineDimensionsBackground({ targetShapeIndex }: NineDimen
         cameraRef.current = camera;
         camera.position.z = 100;
 
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
+        const renderer = new THREE.WebGLRenderer({ 
+            alpha: true, 
+            antialias: profile.mode === 'desktop', 
+            powerPreference: "high-performance" 
+        });
         rendererRef.current = renderer;
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, profile.pixelRatio));
         containerRef.current.appendChild(renderer.domElement);
 
-        // Page Visibility Visibility
+        // Visibility Observer
+        const observer = new IntersectionObserver(([entry]) => {
+            isVisible.current = entry.isIntersecting;
+        }, { threshold: 0.1 });
+        observer.observe(containerRef.current);
+
         const handleVisibilityChange = () => {
-            isVisible.current = !document.hidden;
+            if (document.hidden) isVisible.current = false;
         };
         document.addEventListener("visibilitychange", handleVisibilityChange);
 
         // --- 2. MORPH ENGINE ---
-        const count = 3000;
+        const count = profile.count;
         const dummy = new THREE.Object3D();
         const shapes: number[][] = []; 
 
@@ -197,6 +227,10 @@ export default function NineDimensionsBackground({ targetShapeIndex }: NineDimen
             scene.rotation.z = Math.sin(time * 0.5) * 0.05;
             scene.rotation.x = 0; // Reset X
 
+            // Throttle Rendering
+            frameCountRef.current++;
+            if (frameCountRef.current % profile.updateStep !== 0) return;
+
             // Update logic
             const currentIdx = currentShapeIndexRef.current;
             const targetIdx = targetShapeIndexRef.current;
@@ -244,12 +278,12 @@ export default function NineDimensionsBackground({ targetShapeIndex }: NineDimen
         return () => {
             window.removeEventListener('resize', handleResize);
             document.removeEventListener("visibilitychange", handleVisibilityChange);
+            observer.disconnect();
             if (reqIdRef.current) cancelAnimationFrame(reqIdRef.current);
             if (containerRef.current && renderer.domElement) {
                 containerRef.current.removeChild(renderer.domElement);
             }
             renderer.dispose();
-            // Optional: clean geometry/material
             geometry.dispose();
             material.dispose();
         };

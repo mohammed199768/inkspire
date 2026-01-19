@@ -2,70 +2,55 @@
 
 /* Container */
 .re-reveal-container {
-    position: absolute;
-    inset: 0;
+    position: relative;
     width: 100%;
     height: 100%;
     z-index: 1;
     pointer-events: none;
-    overflow: hidden;
+    overflow: visible;
     background-color: transparent;
     display: flex;
     justify-content: center;
     align-items: flex-end;
-    /* Align grid to bottom */
-    padding-bottom: 0;
+}
+
+@media (min-width: 1025px) {
+    .re-reveal-container {
+        position: absolute;
+        inset: 0;
+    }
 }
 
 /* 
    GRID LAYOUT 
    - "Images down" -> align-items: flex-end in container
-   - "Cutout characters" -> No gaps imperative but using flex gap
 */
 .re-stacks-grid {
     display: flex;
     justify-content: center;
-    /* Make them stand on the bottom line */
-    gap: 0px;
+    align-items: flex-end;
     width: 100%;
-    max-width: 100%;
-    /* Wide enough for 4 chars */
     height: 100%;
     position: relative;
     z-index: 2;
     padding-bottom: 0px;
-    /* Lift images slightly less */
 }
 
-
-
-
 /* 
    STACK 
-   - Treated as "Cutout Characters" (صور شخصيات مفرغة)
-   - Removing "Card" styling 
-*/
-/* 
-   STACK 
-   - Treated as "Cutout Characters" (صور شخصيات مفرغة)
-   - Removing "Card" styling 
+   - Treated as "Cutout Characters"
 */
 .re-stack {
     position: relative;
-    width: 28vw;
-    /* Increased from 25vw */
-    max-width: 550px;
-    /* Increased from 450px */
-    min-width: 300px;
-    /* Increased from 250px */
+    /* Responsive Width: Scales from 70px on small mobile to 550px on desktop */
+    width: clamp(70px, 22vw, 550px);
     flex: 0 0 auto;
 
-    /* Uniform Hover Overlap */
-    margin: 0 -2vw;
+    /* Responsive Overlap */
+    margin: 0 calc(var(--overlap, -2vw));
 
     aspect-ratio: 2/3;
     max-height: 90vh;
-    /* Increased slightly */
 
     overflow: visible;
     border-radius: 0;
@@ -80,142 +65,47 @@
 }
 
 /* 
-   SYMMETRIC ARC LAYOUT
-   Outer images (1 & 4) are lower, inner images (2 & 3) are higher.
+   Symmetric Arc Layout
+   Applying responsive offsets
 */
 .re-stack:nth-child(1),
 .re-stack:nth-child(4) {
-    --y-offset: 12vh; /* Slightly reduced offset to account for larger images */
+    --y-offset: clamp(4vh, 8vh, 12vh);
     transform: translateY(var(--y-offset)) scale(1);
     z-index: 1;
 }
 
 .re-stack:nth-child(2),
 .re-stack:nth-child(3) {
-    --y-offset: -12vh; /* Increased lift for more impact */
+    --y-offset: clamp(-4vh, -8vh, -12vh);
     transform: translateY(var(--y-offset)) scale(1);
     z-index: 2;
 }
 
-/* Extra hover lift to maintain the arc feel */
-.re-stack:hover {
-    z-index: 10 !important;
-    filter: brightness(1) contrast(1.1) grayscale(0);
+/* Disable Hover Lift on non-hover devices */
+@media (hover: hover) {
+    .re-stack:hover {
+        z-index: 10 !important;
+        filter: brightness(1) contrast(1.1) grayscale(0);
+    }
 }
 
-/* TOUCH / MOBILE STATIC STATE 
-   - Ensure images are clear (full brightness)
-   - No transformations or transitions
+/* 
+   TOUCH / MOBILE STATE
+   - Show 4 images on one line
+   - No reveal animation (handled by is-touch class)
 */
 .re-reveal-container.is-touch .re-stack {
-    filter: brightness(0.95) contrast(1.05);
-    /* Slightly boosted for clarity */
-    transform: none !important;
+    filter: brightness(0.9) contrast(1.1) grayscale(0);
+    transform: translateY(var(--y-offset)) scale(1) !important;
     transition: none !important;
+    --overlap: -3vw; /* Slightly more overlap for tight fit */
+}
 
-    /* Reset margins for mobile grid */
-    margin: 0 !important;
-    /* Force reset */
-    width: 48%;
-    /* 2x2 tight grid */
-    max-width: none;
-    min-width: 0;
-
-    /* Mobile Height Constraint */
-    aspect-ratio: 3/4;
+.re-reveal-container.is-touch .re-stacks-grid {
+    padding-bottom: 2rem;
     height: auto;
-    max-height: 35vh;
-}
-
-/* --- RESPONSIVE IMAGE REDUCTION STRATEGY --- */
-
-/* Base Grid: Default is 4 images (Desktop > 1400px) */
-.re-stacks-grid {
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    width: 100%;
-    height: 100%;
-    position: relative;
-    z-index: 2;
-    padding-bottom: 0px;
-    gap: 0;
-}
-
-/* 
-   MEDIUM DESKTOP (1024px - 1400px) - DISABLED: User wants full 4 images on desktop
-   
-   @media (max-width: 1400px) {
-       .re-stack:nth-child(4) {
-           display: none !important;
-       }
-   }
-*/
-
-/* 
-   TABLET / SMALL LAPTOP (768px - 1024px)
-   - Show 2 Images (Hide 3rd & 4th)
-*/
-@media (max-width: 1024px) {
-
-    .re-stack:nth-child(3),
-    .re-stack:nth-child(4) {
-        display: none !important;
-    }
-
-    /* Reset margins for clean 2-image layout */
-    .re-stack {
-        margin: 0 !important;
-        /* No overlap needed for just 2 */
-        width: 35vw;
-        /* Wider to fill space */
-        max-width: 400px;
-    }
-
-    .re-stacks-grid {
-        gap: 20px;
-        /* Clean gap */
-    }
-}
-
-/* 
-   MOBILE (< 768px)
-   - Show 1 Image (Hide 2nd, 3rd, 4th)
-*/
-@media (max-width: 768px) {
-
-    .re-stack:nth-child(2),
-    .re-stack:nth-child(3),
-    .re-stack:nth-child(4) {
-        display: none !important;
-    }
-
-    .re-stacks-grid {
-        /* Standard Center Bottom */
-        align-items: flex-end;
-        padding-bottom: 0px;
-        position: relative;
-        height: 100%;
-        max-height: 50vh;
-        /* Don't take full screen */
-        bottom: 0;
-    }
-
-    .re-stack {
-        margin: 0 !important;
-        width: 80vw;
-        /* Big single hero */
-        max-width: none;
-        height: auto;
-        aspect-ratio: 1/1.2;
-        /* Taller portrait feel */
-    }
-
-    .re-stack-image {
-        width: 100%;
-        left: 0;
-        transform: none;
-    }
+    min-height: 40vh;
 }
 
 .re-stack-base {
@@ -225,7 +115,6 @@
 .re-stack-overlay {
     z-index: 2;
     opacity: 0;
-    /* Ensure the overlay container matches the stack size so mask works */
     width: 100%;
     height: 100%;
     position: absolute;
@@ -257,8 +146,8 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 1400px;
-    height: 1400px;
+    width: clamp(600px, 100vw, 1400px);
+    height: clamp(600px, 100vw, 1400px);
     transform: translate(calc(var(--sx, -1000px) - 50%), calc(var(--sy, -1000px) - 50%));
     z-index: 20;
     pointer-events: none;

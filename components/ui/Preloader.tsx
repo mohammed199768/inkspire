@@ -10,11 +10,14 @@ export default function Preloader() {
     const [particles, setParticles] = useState<{ left: string; top: string; duration: number; delay: number; size: number }[]>([]);
 
     useEffect(() => {
-        // Generate particles only on client side to avoid hydration mismatch
-        const newParticles = Array.from({ length: 30 }).map(() => ({
+        const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        // Generate fewer particles if reduced motion is requested
+        const particleCount = prefersReducedMotion ? 5 : 20;
+
+        const newParticles = Array.from({ length: particleCount }).map(() => ({
             left: `${Math.random() * 100}%`,
             top: `${Math.random() * 100}%`,
-            duration: 2 + Math.random() * 3,
+            duration: prefersReducedMotion ? 5 : (2 + Math.random() * 3),
             delay: Math.random() * 2,
             size: Math.random() * 3 + 1,
         }));
@@ -25,12 +28,12 @@ export default function Preloader() {
             setProgress((prev) => {
                 if (prev >= 100) {
                     clearInterval(interval);
-                    setTimeout(() => setLoading(false), 500); // Faster exit
+                    setTimeout(() => setLoading(false), 300); // Even faster exit
                     return 100;
                 }
-                return prev + 4; // Faster progress
+                return prev + 10; // Significantly faster progress
             });
-        }, 30);
+        }, 20);
 
         return () => clearInterval(interval);
     }, []);
@@ -69,8 +72,8 @@ export default function Preloader() {
                                 fill
                                 className="object-contain drop-shadow-[0_0_20px_rgba(168,85,247,0.4)]"
                                 priority
-                                quality={100}
-                                sizes="(max-width: 768px) 300px, 800px"
+                                quality={85}
+                                sizes="(max-width: 768px) 200px, 400px"
                             />
                         </div>
                     </motion.div>

@@ -105,7 +105,7 @@ export default function TestimonialsSection() {
         return createPortal(
             <AnimatePresence>
                 <div
-                    className="fixed inset-0 z-[999999] flex items-center justify-center overflow-hidden overscroll-none touch-none bg-black md:bg-black/60 md:backdrop-blur-3xl"
+                    className="fixed inset-0 z-[999999] flex items-center justify-center overflow-hidden overscroll-none touch-none bg-black md:bg-black/60 md:backdrop-blur-lg"
                     onClick={closeStories}
                 >
                     {/* Cinematic Backdrop */}
@@ -177,7 +177,7 @@ export default function TestimonialsSection() {
                                 </div>
                                 <button
                                     onClick={(e) => { e.stopPropagation(); closeStories(); }}
-                                    className="w-10 h-10 flex items-center justify-center bg-white/10 hover:bg-white/20 active:scale-90 backdrop-blur-xl rounded-full transition-all border border-white/5 relative z-[60]"
+                                    className="w-10 h-10 flex items-center justify-center bg-white/10 hover:bg-white/20 active:scale-90 backdrop-blur-md rounded-full transition-all border border-white/5 relative z-[60]"
                                     aria-label="Close"
                                 >
                                     <X size={20} className="drop-shadow-lg" />
@@ -204,7 +204,7 @@ export default function TestimonialsSection() {
                                 key={`tag-${activeClient}-${activeStory}`}
                                 initial={{ opacity: 0, y: 15 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="inline-block px-6 py-2.5 rounded-full bg-black/30 backdrop-blur-2xl border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
+                                className="inline-block px-6 py-2.5 rounded-full bg-black/30 backdrop-blur-lg border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
                             >
                                 <span className="text-[12px] font-bold text-white tracking-widest uppercase">
                                     {HIGHLIGHTS[activeClient].stories[activeStory].tag}
@@ -236,7 +236,7 @@ export default function TestimonialsSection() {
                             whileHover={{ scale: 1.1, x: -8 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={(e) => { e.stopPropagation(); prevStory(); }}
-                            className={`w-14 h-14 bg-white/5 hover:bg-white/10 border border-white/20 backdrop-blur-3xl rounded-full flex items-center justify-center text-white pointer-events-auto transition-all shadow-2xl ${activeClient === 0 && activeStory === 0 ? "opacity-10 cursor-not-allowed" : "opacity-100"}`}
+                            className={`w-14 h-14 bg-white/5 hover:bg-white/10 border border-white/20 backdrop-blur-lg rounded-full flex items-center justify-center text-white pointer-events-auto transition-all shadow-2xl ${activeClient === 0 && activeStory === 0 ? "opacity-10 cursor-not-allowed" : "opacity-100"}`}
                         >
                             <ChevronLeft size={28} />
                         </motion.button>
@@ -244,7 +244,7 @@ export default function TestimonialsSection() {
                             whileHover={{ scale: 1.1, x: 8 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={(e) => { e.stopPropagation(); nextStory(); }}
-                            className="w-14 h-14 bg-white/5 hover:bg-white/10 border border-white/20 backdrop-blur-3xl rounded-full flex items-center justify-center text-white pointer-events-auto transition-all shadow-2xl"
+                            className="w-14 h-14 bg-white/5 hover:bg-white/10 border border-white/20 backdrop-blur-lg rounded-full flex items-center justify-center text-white pointer-events-auto transition-all shadow-2xl"
                         >
                             <ChevronRight size={28} />
                         </motion.button>

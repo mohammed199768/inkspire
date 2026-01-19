@@ -119,8 +119,10 @@ const WorksTunnel: React.FC = () => {
                 p = scrolled / total;
             }
 
-            timeRef.current += AUTO_SPEED;
-            pSmoothRef.current += (p - pSmoothRef.current) * 0.04;
+            const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+            
+            timeRef.current += prefersReducedMotion ? AUTO_SPEED * 0.2 : AUTO_SPEED;
+            pSmoothRef.current += (p - pSmoothRef.current) * (prefersReducedMotion ? 0.01 : 0.04);
 
             const t = easeInOutCubic(pSmoothRef.current);
             const idxFloat = t * (numRings - 1);
@@ -180,16 +182,20 @@ const WorksTunnel: React.FC = () => {
                 }
             });
 
-            requestRef.current = requestAnimationFrame(tick);
+            if (isSceneVisible) {
+                requestRef.current = requestAnimationFrame(tick);
+            }
         };
 
-        requestRef.current = requestAnimationFrame(tick);
+        if (isSceneVisible) {
+            requestRef.current = requestAnimationFrame(tick);
+        }
 
         return () => {
             window.removeEventListener('resize', handleResize);
             if (requestRef.current) cancelAnimationFrame(requestRef.current);
         };
-    }, [numRings, centerIndex]);
+    }, [numRings, centerIndex, isSceneVisible]);
 
 
     return (
@@ -206,7 +212,6 @@ const WorksTunnel: React.FC = () => {
                                 alt="Inkspire Logo"
                                 fill
                                 className={styles.logoImg}
-                                priority
                             />
                         </div>
                     </div>
@@ -236,9 +241,8 @@ const WorksTunnel: React.FC = () => {
                                             alt={work.title}
                                             className={styles.img}
                                             fill
-                                            sizes="(max-width: 768px) 90vw, 1200px"
-                                            quality={95}
-                                            priority={ring.index < 3}
+                                            sizes="(max-width: 768px) 90vw, 800px"
+                                            quality={80}
                                         />
                                     </div>
                                 </div>

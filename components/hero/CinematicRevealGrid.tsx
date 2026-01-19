@@ -48,10 +48,10 @@ export default function CinematicRevealGrid() {
                             src={stack.base}
                             alt={stack.alt}
                             fill
-                            priority
-                            quality={90} // Ensure high clarity per "images clearer"
+                            priority={index === 0} // Only first image as priority for LCP
+                            quality={85} // Optimized quality
                             className="re-stack-image re-stack-base"
-                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                         />
 
                         {/* Overlay Image (Revealed) - HIDDEN ON MOBILE */}
@@ -61,10 +61,10 @@ export default function CinematicRevealGrid() {
                                     src={stack.overlay}
                                     alt={stack.alt}
                                     fill
-                                    priority
-                                    quality={95} // High quality for the reveal
+                                    quality={80} // Overlay needs less quality
+                                      loading="lazy"
                                     className="re-stack-image"
-                                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                                 />
                             </div>
                         )}

@@ -45,7 +45,7 @@
 }
 
 .bgLabel {
-    font-size: 8rem;
+    font-size: var(--fs-display);
     font-weight: 900;
     color: rgba(255, 255, 255, 0.02);
     line-height: 1;

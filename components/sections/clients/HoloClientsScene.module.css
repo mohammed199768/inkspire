@@ -128,7 +128,7 @@
 }
 
 .holoTitle {
-    font-size: 2.5rem;
+    font-size: var(--fs-h2);
     font-weight: 700;
     color: white;
     text-transform: uppercase;

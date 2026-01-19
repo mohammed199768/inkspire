@@ -9,6 +9,15 @@ import { usePopup } from '@/hooks/usePopup';
 import { buildPopupFromProject } from '@/lib/popupMappers';
 import styles from './OrbitalClientsScene.module.css';
 
+// --- VISUAL CONFIG ---
+const VISUAL_CONFIG = {
+    glowColor: "rgba(168, 85, 247, 0.35)", // Subtle Purple
+    accentColor: "#a0a0ff",                // Indigo Accent
+    cardOpacity: 0.85,
+    shadowBlur: 3,                         // Minimal glow
+    logoGlowOpacity: 0.25
+};
+
 export default function OrbitalClientsScene() {
     const containerRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLDivElement>(null);
@@ -56,7 +65,12 @@ export default function OrbitalClientsScene() {
             powerPreference: "high-performance"
         });
         renderer.setSize(width, height);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+
+        // Safari detection
+        const isSafari = typeof navigator !== 'undefined' && /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+        // Optimized pixel ratio: Safari on desktop often struggles with high-DPI + filters
+        renderer.setPixelRatio(isSafari ? Math.min(window.devicePixelRatio, 1.25) : Math.min(window.devicePixelRatio, 1.5));
         canvasRef.current.appendChild(renderer.domElement);
 
         // Visibility Observer
@@ -64,6 +78,10 @@ export default function OrbitalClientsScene() {
             ([entry]) => {
                 if (sceneRefs.current) {
                     sceneRefs.current.isVisible = entry.isIntersecting;
+                    // Restart loop if it becomes visible
+                    if (entry.isIntersecting && !sceneRefs.current.reqId) {
+                        animate();
+                    }
                 }
             },
             { threshold: 0 }
@@ -80,7 +98,7 @@ export default function OrbitalClientsScene() {
             ctx.clearRect(0, 0, w, h);
 
             // Glass Background
-            ctx.fillStyle = 'rgba(20, 20, 30, 0.85)';
+            ctx.fillStyle = `rgba(20, 20, 30, ${VISUAL_CONFIG.cardOpacity})`;
             // Rounded Rect manual
             if (ctx.roundRect) {
                 ctx.beginPath();
@@ -90,11 +108,11 @@ export default function OrbitalClientsScene() {
                 ctx.fillRect(10, 10, 492, 492);
             }
 
-            // Glowy Border
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = color;
+            // Glowy Border - Use subtle config
+            ctx.shadowBlur = VISUAL_CONFIG.shadowBlur;
+            ctx.shadowColor = VISUAL_CONFIG.glowColor;
             ctx.strokeStyle = color;
-            ctx.lineWidth = 10;
+            ctx.lineWidth = 8; // Slightly thinner edge
             if (ctx.roundRect) {
                 ctx.beginPath();
                 ctx.roundRect(10, 10, 492, 492, 40);
@@ -116,14 +134,15 @@ export default function OrbitalClientsScene() {
 
                  // Draw Logo
                  ctx.save();
-                 ctx.shadowBlur = 10;
-                 ctx.shadowColor = 'rgba(255,255,255,0.5)';
+                 // Safari + Universal Fix: No hard white halos
+                 ctx.shadowBlur = VISUAL_CONFIG.shadowBlur;
+                 ctx.shadowColor = VISUAL_CONFIG.glowColor;
                  ctx.drawImage(img, 256 - logoW/2, 256 - logoH/2, logoW, logoH);
                  ctx.restore();
             } else {
                 // Text Fallback
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = 'white';
+                ctx.shadowBlur = VISUAL_CONFIG.shadowBlur;
+                ctx.shadowColor = VISUAL_CONFIG.glowColor;
                 ctx.font = 'bold 60px Arial';
                 ctx.fillStyle = 'white';
                 ctx.textAlign = 'center';
@@ -190,7 +209,7 @@ export default function OrbitalClientsScene() {
             const material = new THREE.SpriteMaterial({ 
                 map: tex, 
                 transparent: true, 
-                opacity: 0.5,
+                opacity: isSafari ? 0.35 : 0.5,
                 blending: THREE.AdditiveBlending,
                 depthWrite: false // <--- هام جداً: منع الوهج من حجب الأشياء خلفه
             });
@@ -240,8 +259,8 @@ export default function OrbitalClientsScene() {
                 itemGroup.add(mesh);
 
                 // 2. Glow Sprite
-                const glow = createGlowSprite("#8888ff");
-                glow.scale.set(25, 25, 1);
+                const glow = createGlowSprite(VISUAL_CONFIG.glowColor);
+                glow.scale.set(22, 22, 1);
                 glow.position.z = -0.5; // خلف البطاقة مباشرة
                 itemGroup.add(glow);
 
@@ -300,11 +319,14 @@ export default function OrbitalClientsScene() {
             const r = sceneRefs.current;
             if(!r) return;
             
-            r.reqId = requestAnimationFrame(animate);
+            if (r.isVisible) {
+                r.reqId = requestAnimationFrame(animate);
+            }
 
             if (!r.isVisible) return;
 
-            const time = Date.now() * 0.001;
+            const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+            const time = (Date.now() * 0.001) * (prefersReducedMotion ? 0.3 : 1);
 
             // Rotate stars slowly
             r.stars.rotation.y = time * 0.03;

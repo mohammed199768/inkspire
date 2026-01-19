@@ -66,7 +66,7 @@ export default function InsightPopup() {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.6 }}
-                        className="absolute inset-0 bg-black/90 backdrop-blur-xl overflow-hidden"
+                        className="absolute inset-0 bg-black/80 backdrop-blur-md overflow-hidden"
                         onClick={closePopup}
                     >
                         {/* Animated Grain/Noise for Texture */}
@@ -83,7 +83,7 @@ export default function InsightPopup() {
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.9, opacity: 0, y: 40 }}
                         transition={{ type: "spring", damping: 28, stiffness: 350 }}
-                        className="relative w-full max-w-6xl max-h-[90vh] bg-[#050507]/60 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-[0_0_80px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col md:flex-row z-10 group"
+                        className="relative w-full max-w-6xl max-h-[90vh] bg-[#050507]/80 backdrop-blur-lg border border-white/10 rounded-2xl shadow-[0_0_80px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col md:flex-row z-10 group"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Decorative HUD Elements */}
@@ -113,8 +113,7 @@ export default function InsightPopup() {
                                     fill
                                     className="object-cover object-top opacity-80 group-hover:opacity-100 transition-all duration-1000 scale-[1.01] group-hover:scale-105"
                                     sizes="(max-width: 768px) 100vw, 50vw"
-                                    quality={100}
-                                    priority
+                                    quality={90}
                                 />
                                 {/* Dynamic Overlays */}
                                 <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#050507] via-[#050507]/40 to-transparent md:hidden" />

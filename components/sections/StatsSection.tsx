@@ -1,10 +1,20 @@
 import { stats } from "@/data/staticData";
 import AnimatedCounter from "@/components/ui/AnimatedCounter";
+import SectionTitle from "@/components/ui/SectionTitle";
 
 export default function StatsSection() {
     return (
-        <section className="min-h-[40vh] md:min-h-[50vh] flex items-center justify-center py-12 md:py-20 text-white w-full">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 lg:gap-12 text-center w-full max-w-7xl px-4 md:px-6 mx-auto">
+        <section className="relative isolate flex flex-col items-center justify-center pt-24 pb-20 md:pt-32 md:pb-32 text-white w-full overflow-visible">
+            {/* High-priority Title Layer - Isolated from overlays and animations */}
+            <div className="relative z-50 w-full mb-8 md:mb-12 isolate">
+                <SectionTitle 
+                    title="Strategic" 
+                    highlight="Impact" 
+                    className="!opacity-100 !visible !block" 
+                />
+            </div>
+
+            <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 text-center w-full max-w-7xl px-4 md:px-6 mx-auto">
                 {stats.map((item, i) => (
                     <AnimatedCounter key={i} value={item.val} label={item.label} />
                 ))}

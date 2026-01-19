@@ -9,7 +9,10 @@ interface SectionTitleProps {
 
 export default function SectionTitle({ title, highlight, highlightColor = "text-purple-400", className = "" }: SectionTitleProps) {
     return (
-        <h2 className={`fade-up text-4xl md:text-6xl font-bold mb-16 text-center ${className}`}>
+        <h2 
+            className={`fade-up text-center ${className}`}
+            style={{ marginBottom: 'var(--space-xl)' }}
+        >
             {title} <span className={highlightColor}>{highlight}</span>
         </h2>
     );
