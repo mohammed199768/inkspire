@@ -1,0 +1,114 @@
+.sceneWrap {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 500px; /* Fallback */
+    overflow: visible;
+    /* Cursor handled via JS logic on the canvas container, but default is auto */
+    cursor: auto;
+}
+
+.canvasContainer {
+    position: absolute;
+    inset: 0;
+    z-index: 100;
+}
+
+/* Background UI (Dashed Circle + Label) - Scoped behind canvas */
+.bgUI {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 0; /* Below everything */
+    pointer-events: none;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bgCircle {
+    width: 600px;
+    height: 600px;
+    border: 1px dashed rgba(160, 160, 255, 0.1);
+    border-radius: 50%;
+    position: absolute;
+    animation: spin 60s linear infinite;
+    top: 50%;
+    left: 50%;
+    /* Transformation handled in animation, but need initial centering context */
+    margin-left: -300px;
+    margin-top: -300px;
+}
+
+.bgLabel {
+    font-size: 8rem;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.02);
+    line-height: 1;
+    letter-spacing: -5px;
+    white-space: nowrap;
+    user-select: none;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Info Panel (Bottom Left) */
+.infoPanel {
+    position: absolute;
+    bottom: 40px;
+    left: 40px;
+    z-index: 20; /* Above canvas */
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+.infoPanelVisible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.panelBox {
+    background: rgba(10, 10, 20, 0.85);
+    backdrop-filter: blur(12px);
+    border-left: 3px solid #a0a0ff;
+    padding: 20px 30px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    max-width: 350px;
+    border-radius: 0 8px 8px 0;
+}
+
+.panelTitle {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0;
+    color: white;
+    text-transform: uppercase;
+    line-height: 1.1;
+    margin-bottom: 0.25rem;
+}
+
+.panelCategory {
+    font-size: 0.75rem;
+    color: #a0a0ff;
+    letter-spacing: 0.15em;
+    font-weight: 600;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.75rem;
+}
+
+.panelDesc {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.5;
+    margin: 0;
+}

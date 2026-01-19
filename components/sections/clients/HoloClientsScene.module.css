@@ -1,0 +1,178 @@
+/* Scoped Styles for HoloClientsScene */
+
+/* Container for the 3D Canvas */
+.canvasContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    overflow: hidden;
+    cursor: none; /* Hide default cursor ONLY inside this container */
+    background: radial-gradient(circle at center, #1a1b3a 0%, #050510 100%); /* Local background matches global */
+}
+
+/* Screen FX (Scanlines + Vignette) - Absolute over canvas */
+.screenFx {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 20;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+    background-size: 100% 4px;
+    box-shadow: inset 0 0 100px rgba(0,0,0,0.5);
+    opacity: 0.6;
+}
+
+/* Drone Cursor - Scoped to container */
+.cursor {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 40px;
+    height: 40px;
+    pointer-events: none;
+    z-index: 1000;
+    transform: translate(-50%, -50%);
+    mix-blend-mode: overlay;
+    display: none; /* Hidden by default, shown via JS on desktop */
+}
+
+.cursorCircle {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 1px solid rgba(160, 160, 255, 0.5);
+    border-radius: 50%;
+    animation: spin 4s linear infinite;
+}
+
+.cursorDot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 4px;
+    height: 4px;
+    background: #fff;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px #fff;
+}
+
+.cursorText {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: #a0a0ff;
+    white-space: nowrap;
+    letter-spacing: 2px;
+    font-weight: bold;
+    text-shadow: 0 0 5px #a0a0ff;
+}
+
+/* Holo Interface (Overlay) */
+.holoInterface {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    z-index: 50;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+}
+
+.holoFrame {
+    border: 1px solid rgba(160, 160, 255, 0.3);
+    background: rgba(10, 10, 20, 0.6);
+    backdrop-filter: blur(8px);
+    padding: 30px 50px;
+    clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%);
+    position: relative;
+    box-shadow: 0 0 30px rgba(160, 160, 255, 0.15);
+    text-align: center;
+}
+
+/* Tech decorative corners */
+.holoFrame::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 10px;
+    height: 10px;
+    border-top: 2px solid #a0a0ff;
+    border-left: 2px solid #a0a0ff;
+}
+
+.holoFrame::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    border-bottom: 2px solid #a0a0ff;
+    border-right: 2px solid #a0a0ff;
+}
+
+.holoTitle {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    text-transform: uppercase;
+    margin: 0;
+    text-shadow: 0 0 15px rgba(255,255,255,0.5);
+    font-family: var(--font-outfit), sans-serif;
+}
+
+.holoSubtitle {
+    font-size: 0.9rem;
+    color: #a0a0ff;
+    letter-spacing: 4px;
+    margin-top: 8px;
+    text-transform: uppercase;
+    font-family: monospace;
+}
+
+.holoScan {
+    width: 100%;
+    height: 2px;
+    background: #a0a0ff;
+    margin-top: 15px;
+    box-shadow: 0 0 10px #a0a0ff;
+    animation: scanWidth 0.5s forwards;
+}
+
+/* System Status HUD */
+.systemStatus {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    color: rgba(255,255,255,0.3);
+    font-size: 10px;
+    letter-spacing: 2px;
+    font-family: monospace;
+    z-index: 30;
+    pointer-events: none;
+    line-height: 1.5;
+}
+
+.blinking {
+    animation: blink 1s infinite;
+}
+
+@keyframes spin { 0%{transform: rotate(0deg);} 100%{transform: rotate(360deg);} }
+@keyframes scanWidth { from{width: 0;} to{width: 100%;} }
+@keyframes blink { 50% { opacity: 0; } }
