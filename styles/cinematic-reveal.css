@@ -53,17 +53,19 @@
 .re-stack {
     position: relative;
     width: 28vw;
-    /* Make them BIG (Width driven) */
-    max-width: 500px;
+    /* Increased from 25vw */
+    max-width: 550px;
+    /* Increased from 450px */
     min-width: 300px;
+    /* Increased from 250px */
     flex: 0 0 auto;
 
-    /* Force Overlap but slightly less ("Avengers Style") */
-    margin-left: -0.8vw;
-    margin-right: -0.8vw;
+    /* Uniform Hover Overlap */
+    margin: 0 -2vw;
 
     aspect-ratio: 2/3;
     max-height: 90vh;
+    /* Increased slightly */
 
     overflow: visible;
     border-radius: 0;
@@ -74,34 +76,31 @@
     filter: brightness(0.6) contrast(1.1) grayscale(0.2);
 
     will-change: transform, filter, z-index;
-    transition: filter 0.2s ease-out, transform 0.2s ease-out;
+    transition: filter 0.4s ease-out, transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-/* Extra spacing for middle gap (between 2nd and 3rd) 
-   AND lift the LEFT side images (assumed 1 & 2) up.
+/* 
+   SYMMETRIC ARC LAYOUT
+   Outer images (1 & 4) are lower, inner images (2 & 3) are higher.
 */
-.re-stack:nth-child(1) {
-    margin-bottom: 4vh;
-}
-
-/* Move 4 (2nd) away from 2 (1st) */
-.re-stack:nth-child(2) {
-    margin-right: 0.5vw;
-    margin-bottom: 5vh;
-    margin-left: 1.5vw;
-}
-
-.re-stack:nth-child(3) {
-    margin-left: 0.5vw;
-}
-
-/* Pull 1 (4th) closer to 3 (3rd) and Lower it */
-/* Pull 1 (4th) closer to 3 (3rd) but KEEP VISIBLE */
+.re-stack:nth-child(1),
 .re-stack:nth-child(4) {
-    margin-left: -2vw;
-    /* Reduced from -4vw */
-    margin-bottom: 0;
-    /* Reset from -2vh to fix disappearance */
+    --y-offset: 12vh; /* Slightly reduced offset to account for larger images */
+    transform: translateY(var(--y-offset)) scale(1);
+    z-index: 1;
+}
+
+.re-stack:nth-child(2),
+.re-stack:nth-child(3) {
+    --y-offset: -12vh; /* Increased lift for more impact */
+    transform: translateY(var(--y-offset)) scale(1);
+    z-index: 2;
+}
+
+/* Extra hover lift to maintain the arc feel */
+.re-stack:hover {
+    z-index: 10 !important;
+    filter: brightness(1) contrast(1.1) grayscale(0);
 }
 
 /* TOUCH / MOBILE STATIC STATE 

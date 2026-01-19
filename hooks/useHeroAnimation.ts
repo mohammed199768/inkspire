@@ -12,6 +12,20 @@ export function useHeroAnimation(
     useEffect(() => {
         if (!containerRef.current) return;
 
+        // Check for reduced motion preference
+        const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (prefersReducedMotion) {
+            if (titleRef.current) {
+                const logo = titleRef.current.querySelector(".hero-logo");
+                const tagline = titleRef.current.querySelector(".hero-tagline");
+                if (logo) gsap.set(logo, { y: 0, opacity: 1 });
+                if (tagline) gsap.set(tagline, { y: 0, opacity: 1 });
+            }
+            if (ctaRef.current) gsap.set(ctaRef.current, { y: 0, opacity: 1 });
+            if (scrollLabelRef.current) gsap.set(scrollLabelRef.current, { y: 0, opacity: 1 });
+            return;
+        }
+
         const ctx = gsap.context(() => {
             const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 

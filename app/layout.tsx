@@ -106,7 +106,7 @@ export default function RootLayout({
                 <link rel="icon" href="/logos/Inkspire logos/logo1.png" type="image/png" />
                 <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
             </head>
-            <body className="antialiased overflow-x-hidden bg-black text-white selection:bg-inkspirePurple selection:text-white font-sans">
+            <body className="antialiased overflow-x-hidden text-white selection:bg-inkspirePurple selection:text-white font-sans">
                 <Preloader />
                 <SmoothScroll>
                     <PopupProvider>

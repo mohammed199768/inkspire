@@ -12,14 +12,14 @@ export default function TeamSection() {
     const { openPopup } = usePopup();
 
     return (
-        <div ref={containerRef} className="min-h-screen flex flex-col justify-center py-20 px-6">
+        <div ref={containerRef} className="min-h-[100dvh] flex flex-col justify-start md:justify-center py-24 md:py-20 px-6">
             <SectionTitle title="Meet The" highlight="Team" highlightColor="text-blue-400" />
-            <div className="grid grid-cols-2 md:flex md:flex-wrap justify-center gap-3 md:gap-10 max-w-7xl mx-auto w-full">
+            <div className="grid grid-cols-2 md:flex md:flex-wrap justify-center gap-2 md:gap-10 max-w-7xl mx-auto w-full">
                 {team.map((member, i) => (
                     <div
                         key={i}
                         onClick={() => openPopup(buildPopupFromTeamMember(member))}
-                        className="fade-up group relative w-full md:w-[350px] h-[280px] md:h-[500px] rounded-2xl md:rounded-3xl overflow-hidden transition-all duration-500 md:hover:scale-105 cursor-pointer"
+                        className="fade-up group relative w-full md:w-[350px] h-[240px] md:h-[500px] rounded-xl md:rounded-3xl overflow-hidden transition-all duration-500 md:hover:scale-105 cursor-pointer"
                     >
                         <Image
                             src={member.image}

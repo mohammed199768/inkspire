@@ -123,7 +123,7 @@ export default function TestimonialsSection() {
                         exit={{ scale: 0.95, opacity: 0, y: 50 }}
                         transition={{ type: "spring", damping: 30, stiffness: 300 }}
                         onClick={(e) => e.stopPropagation()}
-                        className="relative w-full h-[100dvh] md:w-[410px] md:h-[85vh] md:max-h-[850px] md:aspect-[9/16] bg-black md:rounded-[3rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.9)] md:border md:border-white/10"
+                        className="relative w-full h-[100dvh] md:w-[480px] md:h-[90vh] md:max-h-[950px] md:aspect-[9/16] bg-black md:rounded-[3rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.9)] md:border md:border-white/10"
                         onMouseDown={() => setIsPaused(true)}
                         onMouseUp={() => setIsPaused(false)}
                         onMouseLeave={() => setIsPaused(false)}
@@ -256,11 +256,11 @@ export default function TestimonialsSection() {
     };
 
     return (
-        <div ref={containerRef} className="min-h-[70vh] flex flex-col justify-center py-16 md:py-24 px-4 md:px-6 relative z-10" dir="ltr">
+        <div ref={containerRef} className="w-full h-full flex flex-col justify-center py-16 md:py-24 px-4 md:px-6 relative z-10" dir="ltr">
             <SectionTitle title="Client" highlight="Stories" highlightColor="text-yellow-400" />
 
             {/* Highlights Row */}
-            <div className="max-w-6xl mx-auto w-full flex gap-4 md:gap-10 overflow-x-auto pb-8 md:pb-12 scrollbar-none px-2 md:px-4 justify-start md:justify-center items-center -mx-4 md:mx-auto">
+            <div className="max-w-6xl w-full flex gap-4 md:gap-10 overflow-x-auto pb-8 md:pb-12 scrollbar-none px-2 md:px-4 justify-start md:justify-center items-center -mx-4 md:mx-auto">
                 {HIGHLIGHTS.map((client, idx) => (
                     <button
                         key={client.id}
@@ -272,7 +272,7 @@ export default function TestimonialsSection() {
                         <div className={`ring-container p-[3px] md:p-[4px] rounded-full transition-all duration-500 group-hover:scale-105 active:scale-95
                             ${seen.has(client.id) ? "seen opacity-50" : "unseen"}`}
                         >
-                            <div className="w-[75px] h-[75px] md:w-[110px] md:h-[110px] rounded-full bg-black p-[2px] md:p-[3px] overflow-hidden relative">
+                            <div className="w-[85px] h-[85px] md:w-[130px] md:h-[130px] rounded-full bg-black p-[2px] md:p-[3px] overflow-hidden relative">
                                 <img
                                     src={client.avatar}
                                     alt={client.name}
@@ -283,23 +283,14 @@ export default function TestimonialsSection() {
                                 )}
                             </div>
                         </div>
-                        <span className={`text-[12px] md:text-[14px] font-semibold tracking-wide transition-all duration-300 ${seen.has(client.id) ? "text-gray-500" : "text-gray-300 group-hover:text-white"}`}>
+                        <span className={`text-[16px] md:text-[20px] font-bold tracking-tight transition-all duration-300 ${seen.has(client.id) ? "text-gray-500" : "text-gray-300 group-hover:text-white"}`}>
                             {client.name}
                         </span>
                     </button>
                 ))}
             </div>
 
-            <div className="flex flex-col items-center justify-center mt-4 text-gray-400 md:text-gray-500 gap-4 opacity-70 hover:opacity-100 transition-all duration-500 hidden md:flex">
-                <div className="flex gap-4 flex-wrap justify-center">
-                    <div className="flex items-center gap-2 text-[12px] border border-white/10 bg-white/5 pr-4 pl-3 py-2 rounded-full backdrop-blur-md">
-                        <Info size={14} className="text-yellow-400" />
-                        <span>Tap circles to view stories</span>
-                    </div>
-                    <span className="text-[12px] border border-white/10 bg-white/5 px-4 py-2 rounded-full backdrop-blur-md">Left/Right to navigate</span>
-                    <span className="text-[12px] border border-white/10 bg-white/5 px-4 py-2 rounded-full backdrop-blur-md">Hold to pause</span>
-                </div>
-            </div>
+
 
             {renderModal()}
 

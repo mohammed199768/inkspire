@@ -58,7 +58,7 @@ export default function InsightPopup() {
     return (
         <AnimatePresence>
             {isOpen && currentPopup && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-8">
+                <div key={currentPopup.id || "popup-overlay"} className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-8">
 
                     {/* Cinematic Overlay */}
                     <motion.div
@@ -112,6 +112,7 @@ export default function InsightPopup() {
                                     alt={currentPopup.title}
                                     fill
                                     className="object-cover object-top opacity-80 group-hover:opacity-100 transition-all duration-1000 scale-[1.01] group-hover:scale-105"
+                                    sizes="(max-width: 768px) 100vw, 50vw"
                                     quality={100}
                                     priority
                                 />
@@ -190,7 +191,7 @@ export default function InsightPopup() {
                                         <span className="relative z-10 font-bold text-xs md:text-sm uppercase tracking-wider group-hover/btn:text-white transition-colors duration-300">
                                             Explore Full Case Study
                                         </span>
-                                        <Layers size={16} className="relative z-10 group-hover/btn:text-white transition-colors duration-300 group-hover/btn:rotate-12 transition-transform" />
+                                        <Layers size={16} className="relative z-10 group-hover/btn:text-white transition-all duration-300 group-hover/btn:rotate-12" />
                                     </a>
                                 )}
                             </div>

@@ -20,7 +20,7 @@ export default function MotionLayout({ children }: { children: React.ReactNode }
     }, [pathname]);
 
     return (
-        <div ref={wrapperRef} data-page className="min-h-screen">
+        <div ref={wrapperRef} data-page className="min-h-[100dvh]">
             {children}
         </div>
     );

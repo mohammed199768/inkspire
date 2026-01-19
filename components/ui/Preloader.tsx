@@ -64,7 +64,7 @@ export default function Preloader() {
 
                         <div className="relative w-full h-full p-8 sm:p-12">
                             <Image
-                                src="/logos/Inkspire logos/logo.svg"
+                                src="/logos/Inkspire logos/logo.webp"
                                 alt="Inkspire Logo"
                                 fill
                                 className="object-contain drop-shadow-[0_0_20px_rgba(168,85,247,0.4)]"

@@ -26,14 +26,14 @@ export function useAnimatedCounter(
             gsap.from(container, {
                 scrollTrigger: {
                     trigger: container,
-                    start: "top 85%",
+                    start: "top 70%",
                     once: true
                 },
-                y: 50,
+                y: 40,
                 opacity: 0,
-                scale: 0.9,
-                duration: 0.8,
-                ease: "back.out(1.7)"
+                scale: 0.95,
+                duration: 0.6,
+                ease: "power3.out"
             });
 
             const proxy = { val: 0 };
@@ -43,7 +43,7 @@ export function useAnimatedCounter(
                 ease: "power2.out",
                 scrollTrigger: {
                     trigger: container,
-                    start: "top 85%",
+                    start: "top 70%",
                     once: true,
                 },
                 onUpdate: () => {

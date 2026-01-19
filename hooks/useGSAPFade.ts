@@ -10,27 +10,46 @@ export function useGSAPFade() {
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        const ctx = gsap.context(() => {
-            const fadeElements = gsap.utils.toArray(".fade-up");
+        const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-            fadeElements.forEach((el: any, index) => {
+        const ctx = gsap.context(() => {
+            const fadeElements = gsap.utils.toArray<HTMLElement>(".fade-up");
+            
+            if (prefersReducedMotion) {
+                 fadeElements.forEach((el) => {
+                     gsap.set(el, { opacity: 1, y: 0 });
+                 });
+                 return;
+            }
+            
+            fadeElements.forEach((el, index) => {
                 gsap.fromTo(el,
                     {
                         opacity: 0,
-                        y: 30
+                        y: 30,
+                        scale: 0.95,
+                        visibility: "hidden"
                     },
                     {
                         opacity: 1,
                         y: 0,
-                        duration: 0.6,
-                        ease: "power2.out",
+                        scale: 1,
+                        visibility: "visible",
+                        duration: 0.5,
+                        ease: "power3.out",
                         scrollTrigger: {
                             trigger: el,
-                            start: "top 90%",
+                            start: "top 70%",
                             once: true,
                             toggleActions: "play none none none"
                         },
-                        delay: (index % 4) * 0.05
+                        delay: (index % 4) * 0.08,
+                        onStart: () => {
+                            (el as HTMLElement).style.willChange = "transform, opacity";
+                        },
+                        onComplete: () => {
+                            (el as HTMLElement).style.willChange = "auto";
+                        }
                     }
                 );
             });

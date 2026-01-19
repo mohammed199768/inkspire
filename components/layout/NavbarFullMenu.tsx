@@ -70,7 +70,7 @@ export default function NavbarFullMenu() {
         <>
             {/* Top Navbar - Always visible */}
             <nav className="fixed top-0 left-0 w-full z-50 px-6 py-6 flex justify-between items-center">
-                <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-transparent backdrop-blur-sm" />
+<div className="absolute inset-0 bg-transparent" />
 
                 <Link
                     href="/"
@@ -114,7 +114,7 @@ export default function NavbarFullMenu() {
                             key={item.label}
                             href={item.href}
                             onClick={() => handleLinkClick(item.href)}
-                            className="text-5xl md:text-7xl font-bold text-white hover:text-white/70 transition-all interactive relative group"
+                            className="text-4xl sm:text-5xl md:text-7xl font-bold text-white hover:text-white/70 transition-all interactive relative group"
                         >
                             {item.label}
                             <span className="absolute -bottom-2 left-0 w-0 h-1 bg-white group-hover:w-full transition-all duration-300" />

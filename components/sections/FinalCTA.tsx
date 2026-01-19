@@ -4,20 +4,22 @@ import { siteContent } from "@/data/siteContent";
 
 export default function FinalCTA() {
     return (
-        <section id="contact" className="py-32 px-6 relative z-10 flex flex-col items-center justify-center text-center">
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
+        <section id="contact" className="w-full min-h-[100dvh] relative z-10 flex flex-col items-center justify-start md:justify-center text-center pt-32 md:pt-0 pb-12 md:pb-0">
+            {/* Background - Fully integrated with tunnel darkness */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent pointer-events-none overflow-hidden" />
 
-            <div className="relative z-10 max-w-3xl mx-auto">
-                <h2 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight">
+            {/* Main Content - Centered but feels boundless */}
+            <div className="relative z-10 max-w-4xl mx-auto px-6">
+                <h2 className="text-4xl sm:text-5xl md:text-8xl font-bold text-white mb-10 leading-none tracking-tight">
                     {siteContent.finalCta.title}
                 </h2>
-                <p className="text-xl text-white/70 font-light mb-12">
+                <p className="text-xl md:text-2xl text-white/60 font-light mb-16 max-w-2xl mx-auto">
                     {siteContent.finalCta.description}
                 </p>
 
                 <a
                     href={siteContent.finalCta.buttonHref}
-                    className="inline-flex items-center justify-center px-10 py-5 bg-white text-inkspirePurple rounded-full text-lg font-bold tracking-wide hover:bg-inkspirePurple hover:text-white transition-all duration-300 interactive shadow-lg hover:shadow-inkspirePurple/50"
+                    className="inline-flex items-center justify-center px-12 py-6 bg-white text-black rounded-full text-xl font-bold tracking-wide hover:scale-105 hover:bg-inkspirePurple hover:text-white transition-all duration-300 shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:shadow-[0_0_60px_rgba(124,58,237,0.6)]"
                 >
                     {siteContent.finalCta.buttonLabel}
                 </a>

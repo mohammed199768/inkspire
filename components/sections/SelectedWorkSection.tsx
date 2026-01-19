@@ -22,7 +22,7 @@ export default function SelectedWorkSection() {
     const selectedWorks = projects.slice(0, 6);
 
     return (
-        <div ref={containerRef} className="min-h-screen flex flex-col justify-center py-20 overflow-hidden">
+        <div ref={containerRef} className="min-h-full w-full flex flex-col pt-32 pb-24 relative">
             <SectionTitle title="Selected" highlight="Work" highlightColor="text-pink-500" />
             <div className="fade-up w-full max-w-[1600px] mx-auto px-4 h-[600px] md:h-[800px] flex items-center">
                 <Swiper

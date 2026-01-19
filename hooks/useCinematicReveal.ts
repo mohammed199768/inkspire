@@ -110,7 +110,7 @@ export function useCinematicReveal() {
                 // Z-index pop
                 const scale = 1 + (intensity * 0.03);
                 stack.style.zIndex = intensity > 0.1 ? "20" : "2";
-                stack.style.transform = `scale(${scale})`;
+                stack.style.transform = `translateY(var(--y-offset, 0px)) scale(${scale})`;
 
                 // B. Filter (Brightness/Contrast/DropShadow)
                 // Base brightness 0.8 -> 1.0ish
@@ -142,7 +142,7 @@ export function useCinematicReveal() {
             } else {
                 // Reset to idle
                 stack.style.zIndex = "2";
-                stack.style.transform = `scale(1)`;
+                stack.style.transform = `translateY(var(--y-offset, 0px)) scale(1)`;
                 stack.style.filter = `brightness(0.7) contrast(1.0) grayscale(0.2)`; // Idle state
                 if (overlay) {
                     overlay.style.opacity = '0';
