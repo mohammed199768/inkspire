@@ -12,7 +12,7 @@ import styles from './OrbitalClientsScene.module.css';
 // --- VISUAL CONFIG ---
 const VISUAL_CONFIG = {
     glowColor: "rgba(168, 85, 247, 0.35)", // Subtle Purple
-    accentColor: "#a0a0ff",                // Indigo Accent
+    accentColor: "#f2e9ff",                // Light Accent
     cardOpacity: 0.85,
     shadowBlur: 3,                         // Minimal glow
     logoGlowOpacity: 0.25
@@ -50,7 +50,7 @@ export default function OrbitalClientsScene() {
         // --- 1. SETUP ---
         const scene = new THREE.Scene();
         // Dark fog to blend with section background
-        scene.fog = new THREE.FogExp2(0x020205, 0.002);
+        scene.fog = new THREE.FogExp2(0x09060f, 0.002);
 
         const width = containerRef.current.clientWidth;
         const height = containerRef.current.clientHeight;

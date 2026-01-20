@@ -48,7 +48,7 @@ function ParticleGlobe(props: any) {
             <Points ref={ref} positions={sphere} stride={3} frustumCulled={false} {...props}>
                 <PointMaterial
                     transparent
-                    color="#a0a0ff"
+                    color="#f2e9ff"
                     size={0.008}
                     sizeAttenuation={true}
                     depthWrite={false}
@@ -77,7 +77,7 @@ export default function ParticleGlobeScene() {
                 dpr={[1, 1.5]}
                 frameloop="always" // We'll keep always but cap it or use visibility
                 onCreated={(state) => {
-                    state.scene.fog = new THREE.FogExp2(0x050510, 0.3);
+                    state.scene.fog = new THREE.FogExp2(0x09060f, 0.3);
                 }}
             >
                 <Suspense fallback={null}>
@@ -97,7 +97,7 @@ export default function ParticleGlobeScene() {
             </div>
             
             {/* Cinematic Gradient Overlay - blends into the site's radial gradient */}
-            <div className="absolute inset-0 bg-gradient-to-l from-transparent via-[#0B0F1A]/40 to-[#0B0F1A] pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-l from-transparent via-[#09060f]/40 to-[#09060f] pointer-events-none" />
             
             {/* Scanline Effect */}
             <div className="scan-line opacity-[0.15]" />

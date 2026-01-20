@@ -10,7 +10,7 @@
     z-index: 10;
     overflow: hidden;
     cursor: none; /* Hide default cursor ONLY inside this container */
-    background: radial-gradient(circle at center, #1a1b3a 0%, #050510 100%); /* Local background matches global */
+    background: radial-gradient(circle at center, #0d0e22 0%, #09060f 100%); /* Local background matches global */
 }
 
 /* Screen FX (Scanlines + Vignette) - Absolute over canvas */
@@ -69,11 +69,11 @@
     left: 50%;
     transform: translateX(-50%);
     font-size: 10px;
-    color: #a0a0ff;
+    color: #f2e9ff;
     white-space: nowrap;
     letter-spacing: 2px;
     font-weight: bold;
-    text-shadow: 0 0 5px #a0a0ff;
+    text-shadow: 0 0 5px #f2e9ff;
 }
 
 /* Holo Interface (Overlay) */
@@ -112,8 +112,8 @@
     left: 0;
     width: 10px;
     height: 10px;
-    border-top: 2px solid #a0a0ff;
-    border-left: 2px solid #a0a0ff;
+    border-top: 2px solid #f2e9ff;
+    border-left: 2px solid #f2e9ff;
 }
 
 .holoFrame::after {
@@ -123,8 +123,8 @@
     right: 0;
     width: 10px;
     height: 10px;
-    border-bottom: 2px solid #a0a0ff;
-    border-right: 2px solid #a0a0ff;
+    border-bottom: 2px solid #f2e9ff;
+    border-right: 2px solid #f2e9ff;
 }
 
 .holoTitle {
@@ -139,7 +139,7 @@
 
 .holoSubtitle {
     font-size: 0.9rem;
-    color: #a0a0ff;
+    color: #f2e9ff;
     letter-spacing: 4px;
     margin-top: 8px;
     text-transform: uppercase;
@@ -149,9 +149,9 @@
 .holoScan {
     width: 100%;
     height: 2px;
-    background: #a0a0ff;
+    background: #f2e9ff;
     margin-top: 15px;
-    box-shadow: 0 0 10px #a0a0ff;
+    box-shadow: 0 0 10px #f2e9ff;
     animation: scanWidth 0.5s forwards;
 }
 

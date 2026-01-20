@@ -21,7 +21,7 @@ export default function AboutSection() {
             </div>
 
             {/* 2. Responsive Content Card - Width controlled for cinematic focus */}
-            <div className="w-full md:w-[min(90vw,900px)] lg:w-[min(70vw,1100px)] -translate-y-2 md:-translate-y-4 mx-auto bg-[#0E1324]/90 border border-white/10 rounded-[1.5rem] md:rounded-[2rem] p-[clamp(1.25rem,4vw,3.5rem)] shadow-2xl relative overflow-hidden backdrop-blur-sm max-h-[80vh] overflow-y-auto custom-scrollbar">
+            <div className="w-full md:w-[min(90vw,900px)] lg:w-[min(70vw,1100px)] -translate-y-2 md:-translate-y-4 mx-auto bg-[#0d0e22]/90 border border-white/10 rounded-[1.5rem] md:rounded-[2rem] p-[clamp(1.25rem,4vw,3.5rem)] shadow-2xl relative overflow-hidden backdrop-blur-sm max-h-[80vh] overflow-y-auto custom-scrollbar">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
                     
                     {/* Text Column - Calibrated Typography */}
@@ -54,7 +54,7 @@ export default function AboutSection() {
                             playsInline
                             preload="metadata"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F1A]/60 via-transparent to-transparent pointer-events-none" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#09060f]/60 via-transparent to-transparent pointer-events-none" />
                         <div className="absolute inset-0 border border-white/5 rounded-[1rem] md:rounded-[1.5rem] pointer-events-none" />
                     </div>
                 </div>

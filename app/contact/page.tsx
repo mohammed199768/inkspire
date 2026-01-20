@@ -31,11 +31,11 @@ export default function ContactPage() {
                 </div>
 
                 {/* Left Fade Overlay (for seamless split) */}
-                <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#0B0F1A] to-transparent z-20 pointer-events-none" />
+                <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#09060f] to-transparent z-20 pointer-events-none" />
                 
                 {/* Top/Bottom Shims */}
-                <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#0B0F1A] to-transparent z-20 pointer-events-none" />
-                <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#0B0F1A] to-transparent z-20 pointer-events-none" />
+                <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#09060f] to-transparent z-20 pointer-events-none" />
+                <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#09060f] to-transparent z-20 pointer-events-none" />
             </div>
 
             {/* Mobile Visual Background (Subtle) */}

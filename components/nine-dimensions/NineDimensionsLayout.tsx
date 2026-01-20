@@ -41,11 +41,11 @@ export default function NineDimensionsLayout() {
     // --- MOBILE LAYOUT (Phone Only) ---
     if (isMobile) {
         return (
-            <main className="w-full min-h-screen relative bg-[#050510] text-white">
+            <main className="w-full min-h-screen relative bg-[#09060f] text-white">
                  {/* Light static gradient for mobile - ultra-lite background if tablet? 
                      Actually if it is tablet it shouldn't be here based on isMobile check.
                  */}
-                 <div className="fixed inset-0 z-0 bg-gradient-to-b from-[#1a1b3a] to-[#050510] pointer-events-none" />
+                 <div className="fixed inset-0 z-0 bg-gradient-to-b from-[#0d0e22] to-[#09060f] pointer-events-none" />
                  
                  <div className="relative z-10 flex flex-col w-full">
                     {SECTIONS.map((item, idx) => (

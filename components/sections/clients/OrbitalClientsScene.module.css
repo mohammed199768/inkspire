@@ -79,7 +79,7 @@
 .panelBox {
     background: rgba(10, 10, 20, 0.85);
     backdrop-filter: blur(12px);
-    border-left: 3px solid #a0a0ff;
+    border-left: 3px solid #f2e9ff;
     padding: 20px 30px;
     box-shadow: 0 10px 40px rgba(0,0,0,0.5);
     max-width: 350px;
@@ -98,7 +98,7 @@
 
 .panelCategory {
     font-size: 0.75rem;
-    color: #a0a0ff;
+    color: #f2e9ff;
     letter-spacing: 0.15em;
     font-weight: 600;
     text-transform: uppercase;

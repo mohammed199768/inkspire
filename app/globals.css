@@ -3,10 +3,13 @@
 @tailwind utilities;
 
 :root {
-  --bg-primary: #0B0F1A;
-  --bg-secondary: #0E1324;
-  --accent-indigo: #5B4DFF;
-  --depth-indigo: #2A2F4F;
+  --bg-base: #09060f;
+  --bg-deep: #0d0e22;
+  --bg-accent: #201037;
+  --bg-primary: #09060f;
+  --bg-secondary: #0d0e22;
+  --accent-indigo: #201037;
+  --depth-indigo: #0d0e22;
   --foreground: #ededed;
 
   /* Typography Scale - Calibrated Clamps */
@@ -28,8 +31,9 @@
 
 body {
   color: var(--foreground);
-  background: #0B0F1A; /* Fallback */
-  background: radial-gradient(circle at center, #0E1324 0%, #0B0F1A 100%);
+  background: var(--bg-base); 
+  background: linear-gradient(-45deg, var(--bg-base), var(--bg-deep), var(--bg-accent), var(--bg-deep));
+  background-size: 400% 400%;
   background-attachment: fixed;
   min-height: 100vh;
   overflow-x: hidden;
@@ -38,11 +42,33 @@ body {
   line-height: 1.6;
 }
 
-/* Fix for iOS Safari background-attachment: fixed performance issue */
+@keyframes cinematicGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Subtle animation on desktop only */
+@media (min-width: 1024px) {
+  @media (prefers-reduced-motion: no-preference) {
+    body {
+      animation: cinematicGradient 20s ease infinite;
+    }
+  }
+}
+
+/* Fix for iOS Safari / Mobile - Static Deep Gradient */
 @supports (-webkit-touch-callout: none) {
   body {
     background-attachment: scroll;
-    background: linear-gradient(180deg, #0B0F1A 0%, #0E1324 100%);
+    background: linear-gradient(180deg, var(--bg-base) 0%, var(--bg-deep) 100%);
+    animation: none !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  body {
+    animation: none !important;
   }
 }
 
@@ -97,8 +123,8 @@ html {
 
 /* Utility for text selection color */
 ::selection {
-  background: #f2e9ff;
-  color: #6b4092;
+  background: var(--bg-accent);
+  color: #ffffff;
 }
 
 /* IBRAND - Special brand font for "Inkspire" */
@@ -192,10 +218,9 @@ h6 { font-size: var(--fs-sm); text-transform: uppercase; letter-spacing: 0.2em; 
   background: linear-gradient(
     90deg,
     #ffffff,
-    #f2e9ff,
-    #6b4092,
-    #404f96,
-    #f2e9ff,
+    var(--bg-accent),
+    var(--bg-deep),
+    var(--bg-accent),
     #ffffff
   );
   background-size: 300% 300%;

@@ -8,21 +8,26 @@ interface NineDimensionsBackgroundProps {
     targetShapeIndex: number;
 }
 
+// --- PALETTE CONSTANTS ---
+const BG_BASE = "#09060f";
+const BG_DEEP = "#0d0e22";
+const BG_ACCENT = "#201037";
+
 // --- PERFORMANCE PROFILES ---
 const getProfile = () => {
-    if (typeof window === 'undefined') return { mode: 'desktop', count: 3000, pixelRatio: 1.5, updateStep: 1, postFX: true };
+    if (typeof window === 'undefined') return { mode: 'desktop', count: 1800, pixelRatio: 1.5, updateStep: 1, postFX: true };
     
     const w = window.innerWidth;
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     
-    if (prefersReduced) return { mode: 'mobile', count: 0, pixelRatio: 1, updateStep: 1, postFX: false };
+    if (prefersReduced) return { mode: 'mobile', count: 400, pixelRatio: 1.0, updateStep: 2, postFX: false };
     
     if (w < 768) {
-        return { mode: 'mobile', count: 0, pixelRatio: 1, updateStep: 1, postFX: false }; // Disabled on small mobile
+        return { mode: 'mobile', count: 600, pixelRatio: 1.0, updateStep: 2, postFX: false }; // Minimal but active
     } else if (w <= 1024) {
-        return { mode: 'tablet', count: 1200, pixelRatio: 1.0, updateStep: 2, postFX: false }; // Lite profile for Tablet
+        return { mode: 'tablet', count: 1200, pixelRatio: 1.0, updateStep: 2, postFX: false }; // Adjusted Tablet DPR
     }
-    return { mode: 'desktop', count: 3000, pixelRatio: 1.5, updateStep: 1, postFX: true }; // Full quality
+    return { mode: 'desktop', count: 1800, pixelRatio: 1.5, updateStep: 1, postFX: true }; // Optimized High
 };
 
 export default function NineDimensionsBackground({ targetShapeIndex }: NineDimensionsBackgroundProps) {
@@ -52,7 +57,7 @@ export default function NineDimensionsBackground({ targetShapeIndex }: NineDimen
         // --- 1. SETUP ---
         const scene = new THREE.Scene();
         sceneRef.current = scene;
-        scene.fog = new THREE.FogExp2(0x050510, 0.002);
+        scene.fog = new THREE.FogExp2(BG_BASE, 0.002);
 
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
         cameraRef.current = camera;
@@ -75,7 +80,7 @@ export default function NineDimensionsBackground({ targetShapeIndex }: NineDimen
         observer.observe(containerRef.current);
 
         const handleVisibilityChange = () => {
-            if (document.hidden) isVisible.current = false;
+            isVisible.current = !document.hidden;
         };
         document.addEventListener("visibilitychange", handleVisibilityChange);
 
@@ -188,17 +193,17 @@ export default function NineDimensionsBackground({ targetShapeIndex }: NineDimen
         }
         shapesRef.current = shapes;
 
-        // --- 3. BUILD MESH ---
-        // CRITICAL Optimization: Low-poly spheres (8x8 segments instead of 64x64)
-        const geometry = new THREE.SphereGeometry(0.3, 8, 8);
+        // BUILD MESH
+        // Increased size slightly (0.4) to maintain "fullness" with 60% fewer particles
+        const geometry = new THREE.SphereGeometry(0.4, 8, 8);
         const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
         const mesh = new THREE.InstancedMesh(geometry, material, count);
         meshRef.current = mesh;
 
         // Coloring
-        const color1 = new THREE.Color(0x6b4092); // Purple
-        const color2 = new THREE.Color(0x404f96); // Indigo
-        const color3 = new THREE.Color(0xffffff); // White
+        const color1 = new THREE.Color(BG_ACCENT); // Accent
+        const color2 = new THREE.Color(BG_DEEP);   // Deep
+        const color3 = new THREE.Color(0xffffff);  // White
         
         for (let i = 0; i < count; i++) {
             dummy.position.set(0,0,0);
@@ -231,36 +236,53 @@ export default function NineDimensionsBackground({ targetShapeIndex }: NineDimen
             frameCountRef.current++;
             if (frameCountRef.current % profile.updateStep !== 0) return;
 
-            // Update logic
+            // Update logic - Constant "alive" feel
             const currentIdx = currentShapeIndexRef.current;
             const targetIdx = targetShapeIndexRef.current;
             const progress = animParams.current.progress;
 
-            if (targetIdx !== currentIdx || progress > 0) {
-                const startShape = shapes[currentIdx];
-                const endShape = shapes[targetIdx];
+            const startShape = shapes[currentIdx];
+            const endShape = shapes[targetIdx];
 
-                for (let i = 0; i < count; i++) {
-                    const i3 = i * 3;
-                    
-                    const x = THREE.MathUtils.lerp(startShape[i3], endShape[i3], progress);
-                    const y = THREE.MathUtils.lerp(startShape[i3+1], endShape[i3+1], progress);
-                    const z = THREE.MathUtils.lerp(startShape[i3+2], endShape[i3+2], progress);
+            // OPTIMIZATION: Cache lookAt target decision per frame
+            const lZ = targetIdx === 1 ? 1000 : 0;
+            // Apply lookAt only every 2 steps to save CPU (Orientation is stable enough for spheres)
+            const shouldUpdateLookAt = (frameCountRef.current % (profile.updateStep * 2)) === 0;
 
-                    const noise = Math.sin(time + i) * 0.5;
-                    
-                    dummy.position.set(x + noise, y + noise, z);
-                    
-                    if (targetIdx === 1) dummy.lookAt(0, 0, 1000); // Tunnel look forward
-                    else dummy.lookAt(0, 0, 0); // Center look
+            for (let i = 0; i < count; i++) {
+                const i3 = i * 3;
+                
+                // Position interpolation
+                let x = startShape[i3];
+                let y = startShape[i3+1];
+                let z = startShape[i3+2];
 
-                    dummy.scale.setScalar(1 + Math.sin(time * 5 + i) * 0.5); 
-
-                    dummy.updateMatrix();
-                    mesh.setMatrixAt(i, dummy.matrix);
+                if (progress > 0) {
+                    x = THREE.MathUtils.lerp(x, endShape[i3], progress);
+                    y = THREE.MathUtils.lerp(y, endShape[i3+1], progress);
+                    z = THREE.MathUtils.lerp(z, endShape[i3+2], progress);
                 }
-                mesh.instanceMatrix.needsUpdate = true;
+
+                // Noise + Drift logic
+                const variance = 1 + (i % 10) * 0.1; 
+                const noise = Math.sin(time * variance + i) * 0.8;
+                const drift = Math.cos(time * 0.3 + i) * 0.4;
+                
+                dummy.position.set(x + noise, y + noise + drift, z + drift);
+                
+                // Optimized lookAt: Decoupled frequency from rendering
+                if (shouldUpdateLookAt) {
+                    dummy.lookAt(0, 0, lZ);
+                }
+
+                // Pulse effect: Throttled by profile.updateStep (implicit in outer loop)
+                const pulse = 1 + Math.sin(time * 3 + i) * 0.3;
+                dummy.scale.setScalar(pulse); 
+
+                dummy.updateMatrix();
+                mesh.setMatrixAt(i, dummy.matrix);
             }
+            mesh.instanceMatrix.needsUpdate = true;
 
             renderer.render(scene, camera);
         };
@@ -271,6 +293,7 @@ export default function NineDimensionsBackground({ targetShapeIndex }: NineDimen
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, profile.pixelRatio));
         };
         window.addEventListener('resize', handleResize);
 

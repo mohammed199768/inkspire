@@ -11,8 +11,8 @@ const config: Config = {
             colors: {
                 background: "var(--background)",
                 foreground: "var(--foreground)",
-                inkspirePurple: '#6b4092',
-                inkspireIndigo: '#404f96',
+                inkspirePurple: '#201037', // Accent
+                inkspireIndigo: '#0d0e22', // Deep
             },
             fontFamily: {
                 sans: ['var(--font-inter)', 'sans-serif'],

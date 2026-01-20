@@ -36,7 +36,7 @@ export default function NineDimensionsHUD({
                         {/* Dot */}
                         <div className={`w-1.5 h-1.5 rounded-full transition-all duration-500 
                             ${currentSection === idx 
-                                ? 'bg-[#a0a0ff] scale-150 shadow-[0_0_10px_#a0a0ff]' 
+                                ? 'bg-[#f2e9ff] scale-150 shadow-[0_0_15px_rgba(242,233,255,0.5)]' 
                                 : 'bg-white/20 group-hover:bg-white/50'}`} 
                         />
                         

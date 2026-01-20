@@ -24,18 +24,18 @@ export default function HeroScene() {
     return (
         <section
             ref={containerRef}
-            className="relative min-h-[100dvh] flex flex-col justify-center md:justify-end items-center pb-0 pt-16 md:pt-0 overflow-hidden"
+            className="relative min-h-[100dvh] flex flex-col justify-center md:justify-start lg:justify-end items-center pb-0 pt-20 md:pt-24 lg:pt-0 overflow-hidden"
             style={{ paddingLeft: 'var(--container-padding)', paddingRight: 'var(--container-padding)' }}
         >
-            {/* 1. Images Row - Top on mobile, Background on desktop */}
-            <div className="relative md:absolute inset-0 w-full h-auto md:h-full overflow-visible pointer-events-none z-10">
+            {/* 1. Images Row - Top on mobile/tablet, Background on desktop */}
+            <div className="relative lg:absolute inset-0 w-full h-auto lg:h-full overflow-visible pointer-events-none z-10">
                 <CinematicRevealGrid />
             </div>
 
             {/* Main Title Container with Glassmorphism */}
-            <div ref={titleRef} className="relative z-30 flex flex-col items-center text-center max-w-[95vw] md:max-w-7xl mx-auto mb-0 mt-8 md:mt-0">
+            <div ref={titleRef} className="relative z-30 flex flex-col items-center text-center max-w-[95vw] md:max-w-7xl mx-auto mb-0 mt-6 md:mt-4 lg:mt-0">
                 {/* Premium Glass Box - Tightened and Safari Optimized */}
-                <div className={`relative px-4 py-6 md:px-12 md:py-8 rounded-[2rem] md:rounded-[4rem] border shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden w-full ${
+                <div className={`relative px-4 py-6 md:px-10 md:py-8 lg:px-12 lg:py-8 rounded-[2rem] md:rounded-[3rem] lg:rounded-[4rem] border shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden w-full ${
                     isSafari ? 'safari-no-backdrop premium-glass-performance' : 'border-white/10 bg-[#0a0a0f]/40'
                 }`}
                      style={!isSafari ? { 
@@ -45,6 +45,8 @@ export default function HeroScene() {
                          WebkitBackdropFilter: 'blur(10px)'
                      } : {}}
                 >
+                    {/* Tablet Overlay Gradient - For readability when images are above */}
+                    <div className="absolute inset-0 bg-gradient-to-b from-[#09060f]/80 to-[#09060f]/40 lg:hidden pointer-events-none" />
                     {/* Atmospheric Glow inside glass - Reduced for Safari */}
                     <div className={`absolute -top-1/2 -left-1/2 w-full h-full bg-indigo-500/5 ${isSafari ? 'blur-[60px]' : 'blur-[100px]'} pointer-events-none`} />
                     <div className={`absolute -bottom-1/2 -right-1/2 w-full h-full bg-purple-500/5 ${isSafari ? 'blur-[60px]' : 'blur-[100px]'} pointer-events-none`} />
