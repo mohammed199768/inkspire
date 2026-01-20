@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import TunnelBackground from "./TunnelBackground";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePageVisibility } from "@/hooks/usePageVisibility";
 
 const sections = [
     {
@@ -28,12 +29,11 @@ const sections = [
 export default function TunnelExperience() {
     const [currentSection, setCurrentSection] = useState(0);
     const [isAnimating, setIsAnimating] = useState(false);
+    const isPageActive = usePageVisibility();
 
     useEffect(() => {
         const handleWheel = (e: WheelEvent) => {
-            // Prevent native scrolling
-
-            if (isAnimating) return;
+            if (isAnimating || !isPageActive) return;
 
             // Threshold to prevent accidental double-skips
             if (Math.abs(e.deltaY) < 50) return;

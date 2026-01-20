@@ -9,7 +9,7 @@ export default function AboutSection() {
     return (
         <section 
             ref={containerRef} 
-            className="w-full h-[100dvh] flex flex-col items-center justify-center py-6 md:py-10 px-4 md:px-6 relative isolate z-10 overflow-hidden"
+            className="scroll-mt-20 w-full min-h-screen flex flex-col items-center justify-center md:justify-start pt-24 pb-20 md:pt-32 lg:pt-32 md:py-14 px-4 md:px-6 relative isolate z-10 overflow-hidden"
         >
             {/* 1. Precise Title Layer - Tightened Spacing */}
             <div className="relative z-50 mb-2 md:mb-4 isolate">

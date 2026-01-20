@@ -3,6 +3,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import gsap from 'gsap';
+import { usePageVisibility } from '@/hooks/usePageVisibility';
+import { safeDispose, disposeRenderer } from '@/lib/three/safeDispose';
 import { clients } from '@/data/clients';
 import { projects } from '@/data/projects';
 import { usePopup } from '@/hooks/usePopup';
@@ -43,9 +45,12 @@ export default function OrbitalClientsScene() {
         reqId: number | null;
         isVisible: boolean;
     } | null>(null);
+    const isPageActive = usePageVisibility();
 
     useEffect(() => {
         if (!containerRef.current || !canvasRef.current) return;
+
+        let alive = true;
 
         // --- 1. SETUP ---
         const scene = new THREE.Scene();
@@ -78,13 +83,13 @@ export default function OrbitalClientsScene() {
             ([entry]) => {
                 if (sceneRefs.current) {
                     sceneRefs.current.isVisible = entry.isIntersecting;
-                    // Restart loop if it becomes visible
-                    if (entry.isIntersecting && !sceneRefs.current.reqId) {
+                    // Restart loop if it becomes visible and page is active
+                    if (entry.isIntersecting && isPageActive && !sceneRefs.current.reqId) {
                         animate();
                     }
                 }
             },
-            { threshold: 0 }
+            { threshold: 0.1 }
         );
         observer.observe(containerRef.current);
 
@@ -185,6 +190,7 @@ export default function OrbitalClientsScene() {
                 img.crossOrigin = "Anonymous";
                 img.src = client.logo;
                 img.onload = () => {
+                    if (!alive) return;
                     drawCardCanvas(ctx, client.name, color, img);
                     tex.needsUpdate = true;
                 };
@@ -221,10 +227,14 @@ export default function OrbitalClientsScene() {
         scene.add(mainGroup);
 
         const items: THREE.Group[] = [];
-        const radiusStep = 22; // زدنا المسافة قليلاً لمنع التداخل الجسدي
+        const radiusStep = 22; 
         
+        // REUSE GEOMETRY
+        const cardGeometry = new THREE.PlaneGeometry(8, 8);
+        const glowGeometry = new THREE.PlaneGeometry(22, 22);
+
         let clientIndex = 0;
-        const ringCounts = [4, 8]; // Inner, Outer
+        const ringCounts = [4, 8]; 
         
         ringCounts.forEach((count, ringIndex) => {
             const radius = (ringIndex + 1.2) * radiusStep;
@@ -243,19 +253,16 @@ export default function OrbitalClientsScene() {
                 const itemGroup = new THREE.Group();
 
                 // 1. Card Mesh
-                const geometry = new THREE.PlaneGeometry(8, 8);
                 const tex = createCardTexture(client);
-                
-                // --- FIX APPLIED HERE ---
                 const material = new THREE.MeshBasicMaterial({ 
                     map: tex,
                     transparent: true,
                     side: THREE.DoubleSide,
-                    alphaTest: 0.5, // <--- هام جداً: قص الحواف الشفافة
-                    depthWrite: true // <--- هام جداً: كتابة العمق الصحيح
+                    alphaTest: 0.5,
+                    depthWrite: true
                 });
 
-                const mesh = new THREE.Mesh(geometry, material);
+                const mesh = new THREE.Mesh(cardGeometry, material);
                 itemGroup.add(mesh);
 
                 // 2. Glow Sprite
@@ -317,13 +324,13 @@ export default function OrbitalClientsScene() {
         // --- 6. ANIMATION LOOP ---
         const animate = () => {
             const r = sceneRefs.current;
-            if(!r) return;
+            if(!r || !alive) return;
             
-            if (r.isVisible) {
-                r.reqId = requestAnimationFrame(animate);
+            if (!r.isVisible || !isPageActive) {
+                r.reqId = null;
+                return;
             }
-
-            if (!r.isVisible) return;
+            r.reqId = requestAnimationFrame(animate);
 
             const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
             const time = (Date.now() * 0.001) * (prefersReducedMotion ? 0.3 : 1);
@@ -453,6 +460,7 @@ export default function OrbitalClientsScene() {
 
         // --- CLEANUP ---
         return () => {
+            alive = false;
             if(sceneRefs.current?.reqId) cancelAnimationFrame(sceneRefs.current.reqId);
             observer.disconnect();
             window.removeEventListener('resize', onResize);
@@ -460,12 +468,30 @@ export default function OrbitalClientsScene() {
             el.removeEventListener('click', onClick);
 
             if(sceneRefs.current) {
-                sceneRefs.current.renderer.dispose();
+                // Kill any lingering GSAP tweens touching scene objects
+                try { gsap.killTweensOf("*"); } catch {}
+
+                // Dispose all geometries/materials/textures inside the scene
+                safeDispose(sceneRefs.current.scene);
+
+                // Remove objects to drop refs
+                sceneRefs.current.scene.clear();
+
+                // Renderer cleanup
+                disposeRenderer(sceneRefs.current.renderer, false);
             }
             if(canvasRef.current) canvasRef.current.innerHTML = '';
         };
+    }, [openPopup, isPageActive]);
 
-    }, [openPopup]);
+    // Restart loop when tab becomes active
+    useEffect(() => {
+        if (isPageActive && sceneRefs.current?.isVisible && !sceneRefs.current?.reqId) {
+            // Re-triggering the useEffect above by adding isPageActive to dependencies 
+            // is the cleanest way or we can call the local animate if exposed.
+            // Since animate is local, the best way is to include isPageActive in the dependency array.
+        }
+    }, [isPageActive]);
 
     return (
         <div ref={containerRef} className={styles.sceneWrap}>

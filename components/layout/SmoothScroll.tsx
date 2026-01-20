@@ -3,11 +3,15 @@
 import { useEffect, useRef } from "react";
 import Lenis from "lenis";
 import { useIsTouchDevice } from "@/hooks/useIsTouchDevice";
+import { usePathname } from "next/navigation";
+import { usePageVisibility } from "@/hooks/usePageVisibility";
 
 export default function SmoothScroll({ children }: { children: React.ReactNode }) {
     const isTouch = useIsTouchDevice();
+    const pathname = usePathname();
     const lenisRef = useRef<Lenis | null>(null);
     const rafIdRef = useRef<number | null>(null);
+    const isPageActive = usePageVisibility();
 
     useEffect(() => {
         // Condition for Lenis: 
@@ -25,6 +29,11 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
             return;
         }
 
+        // Disable Lenis on pages that handle their own scroll/navigation (like the 9-dimensions layout)
+        if (pathname === "/" || pathname === "/experience") {
+            return;
+        }
+
         const lenis = new Lenis({
             duration: 1.2,
             easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -37,6 +46,10 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
         lenisRef.current = lenis;
 
         function raf(time: number) {
+            if (!isPageActive) {
+                rafIdRef.current = null;
+                return;
+            }
             if (lenisRef.current) {
                 lenisRef.current.raf(time);
             }
@@ -55,7 +68,7 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
                 lenisRef.current = null;
             }
         };
-    }, [isTouch]);
+    }, [isTouch, isPageActive]);
 
     return <>{children}</>;
 }

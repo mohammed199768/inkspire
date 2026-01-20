@@ -1,0 +1,43 @@
+/* Tablet range overrides (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  html, body {
+    overflow-x: hidden;
+  }
+
+  /* Section title visibility guard */
+  .fade-up {
+    position: relative;
+    z-index: 20;
+  }
+
+  /* Standard tablet section spacing normalization */
+  .tablet-section-fix {
+    padding-top: 7rem !important;
+    padding-bottom: 3.5rem !important;
+    justify-content: flex-start !important;
+  }
+
+  /* HERO: move reveal grid above text on tablet */
+  .re-reveal-container {
+    position: relative !important;
+    inset: auto !important;
+    height: auto !important;
+    min-height: 55vh;
+    display: flex;
+    align-items: flex-start !important;
+    justify-content: center;
+    padding-top: 5vh;
+    z-index: 10 !important;
+  }
+
+  .re-stacks-grid {
+    height: auto !important;
+    max-height: 50vh;
+    padding-bottom: 2rem !important;
+  }
+
+  /* Readability guard */
+  .tablet-text-veil {
+    background: linear-gradient(to bottom, rgba(9, 6, 15, 0.85), rgba(9, 6, 15, 0.35));
+  }
+}

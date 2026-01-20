@@ -38,7 +38,7 @@ export default function ClientsSection() {
             <div className="w-full h-full flex flex-col lg:flex-row relative z-10 pointer-events-none overflow-visible">
 
                 {/* Left Column: Title - Clickable with pointer-events-auto */}
-                <div className="w-full lg:w-1/3 p-6 md:p-16 flex flex-col justify-center border-b lg:border-b-0 lg:border-r border-white/5 relative z-20 bg-black/20 backdrop-blur-sm pointer-events-auto">
+                <div className="w-full lg:w-1/3 p-6 md:p-16 flex flex-col justify-center md:justify-start md:pt-28 md:py-14 border-b lg:border-b-0 lg:border-r border-white/5 relative z-20 bg-black/20 backdrop-blur-sm pointer-events-auto">
                     <div className="relative">
                         <h6 className="text-sm font-medium text-purple-400 uppercase tracking-[0.2em] mb-4">
                             Partners

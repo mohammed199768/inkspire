@@ -12,13 +12,13 @@ export default function TeamSection() {
     const { openPopup } = usePopup();
 
     return (
-        <div ref={containerRef} className="min-h-screen flex flex-col justify-center md:justify-start py-20 md:py-14 px-6 md:pt-28">
+        <div id="team" ref={containerRef} className="scroll-mt-20 min-h-screen flex flex-col justify-center md:justify-start py-20 md:py-14 px-6 md:pt-28">
             <SectionTitle 
                 title="Meet The" 
                 highlight="Team" 
                 highlightColor="text-blue-400" 
             />
-            <div className="grid grid-cols-2 md:flex md:flex-wrap justify-center gap-2 md:gap-10 max-w-7xl mx-auto w-full">
+            <div className="grid grid-cols-2 md:flex md:flex-wrap justify-center gap-2 md:gap-6 lg:gap-10 max-w-7xl mx-auto w-full">
                 {team.map((member, i) => (
                     <div
                         key={i}

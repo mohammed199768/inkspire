@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import "../styles/tablet.css";
+
 :root {
   --bg-base: #09060f;
   --bg-deep: #0d0e22;

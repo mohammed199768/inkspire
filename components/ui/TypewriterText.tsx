@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { usePageVisibility } from "@/hooks/usePageVisibility";
 
 interface TypewriterTextProps {
     text: string;
@@ -18,17 +19,19 @@ export default function TypewriterText({
 }: TypewriterTextProps) {
     const [displayedText, setDisplayedText] = useState("");
     const [isStarted, setIsStarted] = useState(false);
+    const isPageActive = usePageVisibility();
 
     useEffect(() => {
+        if (!isPageActive) return;
         const startTimeout = setTimeout(() => {
             setIsStarted(true);
         }, delay);
 
         return () => clearTimeout(startTimeout);
-    }, [delay]);
+    }, [delay, isPageActive]);
 
     useEffect(() => {
-        if (!isStarted) return;
+        if (!isStarted || !isPageActive) return;
 
         if (displayedText.length < text.length) {
             const timeout = setTimeout(() => {

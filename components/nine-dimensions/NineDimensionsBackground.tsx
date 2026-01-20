@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import * as THREE from "three";
 import gsap from "gsap";
+import { usePageVisibility } from "@/hooks/usePageVisibility";
 
 interface NineDimensionsBackgroundProps {
     targetShapeIndex: number;
@@ -15,46 +16,205 @@ const BG_ACCENT = "#201037";
 
 // --- PERFORMANCE PROFILES ---
 const getProfile = () => {
-    if (typeof window === 'undefined') return { mode: 'desktop', count: 1800, pixelRatio: 1.5, updateStep: 1, postFX: true };
+    if (typeof window === 'undefined') return { mode: 'desktop', count: 1800, pixelRatio: 1.5, postFX: true };
     
     const w = window.innerWidth;
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     
-    if (prefersReduced) return { mode: 'mobile', count: 400, pixelRatio: 1.0, updateStep: 2, postFX: false };
+    if (prefersReduced) return { mode: 'mobile', count: 400, pixelRatio: 1.0, postFX: false };
     
     if (w < 768) {
-        return { mode: 'mobile', count: 600, pixelRatio: 1.0, updateStep: 2, postFX: false }; // Minimal but active
+        return { mode: 'mobile', count: 600, pixelRatio: 1.0, postFX: false }; 
     } else if (w <= 1024) {
-        return { mode: 'tablet', count: 1200, pixelRatio: 1.0, updateStep: 2, postFX: false }; // Adjusted Tablet DPR
+        return { mode: 'tablet', count: 1200, pixelRatio: 1.0, postFX: false };
     }
-    return { mode: 'desktop', count: 1800, pixelRatio: 1.5, updateStep: 1, postFX: true }; // Optimized High
+    return { mode: 'desktop', count: 1800, pixelRatio: 1.5, postFX: true };
 };
+
+// --- SHADERS ---
+const vertexShader = `
+    uniform float uTime;
+    uniform float uProgress;
+    attribute float aInstanceIdx;
+    attribute vec3 aPosStart;
+    attribute vec3 aPosEnd;
+
+    varying vec3 vColor;
+    varying float vOpacity;
+
+    void main() {
+        // 1. Interpolate between shapes
+        vec3 morphedPos = mix(aPosStart, aPosEnd, uProgress);
+        
+        // 2. Add dynamic movement (noise & drift)
+        // Replicating original JS logic: 
+        // variance = 1 + (i % 10) * 0.1
+        // noise = sin(time * variance + i) * 0.8
+        // drift = cos(time * 0.3 + i) * 0.4
+        
+        float variance = 1.0 + mod(aInstanceIdx, 10.0) * 0.1;
+        float noise = sin(uTime * variance + aInstanceIdx) * 0.8;
+        float drift = cos(uTime * 0.3 + aInstanceIdx) * 0.4;
+        
+        vec3 finalOffset = vec3(noise, noise + drift, drift);
+        
+        // 3. Pulse Scaling
+        // pulse = 1 + sin(time * 3 + i) * 0.3
+        float pulse = 1.0 + sin(uTime * 3.0 + aInstanceIdx) * 0.3;
+        
+        // 4. Combine
+        // Calculate the instance center in model space
+        vec3 instanceCenter = morphedPos + finalOffset;
+        
+        // Apply scaling to the geometry (local position)
+        vec3 scaledVertex = position * pulse;
+        
+        // Transform
+        vec4 mvPosition = modelViewMatrix * instanceMatrix * vec4(instanceCenter + scaledVertex, 1.0);
+        gl_Position = projectionMatrix * mvPosition;
+        
+        vColor = instanceColor;
+        
+        // Distance based opacity (depth feel)
+        float depth = length(mvPosition.xyz);
+        vOpacity = clamp(1.0 - (depth / 600.0), 0.2, 1.0);
+    }
+`;
+
+const fragmentShader = `
+    varying vec3 vColor;
+    varying float vOpacity;
+
+    void main() {
+        gl_FragColor = vec4(vColor, vOpacity);
+    }
+`;
 
 export default function NineDimensionsBackground({ targetShapeIndex }: NineDimensionsBackgroundProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const PROFILE = useRef(getProfile());
+    const isPageActive = usePageVisibility();
     
-    // Refs for cleanup
+    // Refs for optimization
+    const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
     const sceneRef = useRef<THREE.Scene | null>(null);
     const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
-    const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
     const meshRef = useRef<THREE.InstancedMesh | null>(null);
-    const shapesRef = useRef<number[][]>([]);
+    const materialRef = useRef<THREE.ShaderMaterial | null>(null);
+    const shapesRef = useRef<Float32Array[]>([]);
     const reqIdRef = useRef<number | null>(null);
-    const frameCountRef = useRef(0);
     
-    // Animation state refs
+    // State management
     const isVisible = useRef(true);
     const currentShapeIndexRef = useRef(0);
     const targetShapeIndexRef = useRef(0);
     const animParams = useRef({ progress: 0 });
 
+    // Pre-calculate shapes (happens once on mount)
+    const shapes = useMemo(() => {
+        const count = PROFILE.current.count;
+        const result: Float32Array[] = [];
+        
+        for (let s = 0; s < 9; s++) {
+            const data = new Float32Array(count * 3);
+            for (let i = 0; i < count; i++) {
+                let x = 0, y = 0, z = 0;
+                switch(s) {
+                    case 0: // Genesis (Chaos)
+                        x = (Math.random() - 0.5) * 400;
+                        y = (Math.random() - 0.5) * 300;
+                        z = (Math.random() - 0.5) * 200;
+                        break;
+                    case 1: // Tunnel
+                        const r = 30 + Math.random() * 10;
+                        const theta = Math.random() * Math.PI * 2;
+                        x = Math.cos(theta) * r;
+                        y = Math.sin(theta) * r;
+                        z = (Math.random() - 0.5) * 400;
+                        break;
+                    case 2: // Sphere
+                        const radius = 60;
+                        const phi = Math.acos(-1 + (2 * i) / count);
+                        const thetaSphere = Math.sqrt(count * Math.PI) * phi;
+                        x = radius * Math.cos(thetaSphere) * Math.sin(phi);
+                        y = radius * Math.sin(thetaSphere) * Math.sin(phi);
+                        z = radius * Math.cos(phi);
+                        break;
+                    case 3: // Cube
+                        const size = 80;
+                        x = (Math.random() - 0.5) * size;
+                        y = (Math.random() - 0.5) * size;
+                        z = (Math.random() - 0.5) * size;
+                        if(Math.random() > 0.5) {
+                            const axis = Math.floor(Math.random()*3);
+                            if(axis===0) x = Math.sign(x) * size/2;
+                            if(axis===1) y = Math.sign(y) * size/2;
+                            if(axis===2) z = Math.sign(z) * size/2;
+                        }
+                        break;
+                    case 4: // Helix
+                        const t = (i / count) * Math.PI * 20;
+                        x = Math.cos(t) * 20;
+                        y = (i / count - 0.5) * 200;
+                        z = Math.sin(t) * 20;
+                        if (i % 2 === 0) {
+                            x = Math.cos(t + Math.PI) * 20;
+                            z = Math.sin(t + Math.PI) * 20;
+                        }
+                        break;
+                    case 5: // Grid
+                        const col = i % 50;
+                        const row = Math.floor(i / 50);
+                        x = (col - 25) * 8;
+                        z = (row - 30) * 8;
+                        y = Math.sin(x * 0.1) * Math.cos(z * 0.1) * 10 - 40;
+                        break;
+                    case 6: // Ring
+                        const ringR = 60 + Math.random() * 20;
+                        const ringTheta = (i / count) * Math.PI * 2 * 10;
+                        x = Math.cos(ringTheta) * ringR;
+                        y = Math.sin(ringTheta) * ringR;
+                        z = (Math.random() - 0.5) * 5; 
+                        break;
+                    case 7: // Vortex
+                        const vRatio = i / count;
+                        const vR = vRatio * 80 + 5;
+                        const vTheta = vRatio * Math.PI * 20;
+                        y = (vRatio - 0.5) * 200;
+                        x = Math.cos(vTheta) * vR;
+                        z = Math.sin(vTheta) * vR;
+                        break;
+                    case 8: // Harmony
+                        if (i < count * 0.7) {
+                            const r2 = 30;
+                            const p2 = Math.acos(-1 + (2 * i) / (count*0.7));
+                            const t2 = Math.sqrt((count*0.7) * Math.PI) * p2;
+                            x = r2 * Math.cos(t2) * Math.sin(p2);
+                            y = r2 * Math.sin(t2) * Math.sin(p2);
+                            z = r2 * Math.cos(p2);
+                        } else {
+                            x = (Math.random() - 0.5) * 300;
+                            y = (Math.random() - 0.5) * 300;
+                            z = (Math.random() - 0.5) * 300;
+                        }
+                        break;
+                }
+                data[i * 3] = x;
+                data[i * 3 + 1] = y;
+                data[i * 3 + 2] = z;
+            }
+            result.push(data);
+        }
+        return result;
+    }, []);
+
     useEffect(() => {
         if (!containerRef.current) return;
         const profile = PROFILE.current;
-        if (profile.count === 0) return;
+        const count = profile.count;
+        if (count === 0) return;
 
-        // --- 1. SETUP ---
+        // --- SETUP ---
         const scene = new THREE.Scene();
         sceneRef.current = scene;
         scene.fog = new THREE.FogExp2(BG_BASE, 0.002);
@@ -73,216 +233,68 @@ export default function NineDimensionsBackground({ targetShapeIndex }: NineDimen
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, profile.pixelRatio));
         containerRef.current.appendChild(renderer.domElement);
 
-        // Visibility Observer
-        const observer = new IntersectionObserver(([entry]) => {
-            isVisible.current = entry.isIntersecting;
-        }, { threshold: 0.1 });
-        observer.observe(containerRef.current);
+        // --- GEOMETRY & MATERIAL ---
+        const baseGeo = new THREE.SphereGeometry(0.4, 8, 8);
+        const geometry = new THREE.InstancedBufferGeometry().copy(baseGeo as any);
+        geometry.instanceCount = count;
 
-        const handleVisibilityChange = () => {
-            isVisible.current = !document.hidden;
-        };
-        document.addEventListener("visibilitychange", handleVisibilityChange);
+        // Attributes
+        const instanceIdx = new Float32Array(count);
+        for(let i=0; i<count; i++) instanceIdx[i] = i;
+        geometry.setAttribute('aInstanceIdx', new THREE.InstancedBufferAttribute(instanceIdx, 1));
+        
+        const posStart = new THREE.InstancedBufferAttribute(shapes[0], 3);
+        const posEnd = new THREE.InstancedBufferAttribute(shapes[0], 3);
+        geometry.setAttribute('aPosStart', posStart);
+        geometry.setAttribute('aPosEnd', posEnd);
 
-        // --- 2. MORPH ENGINE ---
-        const count = profile.count;
-        const dummy = new THREE.Object3D();
-        const shapes: number[][] = []; 
+        const material = new THREE.ShaderMaterial({
+            uniforms: {
+                uTime: { value: 0 },
+                uProgress: { value: 0 },
+            },
+            vertexShader,
+            fragmentShader,
+            transparent: true,
+            depthWrite: false, // Depth write off for better performance with many particles
+            blending: THREE.AdditiveBlending
+        });
+        materialRef.current = material;
 
-        // Generate Shapes
-        for (let s = 0; s < 9; s++) {
-            const shapeData: number[] = [];
-            for (let i = 0; i < count; i++) {
-                let x = 0, y = 0, z = 0;
-                
-                switch(s) {
-                    case 0: // Genesis (Chaos)
-                        x = (Math.random() - 0.5) * 400;
-                        y = (Math.random() - 0.5) * 300;
-                        z = (Math.random() - 0.5) * 200;
-                        break;
-                    
-                    case 1: // Tunnel (Cylinder)
-                        const r = 30 + Math.random() * 10;
-                        const theta = Math.random() * Math.PI * 2;
-                        x = Math.cos(theta) * r;
-                        y = Math.sin(theta) * r;
-                        z = (Math.random() - 0.5) * 400;
-                        break;
-
-                    case 2: // Sphere (Globe)
-                        const radius = 60;
-                        const phi = Math.acos(-1 + (2 * i) / count);
-                        const sqrtPi = Math.sqrt(count * Math.PI);
-                        const thetaSphere = sqrtPi * phi;
-                        x = radius * Math.cos(thetaSphere) * Math.sin(phi);
-                        y = radius * Math.sin(thetaSphere) * Math.sin(phi);
-                        z = radius * Math.cos(phi);
-                        break;
-
-                    case 3: // Cube
-                        const size = 80;
-                        x = (Math.random() - 0.5) * size;
-                        y = (Math.random() - 0.5) * size;
-                        z = (Math.random() - 0.5) * size;
-                        // Force points to surface
-                        if(Math.random() > 0.5) {
-                            const axis = Math.floor(Math.random()*3);
-                            if(axis===0) x = Math.sign(x) * size/2;
-                            if(axis===1) y = Math.sign(y) * size/2;
-                            if(axis===2) z = Math.sign(z) * size/2;
-                        }
-                        break;
-
-                    case 4: // Helix (DNA)
-                        const t = (i / count) * Math.PI * 20;
-                        x = Math.cos(t) * 20;
-                        y = (i / count - 0.5) * 200;
-                        z = Math.sin(t) * 20;
-                        if (i % 2 === 0) {
-                            x = Math.cos(t + Math.PI) * 20;
-                            z = Math.sin(t + Math.PI) * 20;
-                        }
-                        break;
-
-                    case 5: // Grid (Wave Floor)
-                        const col = i % 50;
-                        const row = Math.floor(i / 50);
-                        x = (col - 25) * 8;
-                        z = (row - 30) * 8;
-                        y = Math.sin(x * 0.1) * Math.cos(z * 0.1) * 10 - 40;
-                        break;
-
-                    case 6: // Ring (Saturn) - Centered XY Plane (Camera shift handles position)
-                        const ringR = 60 + Math.random() * 20;
-                        const ringTheta = (i / count) * Math.PI * 2 * 10;
-                        
-                        // Rotated to face camera (XY Plane)
-                        x = Math.cos(ringTheta) * ringR;
-                        y = Math.sin(ringTheta) * ringR;
-                        z = (Math.random() - 0.5) * 5; 
-                        break;
-
-                    case 7: // Vortex (Funnel)
-                        const vRatio = i / count;
-                        const vR = vRatio * 80 + 5;
-                        const vTheta = vRatio * Math.PI * 20;
-                        y = (vRatio - 0.5) * 200;
-                        x = Math.cos(vTheta) * vR;
-                        z = Math.sin(vTheta) * vR;
-                        break;
-                    
-                    case 8: // Harmony (Sphere + Random Aura)
-                        if (i < count * 0.7) {
-                            const r2 = 30;
-                            const p2 = Math.acos(-1 + (2 * i) / (count*0.7));
-                            const t2 = Math.sqrt((count*0.7) * Math.PI) * p2;
-                            x = r2 * Math.cos(t2) * Math.sin(p2);
-                            y = r2 * Math.sin(t2) * Math.sin(p2);
-                            z = r2 * Math.cos(p2);
-                        } else {
-                            x = (Math.random() - 0.5) * 300;
-                            y = (Math.random() - 0.5) * 300;
-                            z = (Math.random() - 0.5) * 300;
-                        }
-                        break;
-                }
-                shapeData.push(x, y, z);
-            }
-            shapes.push(shapeData);
-        }
-        shapesRef.current = shapes;
-
-        // BUILD MESH
-        // Increased size slightly (0.4) to maintain "fullness" with 60% fewer particles
-        const geometry = new THREE.SphereGeometry(0.4, 8, 8);
-        const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
         const mesh = new THREE.InstancedMesh(geometry, material, count);
         meshRef.current = mesh;
 
-        // Coloring
-        const color1 = new THREE.Color(BG_ACCENT); // Accent
-        const color2 = new THREE.Color(BG_DEEP);   // Deep
-        const color3 = new THREE.Color(0xffffff);  // White
+        // Initial Colors (Pass as instanceColor attribute)
+        const color1 = new THREE.Color(BG_ACCENT);
+        const color2 = new THREE.Color(BG_DEEP);
+        const color3 = new THREE.Color(0xffffff);
         
         for (let i = 0; i < count; i++) {
-            dummy.position.set(0,0,0);
-            dummy.updateMatrix();
-            mesh.setMatrixAt(i, dummy.matrix);
-            
             let c = Math.random();
             let finalColor;
             if(c < 0.5) finalColor = color1.clone().lerp(color2, c * 2);
             else finalColor = color2.clone().lerp(color3, (c - 0.5) * 2);
-            
             mesh.setColorAt(i, finalColor);
         }
         scene.add(mesh);
 
-        // --- 4. ANIMATION LOOP ---
+        // --- ANIMATION LOOP ---
         const animate = () => {
+            if (!isVisible.current || !isPageActive) {
+                reqIdRef.current = null;
+                return;
+            }
             reqIdRef.current = requestAnimationFrame(animate);
 
-            if (!isVisible.current) return;
-
             const time = Date.now() * 0.0005;
-            
-            // Revert to simple rotation as per user's "inspiration" code
             scene.rotation.y = time * 0.1;
             scene.rotation.z = Math.sin(time * 0.5) * 0.05;
-            scene.rotation.x = 0; // Reset X
 
-            // Throttle Rendering
-            frameCountRef.current++;
-            if (frameCountRef.current % profile.updateStep !== 0) return;
-
-            // Update logic - Constant "alive" feel
-            const currentIdx = currentShapeIndexRef.current;
-            const targetIdx = targetShapeIndexRef.current;
-            const progress = animParams.current.progress;
-
-            const startShape = shapes[currentIdx];
-            const endShape = shapes[targetIdx];
-
-            // OPTIMIZATION: Cache lookAt target decision per frame
-            const lZ = targetIdx === 1 ? 1000 : 0;
-            // Apply lookAt only every 2 steps to save CPU (Orientation is stable enough for spheres)
-            const shouldUpdateLookAt = (frameCountRef.current % (profile.updateStep * 2)) === 0;
-
-            for (let i = 0; i < count; i++) {
-                const i3 = i * 3;
-                
-                // Position interpolation
-                let x = startShape[i3];
-                let y = startShape[i3+1];
-                let z = startShape[i3+2];
-
-                if (progress > 0) {
-                    x = THREE.MathUtils.lerp(x, endShape[i3], progress);
-                    y = THREE.MathUtils.lerp(y, endShape[i3+1], progress);
-                    z = THREE.MathUtils.lerp(z, endShape[i3+2], progress);
-                }
-
-                // Noise + Drift logic
-                const variance = 1 + (i % 10) * 0.1; 
-                const noise = Math.sin(time * variance + i) * 0.8;
-                const drift = Math.cos(time * 0.3 + i) * 0.4;
-                
-                dummy.position.set(x + noise, y + noise + drift, z + drift);
-                
-                // Optimized lookAt: Decoupled frequency from rendering
-                if (shouldUpdateLookAt) {
-                    dummy.lookAt(0, 0, lZ);
-                }
-
-                // Pulse effect: Throttled by profile.updateStep (implicit in outer loop)
-                const pulse = 1 + Math.sin(time * 3 + i) * 0.3;
-                dummy.scale.setScalar(pulse); 
-
-                dummy.updateMatrix();
-                mesh.setMatrixAt(i, dummy.matrix);
+            // Update Shader Uniforms
+            if(materialRef.current) {
+                materialRef.current.uniforms.uTime.value = time;
+                materialRef.current.uniforms.uProgress.value = animParams.current.progress;
             }
-            mesh.instanceMatrix.needsUpdate = true;
 
             renderer.render(scene, camera);
         };
@@ -297,62 +309,92 @@ export default function NineDimensionsBackground({ targetShapeIndex }: NineDimen
         };
         window.addEventListener('resize', handleResize);
 
-        // --- CLEANUP ---
+        // Visibility Observer
+        const observer = new IntersectionObserver(([entry]) => {
+            isVisible.current = entry.isIntersecting;
+            if (isVisible.current && isPageActive && !reqIdRef.current) {
+                animate();
+            }
+        }, { threshold: 0.1 });
+        observer.observe(containerRef.current);
+
         return () => {
             window.removeEventListener('resize', handleResize);
-            document.removeEventListener("visibilitychange", handleVisibilityChange);
             observer.disconnect();
             if (reqIdRef.current) cancelAnimationFrame(reqIdRef.current);
             if (containerRef.current && renderer.domElement) {
                 containerRef.current.removeChild(renderer.domElement);
             }
             renderer.dispose();
+            baseGeo.dispose();
             geometry.dispose();
             material.dispose();
         };
-    }, []);
+    }, [isPageActive, shapes]);
 
-    // --- TRIGGER GSAP WHEN PROP CHANGES ---
+    // --- GSAP FLOW ---
     useEffect(() => {
         if (targetShapeIndex === targetShapeIndexRef.current) return;
-
-        targetShapeIndexRef.current = targetShapeIndex;
-        animParams.current.progress = 0;
-
-        // Camera Z specific logic
-        // Camera Logic
-        // Tunnel (1): Zoom in (z=50)
-        // Ring (6): Shift camera right (x=60) so object appears left
-        // Others: Default (x=0, z=100)
         
-        let cameraX = 0;
-        let cameraZ = 100;
+        const ctx = gsap.context(() => {
+            const mesh = meshRef.current;
+            if(!mesh) return;
 
-        if (targetShapeIndex === 1) {
-            cameraZ = 50;
-        } else if (targetShapeIndex === 6) {
-            cameraX = 60; // Move camera right -> Object feels left
-        }
+            // 1. Prepare for transition
+            // Move current state to aPosStart
+            // Move new state to aPosEnd
+            const startData = shapes[currentShapeIndexRef.current];
+            const endData = shapes[targetShapeIndex];
+            
+            const geo = mesh.geometry as THREE.InstancedBufferGeometry;
+            const startAttr = geo.getAttribute('aPosStart') as THREE.InstancedBufferAttribute;
+            const endAttr = geo.getAttribute('aPosEnd') as THREE.InstancedBufferAttribute;
 
-        if(cameraRef.current) {
-            gsap.to(cameraRef.current.position, {
-                x: cameraX,
-                z: cameraZ,
+            startAttr.set(startData);
+            endAttr.set(endData);
+            startAttr.needsUpdate = true;
+            endAttr.needsUpdate = true;
+
+            targetShapeIndexRef.current = targetShapeIndex;
+            animParams.current.progress = 0;
+            
+            // Camera Logic (Unchanged visually)
+            let cameraX = 0;
+            let cameraZ = 100;
+            if (targetShapeIndex === 1) cameraZ = 50;
+            else if (targetShapeIndex === 6) cameraX = 60;
+
+            if (cameraRef.current) {
+                gsap.to(cameraRef.current.position, {
+                    x: cameraX,
+                    z: cameraZ,
+                    duration: 1.5,
+                    ease: "power2.inOut"
+                });
+            }
+            
+            gsap.to(animParams.current, {
+                progress: 1,
                 duration: 1.5,
-                ease: "power2.inOut"
+                ease: "power2.inOut",
+                onComplete: () => {
+                    currentShapeIndexRef.current = targetShapeIndexRef.current;
+                    animParams.current.progress = 0;
+                    const finalStartAttr = geo.getAttribute('aPosStart') as THREE.InstancedBufferAttribute;
+                    finalStartAttr.set(shapes[currentShapeIndexRef.current]);
+                    finalStartAttr.needsUpdate = true;
+                }
             });
-        }
-
-        gsap.to(animParams.current, {
-            progress: 1,
-            duration: 1.5,
-            ease: "power2.inOut",
-            onComplete: () => {
-                currentShapeIndexRef.current = targetShapeIndexRef.current;
-                animParams.current.progress = 0;
+            
+            // Find camera in scene
+            const scene = sceneRef.current;
+            if(scene) {
+                // We'll need a ref to camera. Let's add it.
             }
         });
-    }, [targetShapeIndex]);
+
+        return () => ctx.revert();
+    }, [targetShapeIndex, shapes]);
 
     return (
         <div 

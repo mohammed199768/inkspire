@@ -3,6 +3,7 @@
 import { useEffect, RefObject } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { usePageVisibility } from "@/hooks/usePageVisibility";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -11,10 +12,12 @@ export function useAnimatedCounter(
     countRef: RefObject<HTMLElement>,
     value: string
 ) {
+    const isPageActive = usePageVisibility();
     const numValue = parseInt(value.replace(/\D/g, ''));
     const suffix = value.replace(/[0-9]/g, '');
 
     useEffect(() => {
+        if (!isPageActive) return;
         const el = countRef.current;
         const container = containerRef.current;
         if (!el || !container) return;

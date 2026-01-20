@@ -3,6 +3,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import gsap from 'gsap';
+import { usePageVisibility } from '@/hooks/usePageVisibility';
+import { safeDispose, disposeComposer, disposeRenderer } from '@/lib/three/safeDispose';
 import { usePopup } from '@/hooks/usePopup';
 import { buildPopupFromProject } from '@/lib/popupMappers';
 import { projects } from '@/data/projects';
@@ -58,10 +60,13 @@ export default function HoloClientsScene() {
         droneLight: THREE.PointLight;
         activeSlate: THREE.Group | null;
     } | null>(null);
+    const isPageActive = usePageVisibility();
 
     useEffect(() => {
         if (!canvasRef.current || !containerRef.current) return;
         
+        let alive = true;
+
         // --- 1. SETUP ---
         const scene = new THREE.Scene();
         // Dark fog for depth
@@ -92,11 +97,11 @@ export default function HoloClientsScene() {
         const observer = new IntersectionObserver(
             ([entry]) => {
                 isVisible.current = entry.isIntersecting;
-                if (entry.isIntersecting && !reqIdRef.current) {
+                if (entry.isIntersecting && isPageActive && !reqIdRef.current) {
                     animate();
                 }
             },
-            { threshold: 0 }
+            { threshold: 0.1 }
         );
         observer.observe(containerRef.current);
 
@@ -200,6 +205,7 @@ export default function HoloClientsScene() {
                 img.crossOrigin = "Anonymous";
                 img.src = client.logo;
                 img.onload = () => {
+                    if (!alive) return;
                     draw(img);
                 };
             } else {
@@ -287,11 +293,11 @@ export default function HoloClientsScene() {
 
         // --- 7. ANIMATION LOOP ---
         const animate = () => {
-            if (isVisible.current) {
-                reqIdRef.current = requestAnimationFrame(animate); 
+            if (!isVisible.current || !isPageActive) {
+                reqIdRef.current = null;
+                return;
             }
-            
-            if (!isVisible.current) return;
+            reqIdRef.current = requestAnimationFrame(animate);
 
             const state = sceneRefs.current;
             if(!state) return;
@@ -474,6 +480,7 @@ export default function HoloClientsScene() {
 
         // --- CLEANUP ---
         return () => {
+            alive = false;
             if(reqIdRef.current) cancelAnimationFrame(reqIdRef.current);
             observer.disconnect();
             window.removeEventListener('resize', handleResize);
@@ -485,26 +492,31 @@ export default function HoloClientsScene() {
             
             // Dispose Three.js
             if(sceneRefs.current) {
-                sceneRefs.current.renderer.dispose();
-                sceneRefs.current.composer.dispose();
-                sceneRefs.current.slates.forEach(g => {
-                    // Dispose meshes inside group
-                    g.traverse((obj) => {
-                        if((obj as THREE.Mesh).isMesh) {
-                            (obj as THREE.Mesh).geometry.dispose();
-                            const mat = (obj as THREE.Mesh).material;
-                            if(Array.isArray(mat)) mat.forEach(m => m.dispose());
-                            else (mat as THREE.Material).dispose();
-                        }
-                    });
-                });
+                // kill GSAP tweens created in this component
+                try { gsap.killTweensOf("*"); } catch {}
+
+                // Composer + passes
+                disposeComposer(sceneRefs.current.composer);
+
+                // Dispose everything in scene (materials + maps + textures)
+                safeDispose(sceneRefs.current.scene);
+                sceneRefs.current.scene.clear();
+
+                // Renderer
+                disposeRenderer(sceneRefs.current.renderer, false);
             }
             if(canvasRef.current) {
                 canvasRef.current.innerHTML = '';
             }
         };
+    }, [isPageActive]); 
 
-    }, []); // Run once on mount
+    // Restart loop when tab becomes active
+    useEffect(() => {
+        if (isPageActive && isVisible.current && !reqIdRef.current) {
+            // Re-triggering the useEffect above by adding isPageActive to dependencies
+        }
+    }, [isPageActive]);
 
     return (
         <div ref={containerRef} className="relative w-full h-full min-h-[500px] overflow-visible">

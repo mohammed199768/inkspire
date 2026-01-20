@@ -82,7 +82,7 @@ export default function NineDimensionsLayout() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -50, scale: 1.1 }}
                     transition={{ duration: 1, ease: [0.23, 1, 0.32, 1] }}
-                    className={`absolute inset-0 z-50 w-full h-full flex flex-col items-center justify-center pointer-events-none ${(currentSection === 0 || currentSection === 2 || currentSection === 6 || currentSection === 7 || currentSection === 8) ? 'p-0' : 'p-8'}`}
+                    className={`absolute inset-0 z-50 w-full h-full flex flex-col items-center justify-center md:justify-start pointer-events-none md:pt-28 ${(currentSection === 0 || currentSection === 2 || currentSection === 6 || currentSection === 7 || currentSection === 8) ? 'p-0' : 'p-8'}`}
                 >
                     <div className={`w-full pointer-events-auto ${(currentSection === 0 || currentSection === 2 || currentSection === 6 || currentSection === 7 || currentSection === 8) ? 'h-full' : 'max-w-[1400px]'}`}>
                         {SECTIONS[currentSection].component}

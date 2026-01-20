@@ -32,7 +32,7 @@ export default function ServicesSection() {
     const { openPopup } = usePopup();
 
     return (
-        <div ref={containerRef} className="min-h-screen flex flex-col justify-center md:justify-start py-20 md:py-14 px-6 md:pt-28">
+        <div id="services" ref={containerRef} className="scroll-mt-20 min-h-screen flex flex-col justify-center md:justify-start py-20 md:py-14 px-6 md:pt-28">
             <div className="max-w-7xl mx-auto w-full">
                 <SectionTitle 
                     title="Our" 
@@ -53,7 +53,7 @@ export default function ServicesSection() {
                                 <div className="absolute inset-0 bg-gradient-to-br from-purple-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                                 <div className="relative z-10">
                                     <div className="w-14 h-14 md:w-12 md:h-12 lg:w-14 lg:h-14 bg-white/5 rounded-2xl border border-white/10 flex items-center justify-center mb-6 md:mb-4 lg:mb-6 group-hover:scale-110 transition-transform duration-300 shadow-inner">
-                                        <IconComponent className="text-white group-hover:text-purple-400 transition-colors" size={24} />
+                                        <IconComponent className="text-white group-hover:text-purple-400 transition-colors w-6 h-6 lg:w-7 lg:h-7" />
                                     </div>
                                     <h3 className="text-2xl font-bold mb-4 text-white">{service.title}</h3>
                                     <p className="text-white transition-colors leading-relaxed text-sm">

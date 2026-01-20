@@ -10,6 +10,7 @@ import { buildPopupFromProject } from '@/lib/popupMappers';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import gsap from 'gsap';
+import { usePageVisibility } from '@/hooks/usePageVisibility';
 
 // --- UTILS ---
 function cn(...inputs: ClassValue[]) {
@@ -30,6 +31,7 @@ const AUTO_SPEED = 0.012;
 const WorksTunnel: React.FC = () => {
     const router = useRouter();
     const { openPopup } = usePopup();
+    const isPageActive = usePageVisibility();
     // --- STATE ---
     const [isSceneVisible, setIsSceneVisible] = useState(false);
 
@@ -104,8 +106,8 @@ const WorksTunnel: React.FC = () => {
         window.addEventListener('resize', handleResize);
 
         const tick = () => {
-            if (!containerRef.current || !stackRef.current) {
-                requestRef.current = requestAnimationFrame(tick);
+            if (!containerRef.current || !stackRef.current || !isPageActive) {
+                requestRef.current = undefined;
                 return;
             }
 
@@ -195,11 +197,11 @@ const WorksTunnel: React.FC = () => {
             window.removeEventListener('resize', handleResize);
             if (requestRef.current) cancelAnimationFrame(requestRef.current);
         };
-    }, [numRings, centerIndex, isSceneVisible]);
+    }, [numRings, centerIndex, isSceneVisible, isPageActive]);
 
 
     return (
-        <section ref={containerRef} className={styles.container}>
+        <section id="portfolio" ref={containerRef} className={cn(styles.container, "scroll-mt-20")}>
             <div
                 ref={sceneRef}
                 className={cn(styles.sceneWrapper, isSceneVisible ? styles.sceneActive : styles.sceneHidden)}

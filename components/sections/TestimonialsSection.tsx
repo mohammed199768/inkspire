@@ -10,6 +10,7 @@ import { X, ChevronLeft, ChevronRight, Info } from "lucide-react";
 // Data Structure
 import { useRouter } from "next/navigation";
 import { HIGHLIGHTS } from "@/data/stories";
+import { usePageVisibility } from "@/hooks/usePageVisibility";
 
 const IMG_DURATION = 4500;
 
@@ -21,6 +22,7 @@ export default function TestimonialsSection() {
     const [isPaused, setIsPaused] = useState(false);
     const [seen, setSeen] = useState<Set<string>>(new Set());
     const [mounted, setMounted] = useState(false);
+    const isPageActive = usePageVisibility();
     const timerRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
@@ -66,13 +68,13 @@ export default function TestimonialsSection() {
 
     // Timer logic
     useEffect(() => {
-        if (activeClient !== null && !isPaused) {
+        if (activeClient !== null && !isPaused && isPageActive) {
             timerRef.current = setTimeout(nextStory, IMG_DURATION);
         }
         return () => {
             if (timerRef.current) clearTimeout(timerRef.current);
         };
-    }, [activeClient, activeStory, isPaused, nextStory]);
+    }, [activeClient, activeStory, isPaused, nextStory, isPageActive]);
 
     // Keyboard controls
     useEffect(() => {
@@ -256,7 +258,7 @@ export default function TestimonialsSection() {
     };
 
     return (
-        <div ref={containerRef} className="w-full h-full flex flex-col justify-center py-16 md:py-24 px-4 md:px-6 relative z-10" dir="ltr">
+        <div id="testimonials" ref={containerRef} className="scroll-mt-20 min-h-screen flex flex-col justify-center md:justify-start py-16 md:py-14 px-4 md:px-6 md:pt-28 relative z-10" dir="ltr">
             <SectionTitle title="Client" highlight="Stories" highlightColor="text-yellow-400" />
 
             {/* Highlights Row */}
