@@ -4,7 +4,7 @@ import { siteContent } from "@/data/siteContent";
 
 export default function FinalCTA() {
     return (
-        <section id="contact" className="scroll-mt-24 w-full min-h-[100dvh] relative z-10 flex flex-col items-center justify-start lg:justify-center text-center pt-16 md:pt-20 lg:pt-0 pb-8 md:pb-12 lg:pb-0">
+        <section id="contact" className="scroll-mt-24 w-full min-h-[100svh] relative z-10 flex flex-col items-center justify-start lg:justify-center text-center pt-12 sm:pt-14 md:pt-16 pb-8 lg:pb-0 overflow-visible">
             {/* Background - Fully integrated with tunnel darkness */}
             <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent pointer-events-none overflow-hidden" />
 

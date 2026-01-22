@@ -258,7 +258,7 @@ export default function TestimonialsSection() {
     };
 
     return (
-        <div id="testimonials" ref={containerRef} className="scroll-mt-24 min-h-[100svh] flex flex-col justify-start pt-16 md:pt-20 pb-8 px-4 md:px-6 relative z-10" dir="ltr">
+        <div id="testimonials" ref={containerRef} className="scroll-mt-24 min-h-[100svh] flex flex-col justify-start pt-12 sm:pt-14 md:pt-16 pb-8 px-4 md:px-6 relative z-10 overflow-visible" dir="ltr">
             <SectionTitle title="Client" highlight="Stories" highlightColor="text-accentPurple" />
 
             {/* Highlights Row */}

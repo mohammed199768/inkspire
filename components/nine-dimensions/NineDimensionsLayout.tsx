@@ -130,7 +130,7 @@ export default function NineDimensionsLayout() {
               key={idx}
               id={item.id}
               scrollModeOverride="native"
-              className="justify-start pt-16 md:pt-20 scroll-mt-24"
+              className="justify-start scroll-mt-24"
             >
               {item.component}
             </ResponsiveSection>

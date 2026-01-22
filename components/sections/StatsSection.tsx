@@ -4,7 +4,7 @@ import SectionTitle from "@/components/ui/SectionTitle";
 
 export default function StatsSection() {
     return (
-        <section className="scroll-mt-24 min-h-[100svh] relative isolate flex flex-col items-center justify-start pt-16 md:pt-20 pb-8 text-white w-full overflow-visible">
+        <section className="scroll-mt-24 min-h-[100svh] relative isolate flex flex-col items-center justify-start pt-12 sm:pt-14 md:pt-16 pb-8 text-white w-full overflow-visible">
             {/* High-priority Title Layer - Isolated from overlays and animations */}
             <div className="relative z-50 w-full mb-8 md:mb-12 isolate">
                 <SectionTitle 
