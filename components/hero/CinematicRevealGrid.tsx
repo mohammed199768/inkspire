@@ -40,7 +40,7 @@ export default function CinematicRevealGrid() {
                 {STACKS.map((stack, index) => (
                     <div
                         key={stack.id}
-                        className="re-stack"
+                        className={`re-stack ${(index === 1 || index === 2) ? 're-stack-lifted' : ''}`}
                         ref={(el) => setStackRef(el, index)}
                     >
                         {/* Base Image */}

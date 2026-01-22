@@ -25,37 +25,40 @@ export default function HeroScene() {
         <section 
             ref={containerRef}
             id="home"
-            className=" relative min-h-[100dvh] flex flex-col justify-center md:justify-start lg:justify-end items-center pb-0 pt-20 md:pt-24 lg:pt-0 overflow-hidden scroll-mt-20"
+            className="relative min-h-[100svh] flex flex-col justify-end items-center pt-[4.5rem] pb-16 md:pb-24 lg:pb-32 overflow-hidden scroll-mt-24"
             style={{ paddingLeft: 'var(--container-padding)', paddingRight: 'var(--container-padding)' }}
         >
             {/* Tablet-only readability veil background */}
             <div className="absolute inset-x-0 bottom-0 h-[55vh] md:h-[45vh] tablet-text-veil pointer-events-none z-20 md:block lg:hidden hidden" />
 
-            {/* 1. Images Row - Top on mobile/tablet, Background on desktop */}
-            <div className=" relative lg:absolute inset-0 w-full h-auto lg:h-full overflow-visible pointer-events-none z-10">
+            {/* 1. Images Row - Background Everywhere */}
+            <div className="absolute inset-0 w-full h-full overflow-visible pointer-events-none z-10">
                 <CinematicRevealGrid />
             </div>
 
-            {/* Main Title Container with Glassmorphism */}
-            <div ref={titleRef} className="relative z-30 flex flex-col items-center text-center max-w-[95vw] md:max-w-7xl mx-auto mb-0 mt-6 md:mt-4 lg:mt-0">
-                {/* Premium Glass Box - Tightened and Safari Optimized */}
-                <div className={`relative px-4 py-6 md:px-10 md:py-8 lg:px-12 lg:py-8 rounded-[2rem] md:rounded-[3rem] lg:rounded-[4rem] border shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden w-full ${
-                    isSafari ? 'safari-no-backdrop premium-glass-performance' : 'border-white/10 bg-[#0a0a0f]/40'
-                }`}
-                     style={!isSafari ? { 
-                         backgroundImage: 'radial-gradient(circle at top left, rgba(255,255,255,0.06), transparent), url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")',
-                         backgroundBlendMode: 'overlay',
-                         backdropFilter: 'blur(10px)',
-                         WebkitBackdropFilter: 'blur(10px)'
-                     } : {}}
+            {/* Main Title Container with Glassmorphism - Positioned above CTA */}
+            <div ref={titleRef} className="relative z-30 flex flex-col items-center text-center max-w-[95vw] md:max-w-7xl mx-auto mb-4 md:mb-6 translate-y-8 md:translate-y-12">
+                {/* Premium Clean Glass Capsule (No Blur) - Visual depth via layered transparency */}
+                <div className="relative px-8 py-8 md:px-12 md:py-10 rounded-full overflow-hidden w-full"
+                     style={{ 
+                         background: `
+                            linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)),
+                            linear-gradient(180deg, rgba(167,139,250,0.08), rgba(109,40,217,0.04))
+                         `,
+                         boxShadow: `
+                            inset 0 0 0 1px rgba(255,255,255,0.12),
+                            0 20px 60px rgba(0,0,0,0.35)
+                         `,
+                         transition: 'all 0.5s ease'
+                     }}
                 >
-                    {/* Atmospheric Glow inside glass - Reduced for Safari */}
-                    <div className={`absolute -top-1/2 -left-1/2 w-full h-full bg-indigo-500/5 ${isSafari ? 'blur-[60px]' : 'blur-[100px]'} pointer-events-none`} />
-                    <div className={`absolute -bottom-1/2 -right-1/2 w-full h-full bg-purple-500/5 ${isSafari ? 'blur-[60px]' : 'blur-[100px]'} pointer-events-none`} />
+                    {/* Atmospheric Glow inside glass - Clean & subtle */}
+                    <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-indigo-500/5 blur-[100px] pointer-events-none" />
+                    <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-purple-500/5 blur-[100px] pointer-events-none" />
 
-                    {/* Main Heading (Promoted Tagline with Typewriter) */}
-                    <h1 className="hero-tagline relative z-10 font-black leading-[1.3] drop-shadow-lg text-balance animated-gradient-text tracking-tighter uppercase"
-                        style={{ fontSize: 'var(--fs-h2)' }}
+                    {/* Main Heading - Clean White */}
+                    <h1 className="hero-tagline relative z-10 font-black leading-[1.3] drop-shadow-lg text-balance tracking-tighter uppercase text-white"
+                        style={{ fontSize: 'var(--fs-h3)' }}
                     >
                         <TypewriterText 
                             text="From ink we started, to make people Inkspired." 
@@ -65,11 +68,11 @@ export default function HeroScene() {
                     </h1>
                 </div>
 
-                {/* Elite CTA Button */}
+                {/* Elite CTA Button - Positioned near bottom */}
                 <a
                     ref={ctaRef}
                     href={siteContent.hero.primaryCtaHref}
-                    className="group relative mt-2 md:mt-4 block interactive z-[60]" 
+                    className="group relative mt-3 md:mt-4 block interactive z-[60]" 
                 >
                     <div className="elite-cta-glow !bg-white/10 !blur-[30px] opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 

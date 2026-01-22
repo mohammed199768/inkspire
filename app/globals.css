@@ -10,9 +10,10 @@
   --bg-accent: #201037;
   --bg-primary: #09060f;
   --bg-secondary: #0d0e22;
-  --accent-indigo: #201037;
+  --accent-purple: #a78bfa;
   --depth-indigo: #0d0e22;
-  --foreground: #ededed;
+  --foreground: rgba(255, 255, 255, 0.9);
+  --text-secondary: rgba(255, 255, 255, 0.65);
 
   /* Typography Scale - Calibrated Clamps */
   --fs-display: clamp(2.5rem, 7vw, 5.5rem);
@@ -34,7 +35,7 @@
 body {
   color: var(--foreground);
   background: var(--bg-base); 
-  background: linear-gradient(-45deg, var(--bg-base), var(--bg-deep), var(--bg-accent), var(--bg-deep));
+  background: linear-gradient(-45deg, #09060f, #0d0e22, #201037, #0d0e22);
   background-size: 400% 400%;
   background-attachment: fixed;
   min-height: 100vh;
@@ -220,9 +221,9 @@ h6 { font-size: var(--fs-sm); text-transform: uppercase; letter-spacing: 0.2em; 
   background: linear-gradient(
     90deg,
     #ffffff,
-    var(--bg-accent),
-    var(--bg-deep),
-    var(--bg-accent),
+    #a78bfa,
+    #201037,
+    #a78bfa,
     #ffffff
   );
   background-size: 300% 300%;

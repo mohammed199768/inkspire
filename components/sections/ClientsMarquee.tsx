@@ -7,7 +7,7 @@ import { clients } from "@/data/clients";
 import { usePopup } from "@/hooks/usePopup";
 import { buildPopupFromProject } from "@/lib/popupMappers";
 import { projects } from "@/data/projects";
-import { useIsTouchDevice } from "@/hooks/useIsTouchDevice";
+import { useResponsiveMode } from "@/hooks/useResponsiveMode";
 
 // Dynamic import for the 3D scene (Desktop only heavyweight)
 const OrbitalClientsScene = dynamic(() => import("./clients/OrbitalClientsScene"), {
@@ -18,27 +18,32 @@ const OrbitalClientsScene = dynamic(() => import("./clients/OrbitalClientsScene"
 export default function ClientsSection() {
     const router = useRouter();
     const { openPopup } = usePopup();
-    const isTouch = useIsTouchDevice(); // Hook to detect mobile/tablet
+    const { hasTouch, render3D, scrollMode } = useResponsiveMode();
 
     // Safari detection for performance and rendering optimization
     const isSafari = typeof navigator !== 'undefined' && 
                      /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
-    return (
-        <section className="min-h-[100dvh] w-full flex items-center bg-white/[0.02] border-y border-white/5 relative overflow-visible">
+    // Show grid on touch devices or native scroll mode
+    const showGrid = hasTouch || scrollMode === "native";
+    // Show 3D only on desktop cinematic mode with render3D enabled
+    const show3D = render3D && scrollMode === "cinematic";
 
-            {/* 1. 3D BACKGROUND LAYER (Active on Desktop) - z-0 to stay behind UI */}
-            {!isTouch && isTouch !== undefined && (
+    return (
+        <section className="min-h-[100dvh] w-full flex items-start bg-white/[0.02] border-y border-white/5 relative overflow-visible pt-0">
+
+            {/* 1. 3D BACKGROUND LAYER (Active on Desktop cinematic mode) */}
+            {show3D && (
                 <div className="absolute inset-0 z-0 overflow-visible pointer-events-auto">
                      <OrbitalClientsScene />
                 </div>
             )}
 
-            {/* 2. CONTENT LAYER (z-10) - Use pointer-events-none to let 3D background handle mouse events */}
+            {/* 2. CONTENT LAYER (z-10) */}
             <div className="w-full h-full flex flex-col lg:flex-row relative z-10 pointer-events-none overflow-visible">
 
-                {/* Left Column: Title - Clickable with pointer-events-auto */}
-                <div className="w-full lg:w-1/3 p-6 md:p-16 flex flex-col justify-center md:justify-start md:pt-28 md:py-14 border-b lg:border-b-0 lg:border-r border-white/5 relative z-20 bg-black/20 backdrop-blur-sm pointer-events-auto">
+                {/* Left Column: Title */}
+                <div className="w-full lg:w-1/3 p-6 md:p-12 flex flex-col justify-start pt-16 md:pt-20 pb-8 border-b lg:border-b-0 lg:border-r border-white/5 relative z-20 bg-black/20 backdrop-blur-sm pointer-events-auto">
                     <div className="relative">
                         <h6 className="text-sm font-medium text-purple-400 uppercase tracking-[0.2em] mb-4">
                             Partners
@@ -54,11 +59,11 @@ export default function ClientsSection() {
                     </div>
                 </div>
 
-                {/* Right Column: Interaction Area (Only active on mobile touch) */}
+                {/* Right Column: Interaction Area */}
                 <div className="w-full lg:w-2/3 relative min-h-[500px] lg:min-h-screen">
                     
-                    {/* MOBILE / TOUCH: Render Classic Grid */}
-                    {isTouch && (
+                    {/* Grid for touch/native scroll mode */}
+                    {showGrid && (
                         <div className="w-full h-full pointer-events-auto">
                             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/20 pointer-events-none z-0" />
                             <div className="grid grid-cols-2 md:grid-cols-4 h-full border-t lg:border-t-0 border-l border-white/5">

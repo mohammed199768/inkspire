@@ -1,5 +1,7 @@
+"use client";
+
 import { useEffect, useRef, useCallback } from 'react';
-import { useIsTouchDevice } from './useIsTouchDevice';
+import { useResponsiveMode } from './useResponsiveMode';
 
 // Configuration based on the user's "Global/Premium" reference
 const CONFIG = {
@@ -16,7 +18,7 @@ interface StackState {
 }
 
 export function useCinematicReveal() {
-    const isTouch = useIsTouchDevice();
+    const { hasTouch, isDesktop, prefersReducedMotion } = useResponsiveMode();
     const containerRef = useRef<HTMLDivElement>(null);
     const stacksRef = useRef<(HTMLDivElement | null)[]>([]);
     const requestRef = useRef<number>();
@@ -57,17 +59,12 @@ export function useCinematicReveal() {
 
         // 2. Update Spotlight (Global)
         if (containerRef.current) {
-            // We want the spotlight to be relative to the viewport or container?
-            // The reference uses transform: translate(x,y) on a fixed spotlight.
-            // Here we update CSS vars for the container to use
             const containerRect = containerRef.current.getBoundingClientRect();
             const relX = mouse.currentX - containerRect.left;
             const relY = mouse.currentY - containerRect.top;
 
             containerRef.current.style.setProperty('--sx', `${relX}px`);
             containerRef.current.style.setProperty('--sy', `${relY}px`);
-
-            // Toggle global spotlight opacity
             containerRef.current.style.setProperty('--spot-op', mouse.isHovering ? '1' : '0');
         }
 
@@ -90,9 +87,7 @@ export function useCinematicReveal() {
             // Calculate Target Intensity
             let targetIntensity = 0;
             if (mouse.isHovering) {
-                // (1 - dist/max) clamped [0,1]
                 const norm = Math.max(0, 1 - dist / CONFIG.maxDist);
-                // Ease In Out / Quadratic falloff for "Focus" feel
                 targetIntensity = norm * norm;
             }
 
@@ -106,34 +101,23 @@ export function useCinematicReveal() {
                 const intensity = stackState.intensity;
 
                 // A. Scale & Z-Index
-                // "Subtle Parallax / Scale" -> 1 + intensity * 0.02
-                // Z-index pop
                 const scale = 1 + (intensity * 0.03);
                 stack.style.zIndex = intensity > 0.1 ? "20" : "2";
                 stack.style.transform = `translateY(var(--y-offset, 0px)) scale(${scale})`;
 
                 // B. Filter (Brightness/Contrast/DropShadow)
-                // Base brightness 0.8 -> 1.0ish
-                // Contrast 1.0 -> 1.1
                 const brightness = 0.8 + (intensity * 0.3);
                 const contrast = 1 + (intensity * 0.1);
-                // "Shadow 0 20px 60px" logic
                 const shadowOpacity = intensity * 0.4;
                 stack.style.filter = `brightness(${brightness}) contrast(${contrast}) drop-shadow(0 20px 40px rgba(0,0,0,${shadowOpacity}))`;
 
                 // C. Overlay Mask & Opacity
                 if (overlay) {
-                    // Opacity
                     overlay.style.opacity = intensity.toFixed(3);
-
-                    // Mask relative to stack
                     const maskX = mouse.currentX - rect.left;
                     const maskY = mouse.currentY - rect.top;
-
-                    // Radius grows with intensity
                     const radius = CONFIG.minMaskRadius + (intensity * CONFIG.maxMaskRadius);
                     const feather = CONFIG.maskFeather;
-
                     const maskValue = `radial-gradient(circle ${radius}px at ${maskX}px ${maskY}px, black 100%, transparent calc(100% + ${feather}px))`;
                     overlay.style.webkitMaskImage = maskValue;
                     overlay.style.maskImage = maskValue;
@@ -143,7 +127,7 @@ export function useCinematicReveal() {
                 // Reset to idle
                 stack.style.zIndex = "2";
                 stack.style.transform = `translateY(var(--y-offset, 0px)) scale(1)`;
-                stack.style.filter = `brightness(0.7) contrast(1.0) grayscale(0.2)`; // Idle state
+                stack.style.filter = `brightness(0.7) contrast(1.0) grayscale(0.2)`;
                 if (overlay) {
                     overlay.style.opacity = '0';
                 }
@@ -156,12 +140,9 @@ export function useCinematicReveal() {
     useEffect(() => {
         if (typeof window === 'undefined') return;
 
-        // Enhanced Guard: Disable reveal on Tablet/Mobile or Touch-only devices
-        const isSmallScreen = window.innerWidth <= 1024;
-        const isTouchUI = window.matchMedia("(pointer: coarse)").matches || window.matchMedia("(hover: none)").matches;
-
-        if (isSmallScreen || isTouchUI || isTouch) {
-            // Treat as static state
+        // Disable reveal on touch devices, non-desktop, or reduced motion
+        const isDisabled = hasTouch || !isDesktop || prefersReducedMotion;
+        if (isDisabled) {
             return;
         }
 
@@ -188,10 +169,10 @@ export function useCinematicReveal() {
             window.removeEventListener('resize', onResize);
             if (requestRef.current) cancelAnimationFrame(requestRef.current);
         };
-    }, [isTouch, updateRects, animate]);
+    }, [hasTouch, isDesktop, prefersReducedMotion, updateRects, animate]);
 
-    // Flag to disable the entire interactive reveal
-    const isDisabled = isTouch === true || (typeof window !== 'undefined' && window.innerWidth <= 1024);
+    // Compute isDisabled based on responsive mode
+    const isDisabled = hasTouch || !isDesktop || prefersReducedMotion;
 
     return {
         isTouch: isDisabled,

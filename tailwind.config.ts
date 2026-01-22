@@ -9,10 +9,12 @@ const config: Config = {
     theme: {
         extend: {
             colors: {
-                background: "var(--background)",
+                background: "#09060f",
                 foreground: "var(--foreground)",
-                inkspirePurple: '#201037', // Accent
-                inkspireIndigo: '#0d0e22', // Deep
+                inkspireBlack: '#09060f',
+                inkspirePurple: '#201037', // Deep Royal
+                inkspireIndigo: '#0d0e22', // Midnight
+                accentPurple: '#a78bfa',    // Soft Light Purple for highlights
             },
             fontFamily: {
                 sans: ['var(--font-inter)', 'sans-serif'],

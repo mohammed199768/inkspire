@@ -258,8 +258,8 @@ export default function TestimonialsSection() {
     };
 
     return (
-        <div id="testimonials" ref={containerRef} className="scroll-mt-20 min-h-screen flex flex-col justify-center md:justify-start py-16 md:py-14 px-4 md:px-6 md:pt-28 relative z-10" dir="ltr">
-            <SectionTitle title="Client" highlight="Stories" highlightColor="text-yellow-400" />
+        <div id="testimonials" ref={containerRef} className="scroll-mt-24 min-h-[100svh] flex flex-col justify-start pt-16 md:pt-20 pb-8 px-4 md:px-6 relative z-10" dir="ltr">
+            <SectionTitle title="Client" highlight="Stories" highlightColor="text-accentPurple" />
 
             {/* Highlights Row */}
             <div className="max-w-6xl w-full flex gap-4 md:gap-10 overflow-x-auto pb-8 md:pb-12 scrollbar-none px-2 md:px-4 justify-start md:justify-center items-center -mx-4 md:mx-auto">

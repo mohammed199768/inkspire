@@ -12,11 +12,11 @@ export default function TeamSection() {
     const { openPopup } = usePopup();
 
     return (
-        <div id="team" ref={containerRef} className="scroll-mt-20 min-h-screen flex flex-col justify-center md:justify-start py-20 md:py-14 px-6 md:pt-28">
+        <div id="team" ref={containerRef} className="scroll-mt-24 min-h-[100svh] flex flex-col justify-start pt-16 md:pt-20 pb-8 px-4 md:px-6">
             <SectionTitle 
                 title="Meet The" 
                 highlight="Team" 
-                highlightColor="text-blue-400" 
+                highlightColor="text-accentPurple" 
             />
             <div className="grid grid-cols-2 md:flex md:flex-wrap justify-center gap-2 md:gap-6 lg:gap-10 max-w-7xl mx-auto w-full">
                 {team.map((member, i) => (
@@ -34,7 +34,7 @@ export default function TeamSection() {
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex flex-col justify-end p-4 md:p-6 lg:p-8 translate-y-0 md:translate-y-4 md:group-hover:translate-y-0 transition-transform duration-300 z-10">
                             <h3 className="text-lg md:text-2xl lg:text-3xl font-bold text-white mb-1 leading-tight">{member.name}</h3>
-                            <p className="text-purple-400 font-medium tracking-wide text-xs md:text-base">{member.role}</p>
+                            <p className="text-accentPurple font-medium tracking-wide text-xs md:text-base">{member.role}</p>
                         </div>
                     </div>
                 ))}

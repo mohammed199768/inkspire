@@ -28,11 +28,11 @@ export default function SelectedWorkSection() {
             className="scroll-mt-20 h-[100dvh] w-full flex flex-col relative isolate overflow-hidden bg-transparent"
         >
             {/* 1. Title Rail - High priority visibility */}
-            <div className="relative z-50 pt-16 md:pt-24 pb-4 md:pb-6 isolate flex-shrink-0 pointer-events-none">
+            <div className="relative z-50 pt-16 md:pt-20 pb-2 isolate flex-shrink-0 pointer-events-none">
                 <SectionTitle 
                     title="Selected" 
                     highlight="Work" 
-                    highlightColor="text-pink-500" 
+                    highlightColor="text-accentPurple" 
                     className="!mb-0"
                 />
             </div>

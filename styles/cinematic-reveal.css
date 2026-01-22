@@ -42,23 +42,27 @@
 */
 .re-stack {
     position: relative;
-    /* Responsive Width: Scales from 70px on small mobile to 550px on desktop */
-    width: clamp(70px, 22vw, 550px);
+    /* Responsive Width: Large & Impactful */
+    width: clamp(100px, 30vw, 700px);
     flex: 0 0 auto;
 
-    /* Responsive Overlap */
-    margin: 0 calc(var(--overlap, -2vw));
+    /* Responsive Spacing - Subtle Overlap */
+    margin: 0 calc(var(--overlap, -1.5vw));
 
-    aspect-ratio: 2/3;
-    max-height: 90vh;
+    aspect-ratio: 4/5;
+    max-height: 95vh;
 
-    overflow: visible;
-    border-radius: 0;
+    /* Invisible Container - Only images show */
+    overflow: hidden;
+    border-radius: 2rem;
     background: transparent;
-    box-shadow: none;
+    
+    /* Removed all visual box indicators */
+    box-shadow: none; 
+    backdrop-filter: none;
 
     /* Base Filters - Darker for unrevealed state */
-    filter: brightness(0.6) contrast(1.1) grayscale(0.2);
+    filter: brightness(0.6) contrast(1.05) grayscale(0.2);
 
     will-change: transform, filter, z-index;
     transition: filter 0.4s ease-out, transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
@@ -70,16 +74,16 @@
 */
 .re-stack:nth-child(1),
 .re-stack:nth-child(4) {
-    --y-offset: clamp(4vh, 8vh, 12vh);
+    --y-offset: clamp(2vh, 4vh, 6vh);
     transform: translateY(var(--y-offset)) scale(1);
     z-index: 1;
 }
 
-.re-stack:nth-child(2),
-.re-stack:nth-child(3) {
-    --y-offset: clamp(-4vh, -8vh, -12vh);
-    transform: translateY(var(--y-offset)) scale(1);
-    z-index: 2;
+/* Lifted Middle Images */
+.re-stack.re-stack-lifted {
+    --y-offset: clamp(-10vh, -18vh, -25vh);
+    transform: translateY(var(--y-offset)) scale(1.05);
+    z-index: 5;
 }
 
 /* Disable Hover Lift on non-hover devices */
