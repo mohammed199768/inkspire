@@ -32,7 +32,7 @@ export default function ServicesSection() {
     const { openPopup } = usePopup();
 
     return (
-        <div id="services" ref={containerRef} className="scroll-mt-24 min-h-[100svh] lg:h-full flex flex-col justify-start pt-12 sm:pt-14 md:pt-16 pb-12 px-4 md:px-6 relative isolate overflow-visible">
+        <div id="services" ref={containerRef} className="scroll-mt-24 min-h-[100svh] lg:h-full flex flex-col justify-start pt-12 sm:pt-14 md:pt-16 pb-8 px-4 md:px-6 relative isolate overflow-visible">
             {/* Background Veil - High contrast for readability */}
             <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-full lg:h-[95%] w-full max-w-7xl mx-auto pointer-events-none z-0"
                  style={{ 

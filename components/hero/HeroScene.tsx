@@ -25,7 +25,7 @@ export default function HeroScene() {
         <section 
             ref={containerRef}
             id="home"
-            className="relative min-h-[100svh] flex flex-col justify-center lg:justify-end items-center pt-20 pb-16 md:pb-24 lg:pb-32 overflow-hidden scroll-mt-24"
+            className="relative min-h-[100svh] flex flex-col justify-start lg:justify-end items-center pt-[calc(env(safe-area-inset-top)+64px)] sm:pt-20 md:pt-[4.5rem] pb-16 md:pb-24 lg:pb-32 overflow-hidden scroll-mt-24"
             style={{ paddingLeft: 'var(--container-padding)', paddingRight: 'var(--container-padding)' }}
         >
             {/* Tablet-only readability veil background */}
@@ -36,7 +36,7 @@ export default function HeroScene() {
                 <CinematicRevealGrid />
             </div>
 
-            {/* Main Title Container with Glassmorphism - Centered on mobile/tablet */}
+            {/* Main Title Container with Glassmorphism - Positioned close to the top on mobile/tablet */}
             <div ref={titleRef} className="relative z-30 flex flex-col items-center text-center max-w-[95vw] md:max-w-7xl mx-auto mb-4 md:mb-6 mt-0 lg:translate-y-12">
                 {/* Premium Clean Glass Capsule (No Blur) - Visual depth via layered transparency */}
                 <div className="relative px-8 py-8 md:px-12 md:py-10 rounded-full overflow-hidden w-full"
