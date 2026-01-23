@@ -3,8 +3,10 @@
 import { useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useResponsiveMode } from "./useResponsiveMode";
 
 export function useCinematicTransitions(scope?: React.RefObject<HTMLElement>) {
+    const { isDesktop } = useResponsiveMode();
     useEffect(() => {
         gsap.registerPlugin(ScrollTrigger);
 
@@ -12,6 +14,8 @@ export function useCinematicTransitions(scope?: React.RefObject<HTMLElement>) {
             // Scope awareness: search within scope if provided, otherwise global
             // Note: gsap.utils.toArray uses document if no scope, but we want implicit scoping
             // if we are inside a context.
+            if (!isDesktop) return;
+
             const sections = gsap.utils.toArray<HTMLElement>(".cinematic-section", scope?.current || undefined);
 
             sections.forEach((section, index) => {
@@ -56,5 +60,5 @@ export function useCinematicTransitions(scope?: React.RefObject<HTMLElement>) {
         }, scope); // GSAP Context attached to scope for easy cleanup
 
         return () => ctx.revert();
-    }, [scope]);
+    }, [scope, isDesktop]);
 }

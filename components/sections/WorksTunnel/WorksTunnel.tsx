@@ -60,6 +60,7 @@ import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import gsap from 'gsap';
 import { usePageVisibility } from '@/hooks/usePageVisibility';
+import { useResponsiveMode } from '@/hooks/useResponsiveMode';
 
 // --- UTILS ---
 function cn(...inputs: ClassValue[]) {
@@ -81,6 +82,7 @@ const WorksTunnel: React.FC = () => {
     const router = useRouter();
     const { openPopup } = usePopup();
     const isPageActive = usePageVisibility();
+    const { isMobile } = useResponsiveMode();
     // --- STATE ---
     const [isSceneVisible, setIsSceneVisible] = useState(false);
 
@@ -141,18 +143,13 @@ const WorksTunnel: React.FC = () => {
         ringRefs.current = ringRefs.current.slice(0, numRings);
         cardRefs.current = cardRefs.current.slice(0, numRings);
 
-        const handleResize = () => {
-            if (typeof window === 'undefined') return;
-            const isMobile = window.innerWidth < 520;
-            dims.current.radius = isMobile ? 160 : 300;
-            dims.current.ringSpacing = isMobile ? 200 : 280;
+        // Update dims based on responsive mode
+        dims.current.radius = isMobile ? 160 : 300;
+        dims.current.ringSpacing = isMobile ? 200 : 280;
 
-            ringRefs.current.forEach(r => {
-                if (r) r.style.setProperty('--radius', `${dims.current.radius}px`);
-            });
-        };
-        handleResize();
-        window.addEventListener('resize', handleResize);
+        ringRefs.current.forEach(r => {
+            if (r) r.style.setProperty('--radius', `${dims.current.radius}px`);
+        });
 
         const tick = () => {
             // ARCHITECTURAL PATTERN: Demand Rendering Gate
@@ -246,10 +243,9 @@ const WorksTunnel: React.FC = () => {
         }
 
         return () => {
-            window.removeEventListener('resize', handleResize);
             if (requestRef.current) cancelAnimationFrame(requestRef.current);
         };
-    }, [numRings, centerIndex, isSceneVisible, isPageActive]);
+    }, [numRings, centerIndex, isSceneVisible, isPageActive, isMobile]);
 
 
     return (
