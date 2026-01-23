@@ -21,11 +21,11 @@
 The GTM container is injected into the application root, loading once for the entire single-page application (SPA).
 
 ### Head Snippet (Script Load)
-**Location**: `app/layout.tsx` (Lines 105-113)
-**Mechanism**: `next/script` with `strategy="afterInteractive"`
+**Location**: `app/layout.tsx`
+**Mechanism**: `next/script` with `strategy="beforeInteractive"` (High priority)
 **Evidence**:
 ```tsx
-<Script id="gtm-script" strategy="afterInteractive">
+<Script id="gtm-script" strategy="beforeInteractive">
     {`(function(w,d,s,l,i){...})(window,document,'script','dataLayer','${process.env.NEXT_PUBLIC_GTM_ID}');`}
 </Script>
 ```

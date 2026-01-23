@@ -107,7 +107,22 @@ export default function RootLayout({
                 <link rel="icon" href="/logos/Inkspire logos/logo1.png" type="image/png" />
                 <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
                 {/* Google Tag Manager */}
-                <Script id="gtm-script" strategy="afterInteractive">
+                {/* STRICT VALIDATION: GTM ID must be present */}
+                {(() => {
+                    const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
+                    if (!GTM_ID) {
+                         // In production, this should ideally fail build, but at runtime it's a critical error for tracking.
+                         // We throw to ensure visibility if this mandatory var is missing.
+                         // (Only throws during rendering if missing)
+                         if (process.env.NODE_ENV === 'production') {
+                             throw new Error("CRITICAL: NEXT_PUBLIC_GTM_ID is missing. GTM cannot be initialized.");
+                         }
+                         console.error("WARNING: NEXT_PUBLIC_GTM_ID is missing.");
+                    }
+                    return null;
+                })()}
+
+                <Script id="gtm-script" strategy="beforeInteractive">
                     {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
                     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
                     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
