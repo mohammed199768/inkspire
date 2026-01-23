@@ -394,7 +394,11 @@ h6 { font-size: var(--fs-sm); text-transform: uppercase; letter-spacing: 0.2em; 
 }
 
 /* Base state for GSAP Fade Up to prevent flickering */
+/* Base state for GSAP Fade Up - VISIBLE BY DEFAULT (Safety) */
+/* RATIONALE: We delegate hiding to the JS hook (useGSAPFade) to prevent 
+   permanently invisible content if JS fails or the hook is missing. */
 .fade-up {
-  opacity: 0;
-  visibility: hidden;
+  /* opacity: 0;  <-- REMOVED: Managed by useGSAPFade.ts */
+  /* visibility: hidden; <-- REMOVED: Managed by useGSAPFade.ts */
+  transform: translateZ(0); /* Prepare layer for animation */
 }

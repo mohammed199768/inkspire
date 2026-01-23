@@ -176,7 +176,8 @@
 **PURPOSE**: Simple fade-in animation
 
 **INPUTS**: None  
-**OUTPUTS**: ref (to attach to element)
+**OUTPUTS**: ref (to attach to element)  
+**NOTE**: Explicitly sets initial `opacity: 0` / `visibility: hidden` before animating (Safe-Fail pattern).
 
 **CLEANUP**: GSAP context revert
 

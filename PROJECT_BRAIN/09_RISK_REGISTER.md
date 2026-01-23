@@ -77,6 +77,17 @@
 
 ---
 
+## 7. Global Visibility Traps
+
+**SEVERITY**: MEDIUM  
+**CONTEXT**: CSS classes like `.fade-up { opacity: 0 }`.  
+**RISK**: If JS fails or hook is missing, content remains invisible forever.  
+**MITIGATION**:  
+- **Inverted Logic**: CSS defaults to visible. JS hook sets initial hidden state.  
+- **Ref**: `hooks/useGSAPFade.ts` refactored to specific visibility control.
+
+---
+
 ## SUMMARY
 
 **Top Priority**: Ensure `safeDispose` and RAF cleanup are NEVER missed in new 3D components.

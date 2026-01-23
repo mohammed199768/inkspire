@@ -56,59 +56,81 @@ export function useAnimatedCounter(
         el.innerText = "0" + suffix;
 
         // ====================================================================
-        // GSAP CONTEXT - Scoped animation cleanup
+        // DEVICE DETECTION - Use Native Observer on Small Screens
         // ====================================================================
-        // Benefits:
-        // - All animations created inside are tracked
-        // - ctx.revert() removes ALL at once
-        // - Prevents ScrollTrigger memory leaks
-        const ctx = gsap.context(() => {
-            // ================================================================
-            // CONTAINER REVEAL ANIMATION
-            // ================================================================
-            gsap.from(container, {
-                scrollTrigger: {
-                    trigger: container,
-                    start: "top 70%",  // When container's top hits 70% of viewport
-                    once: true          // Only trigger once, not on re-scroll
-                },
-                y: 40,            // Slide up from 40px below
-                opacity: 0,       // Fade in
-                scale: 0.95,      // Slight zoom in
-                duration: 0.6,
-                ease: "power3.out"
-            });
+        // WHY: ScrollTrigger behaves differently in native scroll mode (mobile).
+        // IntersectionObserver is reliable for native scrolling.
+        const isSmallScreen = window.matchMedia("(max-width: 1023px)").matches;
+        let observer: IntersectionObserver | null = null;
+        let ctx: gsap.Context | null = null;
 
-            // ================================================================
-            // NUMBER COUNTING ANIMATION - Proxy pattern
-            // ================================================================
-            // PATTERN: Animate plain object, update DOM in onUpdate
-            // WHY: GSAP cannot directly animate DOM text properties
-            const proxy = { val: 0 };  // Proxy object (0 → numValue)
-            gsap.to(proxy, {
-                val: numValue,
-                duration: 2.5,
-                ease: "power2.out",
-                scrollTrigger: {
-                    trigger: container,
-                    start: "top 70%",
-                    once: true,
-                },
-                onUpdate: () => {
-                    // Read proxy.val (interpolated value) and update DOM
-                    el.innerText = Math.ceil(proxy.val) + suffix;
+        // Function to run the animation logic
+        const runAnimation = () => {
+             ctx = gsap.context(() => {
+                // ================================================================
+                // CONTAINER REVEAL ANIMATION
+                // ================================================================
+                // CONDITIONAL TRIGGER:
+                // - Desktop: Uses ScrollTrigger properties
+                // - Mobile: Triggered imperatively by Observer (no ScrollTrigger prop)
+                gsap.from(container, {
+                    ...(isSmallScreen ? {} : {
+                        scrollTrigger: {
+                            trigger: container,
+                            start: "top 70%",
+                            once: true
+                        }
+                    }),
+                    y: 40,
+                    opacity: 0,
+                    scale: 0.95,
+                    duration: 0.6,
+                    ease: "power3.out"
+                });
+
+                // ================================================================
+                // NUMBER COUNTING ANIMATION - Proxy pattern
+                // ================================================================
+                const proxy = { val: 0 };
+                gsap.to(proxy, {
+                    val: numValue,
+                    duration: 2.5,
+                    ease: "power2.out",
+                    ...(isSmallScreen ? {} : {
+                        scrollTrigger: {
+                            trigger: container,
+                            start: "top 70%",
+                            once: true,
+                        }
+                    }),
+                    onUpdate: () => {
+                        el.innerText = Math.ceil(proxy.val) + suffix;
+                    }
+                });
+            }, container);
+        };
+
+        if (isSmallScreen) {
+            // NATIVE TRIGGER (Mobile/Tablet)
+            observer = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting) {
+                    runAnimation();
+                    observer?.disconnect(); // Run once
                 }
-            });
-        }, container); // Scope to container
+            }, { threshold: 0.35 }); // Trigger when 35% visible
+            observer.observe(container);
+        } else {
+            // SCROLLTRIGGER (Desktop) - Run immediately, logic handles trigger
+            runAnimation();
+        }
 
         // ====================================================================
-        // CLEANUP - Revert ALL animations in context
+        // CLEANUP
         // ====================================================================
-        // Removes:
-        // - Both gsap.from and gsap.to animations
-        // - Both ScrollTrigger instances
-        // - Restores DOM to pre-animation state
-        return () => ctx.revert();
+        return () => {
+            if (ctx) ctx.revert();
+            if (observer) observer.disconnect();
+        };
     }, [containerRef, countRef, numValue, suffix, isPageActive]);
 
     return { suffix }; // Expose suffix for consumer if needed

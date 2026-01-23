@@ -71,7 +71,9 @@ Components documented inline via 32 files (Tier 1-3B). Full catalog deferred to 
 **EVIDENCE LOCATION**: Documented in Tier 3B  
 **FILES**:
 - components/sections/ClientsMarquee.tsx
-- components/sections/StatsSection.tsx
+- components/sections/StatsSection.tsx (Used in 9D Tunnel)
+- components/sections/AboutSection.tsx (Used in 9D Sphere)
+- components/sections/ServicesSection.tsx (Used in 9D Cube)
 - components/sections/SelectedWorkSection.tsx
 - components/sections/TestimonialsSection.tsx
 - Others: AboutSection, ServicesSection, TeamSection, FinalCTA

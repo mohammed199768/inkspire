@@ -38,6 +38,9 @@
 
 - **Three.js Bundle**: 4 scenes. Monitoring for bloat.
 - **hydration**: usage of `isHydrated` guard verified in `NineDimensionsLayout`.
+- **CSS Visibility**: Added `.fade-up` override in `tablet.css` to prevent invisible sections on native scroll.
+- **Animated Counters**: Fixed `useAnimatedCounter` to use `IntersectionObserver` on small screens (native scroll fallback).
+- **Portfolio Visibility**: Refactored `.fade-up` behavior. Removed global `opacity: 0` CSS trap; moved initial state management to `useGSAPFade` hook.
 
 ---
 

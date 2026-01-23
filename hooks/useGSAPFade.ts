@@ -23,35 +23,31 @@ export function useGSAPFade() {
             }
             
             fadeElements.forEach((el, index) => {
-                gsap.fromTo(el,
-                    {
-                        opacity: 0,
-                        y: 30,
-                        scale: 0.95,
-                        visibility: "hidden"
+                // ARCHITECTURAL CHANGE: Explicitly set initial hidden state in JS
+                // This replaces the dangerous global CSS .fade-up { opacity: 0 }
+                gsap.set(el, { opacity: 0, y: 30, visibility: "hidden" });
+
+                gsap.to(el, {
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
+                    visibility: "visible",
+                    duration: 0.5,
+                    ease: "power3.out",
+                    scrollTrigger: {
+                        trigger: el,
+                        start: "top 70%",
+                        once: true,
+                        toggleActions: "play none none none"
                     },
-                    {
-                        opacity: 1,
-                        y: 0,
-                        scale: 1,
-                        visibility: "visible",
-                        duration: 0.5,
-                        ease: "power3.out",
-                        scrollTrigger: {
-                            trigger: el,
-                            start: "top 70%",
-                            once: true,
-                            toggleActions: "play none none none"
-                        },
-                        delay: (index % 4) * 0.08,
-                        onStart: () => {
-                            (el as HTMLElement).style.willChange = "transform, opacity";
-                        },
-                        onComplete: () => {
-                            (el as HTMLElement).style.willChange = "auto";
-                        }
+                    delay: (index % 4) * 0.08,
+                    onStart: () => {
+                        (el as HTMLElement).style.willChange = "transform, opacity";
+                    },
+                    onComplete: () => {
+                        (el as HTMLElement).style.willChange = "auto";
                     }
-                );
+                });
             });
         }, containerRef);
 

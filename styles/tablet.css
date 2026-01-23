@@ -41,3 +41,16 @@
     background: linear-gradient(to bottom, rgba(9, 6, 15, 0.85), rgba(9, 6, 15, 0.35));
   }
 }
+
+/* Visibility Guard for Native Scroll (Mobile + Tablet) */
+/* RATIONALE: The .fade-up class (globals.css) hides elements by default (opacity: 0).
+   On desktop, GSAP handles the reveal. On mobile/tablet native scroll, we need
+   to Force visibility to ensure content isn't hidden if animation scripts 
+   are delayed or don't trigger correctly in the stacked layout. */
+@media (max-width: 1023px) {
+  .fade-up {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+  }
+}

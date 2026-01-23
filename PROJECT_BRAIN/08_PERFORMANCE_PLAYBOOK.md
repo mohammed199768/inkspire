@@ -92,4 +92,8 @@
 ## SUMMARY
 
 **Critical Rule**:
+**Critical Rule 1**:
 If adding a new animation loop (RAF), you **MUST** implement the Demand Rendering pattern. Never allow an infinite loop that runs when the tab is hidden.
+
+**Critical Rule 2**:
+Avoid "Hidden by Default" global CSS classes. Always set initial hidden state in JavaScript (`gsap.set`) immediately before animation. This prevents "blank page" syndrome if JS fails.
