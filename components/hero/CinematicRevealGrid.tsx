@@ -1,3 +1,31 @@
+// ============================================================================
+// ARCHITECTURAL INTENT: Cinematic Image Reveal Grid
+// ============================================================================
+// Interactive background for Hero section with mouse-reveal effect.
+//
+// UX PATTERN:
+// - Desktop: Overlay image revealed via clip-path on mouse move (GSAP)
+// - Touch devices: Base images only (no overlay, no interaction)
+//
+// PERFORMANCE STRATEGY:
+// - LCP Optimization: First image priority={true}, others lazy
+// - Next.js Image: Automatic WebP, responsive srcset
+// - Touch detection: Don't load overlay images on mobile
+//
+// DATA FLOW:
+// - Hook: useCinematicReveal (Tier 1, documented)
+// - INPUT: isTouch, containerRef, setStackRef from hook
+// - OUTPUT: 4-column grid with base + overlay images
+// - ANIMATION: Hook handles GSAP clip-path reveals
+//
+// CRITICAL DECISIONS:
+// - Overlay images NOT loaded on touch (saves ~1MB+ bandwidth)
+// - CSS Module for reveal animations
+// - quality=85 base, quality=80 overlay
+//
+// EVIDENCE: Used in HeroScene (Genesis section)
+// ============================================================================
+
 "use client";
 
 import Image from "next/image";

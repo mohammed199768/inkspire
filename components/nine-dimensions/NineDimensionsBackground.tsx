@@ -1,3 +1,33 @@
+// ============================================================================
+// ARCHITECTURAL INTENT: 3D Particle Background System
+// ============================================================================
+// Renders dynamic 3D particle backgrounds that morph between 9 geometric shapes.
+//
+// CORE TECHNOLOGY:
+// - Three.js InstancedMesh for GPU-efficient particle rendering
+// - Custom GLSL shaders for morphing + drift animations
+// - GSAP for smooth shape transitions
+//
+// PERFORMANCE STRATEGY:
+// - Tiered profiles: desktop (1500p), tablet (600-800p), mobile (0p/gradient)
+// - Demand rendering: RAF loop pauses when invisible or idle
+// - IntersectionObserver + Page Visibility gating
+// - Pixel ratio capping (1.5 desktop, 1.0 tablet/mobile)
+//
+// LIFECYCLE MANAGEMENT:
+// - Proper Three.js disposal (geometries, materials, renderer)
+// - GSAP context cleanup
+// - Event listener removal
+// - RAF cancellation
+//
+// KEY DECISIONS:
+// - GPU morphing (not CPU): Attributes aPosStart/aPosEnd, uProgress uniform
+// - Demand rendering: Stops RAF when not transitioning AND progress === 0
+// - WeakSet NOT needed: disposals happen once on unmount
+//
+// EVIDENCE: Three.js integration patterns in ARCHITECTURE_MEMORY.txt
+// ============================================================================
+
 "use client";
 
 import { useEffect, useRef, useMemo, useCallback } from "react";
@@ -26,6 +56,11 @@ const BG_ACCENT = "#201037";
 // PERFORMANCE PROFILES
 // Now uses useResponsiveMode instead of window.innerWidth checks
 // ============================================================================
+// ARCHITECTURAL DECISION: Tiered particle counts
+// - Desktop: 1500 particles (full experience)
+// - Tablet: 600-800 particles (lite mode for capable devices)
+// - Mobile: 0 particles (gradient fallback only)
+// - Pixel ratio capping prevents excessive fragment shader load
 interface PerformanceProfile {
   mode: "mobile" | "tablet" | "desktop";
   count: number;
@@ -44,6 +79,11 @@ const PROFILES: Record<string, PerformanceProfile> = {
 // ============================================================================
 // SHADERS
 // ============================================================================
+// ARCHITECTURAL NOTE: Morphing happens on GPU (zero CPU cost)
+// - aPosStart: Current shape positions
+// - aPosEnd: Target shape positions
+// - uProgress: GSAP-animated 0→1 transition
+// - GPU linearly interpolates: mix(start, end, progress)
 const vertexShader = `
     uniform float uTime;
     uniform float uProgress;
@@ -135,6 +175,10 @@ export default function NineDimensionsBackground({
   // ============================================================================
   // PRE-CALCULATE SHAPES
   // ============================================================================
+  // ARCHITECTURAL DECISION: Compute all 9 shape positions upfront
+  // - useMemo prevents recalculation on re-render
+  // - Dependency: [profile.count] (only recalc when particle count changes)
+  // - Each shape is Float32Array (x,y,z per particle)
   const shapes = useMemo(() => {
     const count = profile.count;
     const result: Float32Array[] = [];
@@ -237,6 +281,11 @@ export default function NineDimensionsBackground({
   // ============================================================================
   // CLEANUP FUNCTION
   // ============================================================================
+  // ARCHITECTURAL PATTERN: Centralized disposal
+  // - Cancels RAF loop
+  // - Reverts GSAP context (removes all tweens)
+  // - Disposes Three.js objects (prevents GPU memory leak)
+  // - Removes canvas from DOM
   const cleanup = useCallback(() => {
     // Cancel RAF
     if (reqIdRef.current) {
@@ -286,6 +335,18 @@ export default function NineDimensionsBackground({
   // ============================================================================
   // THREE.JS SETUP EFFECT
   // ============================================================================
+  // RESPONSIBILITY:
+  // - Creates scene, camera, renderer
+  // - Sets up InstancedMesh with custom shader material
+  // - Initializes shape attributes (aPosStart, aPosEnd)
+  // - Starts render loop with demand rendering logic
+  // - Attaches resize handler and visibility observer
+  //
+  // DEPENDENCY ARRAY: [profile, shapes, isPageActive, cleanup]
+  // - profile: User switches devices → rebuild with new particle count
+  // - shapes: Particle count changes → new shape data
+  // - isPageActive: Page visibility changes → gate rendering
+  // - cleanup: Reference stability (useCallback)
   useEffect(() => {
     if (!containerRef.current) return;
     if (profile.count <= 0) return;
@@ -378,7 +439,13 @@ export default function NineDimensionsBackground({
     }
     scene.add(mesh);
 
-    // Animation loop with demand rendering
+    // ARCHITECTURAL PATTERN: Demand Rendering
+    // RAF loop runs ONLY when:
+    // 1. isVisible.current === true (IntersectionObserver)
+    // 2. isPageActive === true (Page Visibility API)
+    // 3. isTransitioning.current === true OR progress !== 0
+    //
+    // WHY: Saves CPU/GPU when background not visible or static
     // Animation loop with Demand Rendering logic
     const animate = () => {
       // Demand Gating: Render only if visible, active, or transitioning
@@ -436,6 +503,15 @@ export default function NineDimensionsBackground({
   // ============================================================================
   // SHAPE TRANSITION EFFECT (GSAP)
   // ============================================================================
+  // RESPONSIBILITY:
+  // - Updates GPU attributes (aPosStart → aPosEnd) when targetShapeIndex changes
+  // - Animates uProgress uniform from 0 → 1 (GSAP)
+  // - Morphing happens entirely on GPU (vertex shader)
+  //
+  // LIFECYCLE:
+  // - gsap.context() scopes all tweens for batch cleanup
+  // - Revert previous context before starting new transition
+  // - isTransitioning flag gates demand rendering
   useEffect(() => {
     if (targetShapeIndex === targetShapeIndexRef.current) return;
     if (!meshRef.current) return;

@@ -1,3 +1,28 @@
+// ============================================================================
+// ARCHITECTURAL INTENT: Nine Dimensions Home Page Orchestrator
+// ============================================================================
+// Central coordination point for the "9 Dimensions" cinematic home page.
+//
+// RESPONSIBILITY:
+// - Manages 9 full-screen sections representing creative "dimensions"
+// - Orchestrates 3D background morphing (NineDimensionsBackground)
+// - Controls section navigation in cinematic mode
+// - Provides fallback stacked layout for native scroll mode
+//
+// DATA FLOW:
+// - INPUT: useResponsiveMode (scrollMode, render3D, isHydrated)
+// - CONTROL: useNineDimensionsController (currentSection, navigate)
+// - OUTPUT: Either cinematic (fixed viewport) or native (stacked) layout
+//
+// KEY ARCHITECTURAL PATTERNS:
+// 1. Hydration safety: Render placeholder until isHydrated === true
+// 2. Dual rendering modes: Completely different DOM structures
+// 3. Dynamic imports: Heavy sections loaded on-demand
+// 4. AnimatePresence: Section transition orchestration
+//
+// EVIDENCE: Core of 9D architecture documented in ARCHITECTURE_MEMORY.txt
+// ============================================================================
+
 "use client";
 
 import dynamic from "next/dynamic";
@@ -30,6 +55,9 @@ const FinalCTA = dynamic(() => import("@/components/sections/FinalCTA"));
 // ============================================================================
 // SECTION DEFINITIONS
 // ============================================================================
+// ARCHITECTURAL NOTE: Section index → 3D shape mapping
+// This array defines both content AND background shape for each "dimension"
+// Background morphing handled by NineDimensionsBackground (targetShapeIndex prop)
 const SECTIONS = [
   { id: "genesis", component: <HeroScene /> }, // 0: Genesis (Chaos)
   { id: "tunnel", component: <StatsSection /> }, // 1: Tunnel
@@ -42,7 +70,8 @@ const SECTIONS = [
   { id: "harmony", component: <FinalCTA /> }, // 8: Harmony
 ];
 
-// Sections that need full-height styling
+// ARCHITECTURAL NOTE: Full-height sections need viewport-filling styles
+// Other sections have content-based height
 const FULL_HEIGHT_SECTIONS = new Set([0, 2, 6, 7, 8]);
 
 // ============================================================================
@@ -101,6 +130,11 @@ export default function NineDimensionsLayout() {
   // ============================================================================
   // HYDRATION PLACEHOLDER - Prevents layout flicker
   // ============================================================================
+  // ARCHITECTURAL RATIONALE:
+  // - Server renders desktop assumption (isHydrated = false)
+  // - Client may be mobile/tablet (different scrollMode)
+  // - Prevents React hydration mismatch error
+  // - Shows solid background until device detection completes
   if (!isHydrated) {
     return (
       <main className="fixed inset-0 w-full h-full bg-[#09060f]" />
@@ -111,6 +145,11 @@ export default function NineDimensionsLayout() {
   // ============================================================================
   // NATIVE SCROLL MODE (Mobile + Tablet)
   // ============================================================================
+  // ARCHITECTURAL RATIONALE:
+  // - Mobile: No 3D background (performance)
+  // - Tablet (capable): Lite 3D background (reduced particles)
+  // - All sections stacked vertically
+  // - Standard browser scroll (no Lenis, no section switching)
   if (scrollMode === "native") {
     return (
       <main className="w-full min-h-screen relative bg-[#09060f] text-white">
@@ -144,6 +183,10 @@ export default function NineDimensionsLayout() {
   // CINEMATIC MODE (Desktop)
   // Wait for controller to be ready before rendering
   // ============================================================================
+  // ARCHITECTURAL NOTE:
+  // - Controller needs time to attach event listeners
+  // - isReady flag prevents rendering sections before navigation is active
+  // - Prevents race condition (keyboard navigation before listeners attached)
   if (!isReady) {
     // SSR-safe placeholder that matches server render
     return (

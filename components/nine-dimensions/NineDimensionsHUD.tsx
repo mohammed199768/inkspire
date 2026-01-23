@@ -1,3 +1,33 @@
+// ============================================================================
+// ARCHITECTURAL INTENT: Nine Dimensions Navigation HUD
+// ============================================================================
+// Visual navigation UI for cinematic mode (desktop only).
+//
+// RESPONSIBILITY:
+// - Displays progress dots (current section indicator)
+// - Provides click navigation to any section
+// - Shows scroll hint (fade during animations)
+//
+// DATA FLOW:
+// - INPUT: currentSection (active section index)
+// - INPUT: totalSections (9 in current implementation)
+// - INPUT: isAnimating (animation lock from controller)
+// - OUTPUT: Dot clicks trigger onDotClick(index)
+//
+// INTEGRATION:
+// - Used by NineDimensionsLayout in cinematic mode
+// - Props drilled from useNineDimensionsController
+// - Animation lock prevents spam clicking
+//
+// VISUAL BEHAVIOR:
+// - Active dot: glows, scales 150%
+// - Inactive dots: white/20 opacity
+// - Hover: Shows section number tooltip
+// - Scroll hint: Fades during transitions
+//
+// EVIDENCE: Part of 9D system, NineDimensionsLayout.tsx:193-199
+// ============================================================================
+
 "use client";
 
 import React from "react";

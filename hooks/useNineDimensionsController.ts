@@ -4,6 +4,31 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useResponsiveMode } from "@/hooks/useResponsiveMode";
 
 // ============================================================================
+// ARCHITECTURAL NOTE: SECTION NAVIGATION STATE MACHINE
+// ============================================================================
+// This hook implements a finite state machine for Nine Dimensions home page
+// section navigation in desktop cinematic mode.
+//
+// STATE: currentSection (integer 0 to N-1)
+// TRANSITIONS: User events (wheel, keyboard, touch) trigger navigate(±1)
+// GUARDS: Bounds validation, animation lock, enabled flag, scroll mode check
+//
+// CONDITIONAL ACTIVATION:
+// - ONLY active when scrollMode === "cinematic" (desktop)
+// - Disabled in native scroll mode (mobile/tablet use normal scroll)
+// - Respects enabled flag for programmatic control
+//
+// EVENT HANDLING:
+// - Wheel events (desktop mouse/trackpad)
+// - Keyboard arrows (accessibility + power users)
+// - Touch swipe (tablets that qualify for cinematic mode)
+//
+// ANIMATION LOCKING:
+// Prevents section spam by locking interactions during transitions.
+// Lock duration respects prefers-reduced-motion (100ms vs 1500ms).
+// ============================================================================
+
+// ============================================================================
 // TYPES
 // ============================================================================
 interface UseNineDimensionsControllerOptions {
@@ -53,9 +78,25 @@ export function useNineDimensionsController(
   const [currentSection, setCurrentSection] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isReady, setIsReady] = useState(false);
+  
+  // ============================================================================
+  // ANIMATION TIMEOUT REF - Cleanup on unmount
+  // ============================================================================
+  // Stores setTimeout ID for animation lock release.
+  // MUST be cleared on unmount to prevent setState on unmounted component.
+  // ============================================================================
   const animationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Mark as ready after hydration
+  // ============================================================================
+  // HYDRATION SAFETY - Mark ready after client mount
+  // ============================================================================
+  // isReady flag prevents hydration mismatch:
+  // - Server renders with isReady: false
+  // - Client sets isReady: true after mount
+  // - Consumer (NineDimensionsLayout) waits for isReady before showing content
+  //
+  // CLEANUP: Clear pending animation timeout on unmount
+  // ============================================================================
   useEffect(() => {
     setIsReady(true);
     return () => {
@@ -65,12 +106,28 @@ export function useNineDimensionsController(
     };
   }, []);
 
-  // Navigation function
+  // ============================================================================
+  // NAVIGATE FUNCTION - State transition with guards
+  // ============================================================================
+  // GUARDS (early returns):
+  // 1. enabled === false → controller disabled
+  // 2. nextIndex out of bounds [0, totalSections-1] → invalid transition
+  // 3. isAnimating === true → prevent spam during transition
+  //
+  // TRANSITION:
+  // 1. Set animation lock (prevents concurrent transitions)
+  // 2. Update current section state
+  // 3. Schedule lock release after animation completes
+  //
+  // REDUCED MOTION:
+  // Animation duration: 100ms (reduced) vs 1500ms (normal)
+  // Accessibility compliance with prefers-reduced-motion
+  // ============================================================================
   const navigate = useCallback(
     (nextIndex: number) => {
-      if (!enabled) return;
-      if (nextIndex < 0 || nextIndex >= totalSections) return;
-      if (isAnimating) return;
+      if (!enabled) return; // Guard: Controller disabled
+      if (nextIndex < 0 || nextIndex >= totalSections) return; // Guard: Bounds check
+      if (isAnimating) return; // Guard: Animation lock
 
       setIsAnimating(true);
       setCurrentSection(nextIndex);
@@ -95,64 +152,115 @@ export function useNineDimensionsController(
     // Don't attach handlers if disabled or in native scroll mode
     if (!enabled || scrollMode !== "cinematic") return;
 
-    // 1. Wheel (Desktop scroll)
+    // ============================================================================
+    // 1. WHEEL EVENT HANDLER (Desktop Mouse/Trackpad)
+    // ============================================================================
+    // NOISE FILTER: Requires minimum 30px deltaY to trigger
+    // WHY: Prevents accidental section changes from small scroll gestures
+    //
+    // DIRECTION:
+    // - Positive deltaY (scroll down) → next section
+    // - Negative deltaY (scroll up) → previous section
+    // ============================================================================
     const handleWheel = (e: WheelEvent) => {
-      if (isAnimating) return;
-      if (Math.abs(e.deltaY) < 30) return;
+      if (isAnimating) return; // Animation lock check
+      if (Math.abs(e.deltaY) < 30) return; // Noise filter: ignore tiny scrolls
 
       if (e.deltaY > 0) {
-        navigate(currentSection + 1);
+        navigate(currentSection + 1); // Scroll down → next
       } else {
-        navigate(currentSection - 1);
+        navigate(currentSection - 1); // Scroll up → previous
       }
     };
 
-    // 2. Keyboard (arrows)
+    // ============================================================================
+    // 2. KEYBOARD EVENT HANDLER (Arrow Keys)
+    // ============================================================================
+    // ACCESSIBILITY: Enables keyboard-only navigation
+    // POWER USERS: Faster than mouse for sequential browsing
+    //
+    // BINDINGS:
+    // - ArrowDown / ArrowRight → next section (intuitive direction mapping)
+    // - ArrowUp / ArrowLeft → previous section
+    //
+    // CRITICAL: e.preventDefault() blocks default page scroll behavior
+    // Without this, arrow keys would BOTH change section AND scroll the page.
+    // ============================================================================
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (isAnimating) return;
+      if (isAnimating) return; // Animation lock check
       
       switch (e.key) {
         case "ArrowDown":
         case "ArrowRight":
-          e.preventDefault();
+          e.preventDefault(); // Block default scroll
           navigate(currentSection + 1);
           break;
         case "ArrowUp":
         case "ArrowLeft":
-          e.preventDefault();
+          e.preventDefault(); // Block default scroll
           navigate(currentSection - 1);
           break;
       }
     };
 
-    // 3. Touch Swipe (for tablets with touch in cinematic mode)
+    // ============================================================================
+    // 3. TOUCH SWIPE HANDLER (Tablets in Cinematic Mode)
+    // ============================================================================
+    // EDGE CASE: Some tablets qualify for cinematic mode (capable hardware + fine pointer)
+    // This provides touch gesture fallback for those devices.
+    //
+    // SWIPE DETECTION:
+    // 1. touchstart captures starting Y position
+    // 2. touchend captures ending Y position
+    // 3. delta = start - end
+    //    - Positive delta (swipe up, finger moves up) → next section
+    //    - Negative delta (swipe down, finger moves down) → previous section
+    //
+    // THRESHOLD: Requires 50px minimum swipe to prevent accidental triggers
+    // ============================================================================
     let touchStart = 0;
     const handleTouchStart = (e: TouchEvent) => {
       touchStart = e.touches[0].clientY;
     };
 
     const handleTouchEnd = (e: TouchEvent) => {
-      if (isAnimating) return;
+      if (isAnimating) return; // Animation lock check
       const touchEnd = e.changedTouches[0].clientY;
       const delta = touchStart - touchEnd;
 
       // Require significant swipe (50px threshold)
       if (Math.abs(delta) > 50) {
         if (delta > 0) {
-          navigate(currentSection + 1);
+          navigate(currentSection + 1); // Swipe up → next
         } else {
-          navigate(currentSection - 1);
+          navigate(currentSection - 1); // Swipe down → previous
         }
       }
     };
 
-    // Attach listeners
+    // ============================================================================
+    // ATTACH EVENT LISTENERS
+    // ============================================================================
+    // PASSIVE OPTIMIZATION:
+    // wheel, touchstart, touchend use { passive: true }
+    // - Signals browser we WON'T call preventDefault()
+    // - Allows browser to optimize scroll performance
+    // - Safe because we don't need to block these events
+    //
+    // keydown is NOT passive (we DO call preventDefault on arrows)
+    // ============================================================================
     window.addEventListener("wheel", handleWheel, { passive: true });
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown); // Not passive (we use preventDefault)
     window.addEventListener("touchstart", handleTouchStart, { passive: true });
     window.addEventListener("touchend", handleTouchEnd, { passive: true });
 
-    // Cleanup
+    // ============================================================================
+    // CLEANUP - Remove all event listeners
+    // ============================================================================
+    // CRITICAL: Without this cleanup, each re-render would add duplicate listeners
+    // MEMORY LEAK: Event listeners hold references to component scope
+    // CONSEQUENCE: Hundreds of orphaned listeners after multiple renders
+    // ============================================================================
     return () => {
       window.removeEventListener("wheel", handleWheel);
       window.removeEventListener("keydown", handleKeyDown);

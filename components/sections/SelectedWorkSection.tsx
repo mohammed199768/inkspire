@@ -1,3 +1,30 @@
+// ============================================================================
+// ARCHITECTURAL INTENT: Selected Work Slider Section
+// ============================================================================
+// Portfolio slider using Swiper with 3D creative effects.
+//
+// CORE TECHNOLOGY:
+// - Swiper.js (touch slider library)
+// - EffectCreative module (3D perspective transforms)
+// - Autoplay module (3s delay)
+//
+// DATA FLOW:
+// - INPUT: projects.slice(0, 6) - first 6 projects
+// - OUTPUT: Carousel with prev/next slides scaled + rotated
+// - INTERACTION: Click opens project popup
+//
+// ANIMATION PATTERN:
+// - useGSAPFade: Entrance animation (Tier 1 hook)
+// - Swiper creative effect: slide transitions
+// - Prev/Next: translate [-90%, 0, -400], scale 0.85, rotate ±5deg
+//
+// PERFORMANCE:
+// - priority={index < 3}: First 3 images prioritized (LCP)
+// - quality=95: High quality for portfolio showcase
+//
+// EVIDENCE: Swiper integration, popup system pattern
+// ============================================================================
+
 "use client";
 
 import Image from "next/image";

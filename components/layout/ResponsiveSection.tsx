@@ -1,3 +1,21 @@
+// ============================================================================
+// ARCHITECTURAL INTENT: Responsive Section Wrapper
+// ============================================================================
+// Provides dual-mode section rendering with intelligent animation behavior.
+//
+// DESIGN RATIONALE:
+// - scrollMode === 'native': Scroll-triggered in-view animations (mobile + tablet)
+// - scrollMode === 'cinematic': No in-view animations (handled by parent AnimatePresence)
+//
+// KEY FEATURES:
+// - Uses 100svh for proper mobile viewport (excludes browser chrome)
+// - Safe-area padding for notched devices
+// - Ref composition pattern (forwards ref while using IntersectionObserver)
+// - Respects prefersReducedMotion
+//
+// EVIDENCE: Part of 9D system documented in ARCHITECTURE_MEMORY.txt
+// ============================================================================
+
 "use client";
 
 import React, { forwardRef } from "react";
@@ -26,6 +44,9 @@ interface ResponsiveSectionProps {
 // ============================================================================
 // DEFAULT ANIMATION VARIANTS
 // ============================================================================
+// ARCHITECTURAL NOTE:
+// - defaultVariants: Used for native scroll mode (fade + slide up)
+// - reducedMotionVariants: Accessibility fallback (no motion)
 const defaultVariants = {
   hidden: {
     opacity: 0,
@@ -89,12 +110,14 @@ const ResponsiveSection = forwardRef<HTMLElement, ResponsiveSectionProps>(
       ? reducedMotionVariants
       : animationVariants ?? defaultVariants;
 
-    // Combine refs
+    // ARCHITECTURAL PATTERN: Ref Composition
+    // Why: Need both IntersectionObserver ref (internal) AND forwarded ref (parent)
+    // Solution: Single callback ref that updates both
     const setRef = (element: HTMLElement | null) => {
-      // Update inViewRef
+      // Update inViewRef (for IntersectionObserver)
       (inViewRef as React.MutableRefObject<HTMLElement | null>).current = element;
       
-      // Update forwarded ref
+      // Update forwarded ref (for parent access)
       if (typeof forwardedRef === "function") {
         forwardedRef(element);
       } else if (forwardedRef) {
@@ -115,7 +138,16 @@ const ResponsiveSection = forwardRef<HTMLElement, ResponsiveSectionProps>(
       "flex-col",
     ].join(" ");
 
-    // Cinematic mode: No in-view animation (handled by page transitions)
+    // ARCHITECTURAL DECISION: Conditional Rendering Based on Scroll Mode
+    //
+    // Cinematic mode (desktop): NO in-view animation
+    // - Parent AnimatePresence handles section transitions
+    // - Render plain <section> (no motion)
+    // - Prevents double-animation (AnimatePresence + in-view)
+    //
+    // Native mode (mobile/tablet): IN-VIEW animation
+    // - Uses motion.section with IntersectionObserver
+    // - Animates when scrolled into view
     if (activeScrollMode === "cinematic" || !shouldAnimate) {
       return (
         <section

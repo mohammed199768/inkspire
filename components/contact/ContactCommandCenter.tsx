@@ -1,3 +1,31 @@
+// ============================================================================
+// ARCHITECTURAL INTENT: Contact Form Command Center
+// ============================================================================
+// Cinematic contact form with "mission briefing" theme.
+//
+// RESPONSIBILITY:
+// - Collects user contact information (name, email, service, message)
+// - Provides visual feedback with animated transitions
+// - Shows success state after submission
+//
+// DATA FLOW:
+// - INPUT: User form inputs (controlled components)
+// - STATE: formState (name, email, service, message), activeField, isSubmitted
+// - OUTPUT: Form submission (currently simulated with setTimeout)
+//
+// CRITICAL NOTES:
+// - NO BACKEND: Form submission is simulated (1.5s timeout)
+// - NO API CALL: Data not sent anywhere
+// - CLIENT-ONLY: All validation and state management in component
+//
+// ANIMATION STRATEGY:
+// - Framer Motion stagger for form fields (0.1s delay between items)
+// - AnimatePresence for form  success state transition
+// - Active field highlighting (purple underline animation)
+//
+// EVIDENCE: Contact page component, no backend per PROJECT_INDEX.txt
+// ============================================================================
+
 "use client";
 
 import React, { useState } from "react";

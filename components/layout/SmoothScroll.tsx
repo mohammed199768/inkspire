@@ -1,3 +1,22 @@
+// ============================================================================
+// ARCHITECTURAL INTENT: Smooth Scroll Wrapper Component
+// ============================================================================
+// Pure delegation wrapper around useCinematicScroll hook.
+// This component exists solely to invoke the hook at the layout level.
+//
+// DATA FLOW:
+// - No props consumed
+// - Hook internally reads useResponsiveMode, usePathname, usePageVisibility
+// - Hook conditionally initializes Lenis based on scrollMode === 'cinematic'
+//
+// WHY COMPONENT NOT HOOK?:
+// - Needs to be placed in layout hierarchy (app/layout.tsx)
+// - React Context pattern: Provider must be a component
+// - Keeps layout.tsx clean (doesn't need hook invocation)
+//
+// EVIDENCE: Documented in ARCHITECTURE_MEMORY.txt under Scroll System
+// ============================================================================
+
 "use client";
 
 import { useCinematicScroll } from "@/hooks/useCinematicScroll";

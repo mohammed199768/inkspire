@@ -1,3 +1,28 @@
+// ============================================================================
+// ARCHITECTURAL INTENT: Page Loading Screen
+// ============================================================================
+// Blocks interaction until page resources are loaded.
+//
+// LOADING PATTERN:
+// - Simulated progress bar (not real asset loading)
+// - Increments by 10% every 20ms = ~200ms total duration
+// - Fast enough to not annoy users, slow enough to show brand
+//
+// VISUAL ELEMENTS:
+// - Animated logo with glow effects
+// - Progress bar with gradient
+// - Floating particles (respects prefers-reduced-motion)
+//
+// ACCESSIBILITY:
+// - Reduces particle count if prefers-reduced-motion
+// - Still functional, just less visually busy
+//
+// TRADE-OFF NOTES:
+// - Uses setInterval (cleanup via clearInterval)
+// - AnimatePresence exit animation (Framer Motion handles cleanup)
+// - No real asset tracking (could enhance with window.load listener)
+// ============================================================================
+
 "use client";
 
 import { useEffect, useState } from "react";

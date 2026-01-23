@@ -1,3 +1,34 @@
+// ============================================================================
+// ARCHITECTURAL INTENT: Clients Section with Dual Rendering
+// ============================================================================
+// Displays client logos with either 3D orbital scene (desktop) or grid (touch).
+//
+// DUAL RENDERING PATTERN:
+// - Desktop cinematic + render3D: OrbitalClientsScene (3D)
+// - Touch/native scroll: Static grid layout
+//
+// DATA FLOW:
+// - INPUT: clients (static data), useResponsiveMode (device detection)
+// - OUTPUT: Grid or 3D scene based on device capabilities
+// - INTERACTION: Click opens associated project popup
+//
+// PERFORMANCE STRATEGY:
+// - Dynamic import: OrbitalClientsScene loaded only when show3D === true
+// - SSR disabled for 3D scene (ssr: false)
+// - Loading placeholder during code-split loading
+//
+// SAFARI OPTIMIZATION:
+// - Detects Safari for filter adjustments
+// - Safari: opacity-based instead of grayscale (performance)
+//
+// CRITICAL DECISIONS:
+// - Dual layout not conditional rendering within single component
+// - 3D scene pointer-events-auto (clickable)
+// - Grid uses popup system (not routing)
+//
+// EVIDENCE: Part of 9D sections, popup integration pattern
+// ============================================================================
+
 "use client";
 
 import Image from "next/image";
@@ -9,7 +40,8 @@ import { buildPopupFromProject } from "@/lib/popupMappers";
 import { projects } from "@/data/projects";
 import { useResponsiveMode } from "@/hooks/useResponsiveMode";
 
-// Dynamic import for the 3D scene (Desktop only heavyweight)
+// ARCHITECTURAL DECISION: Dynamic import for code-splitting
+// 3D scene only loaded when show3D === true (desktop cinematic mode)
 const OrbitalClientsScene = dynamic(() => import("./clients/OrbitalClientsScene"), {
     ssr: false,
     loading: () => <div className="w-full h-full flex items-center justify-center text-white/20">Loading Orbital System...</div>

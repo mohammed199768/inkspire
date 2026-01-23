@@ -1,3 +1,51 @@
+// ============================================================================
+// ARCHITECTURAL INTENT: Three.js Shader-Based Tunnel Background
+// ============================================================================
+// Infinite 3D tunnel effect using GPU shaders for tunnel/experience route.
+//
+// CORE TECHNOLOGY:
+// - Three.js InstancedMesh (600 particles)
+// - Custom GLSL shaders (vertex + fragment)
+// - GPU-driven Z-loop animation (infinite tunnel)
+// - GSAP for section transition effects
+//
+// PERFORMANCE STRATEGY:
+// - Demand rendering: RAF pauses when invisible OR page inactive
+// - IntersectionObserver + usePageVisibility gating
+// - DPR capped at 1.5
+// - Additive blending (GPU compositing)
+//
+// SHADER ARCHITECTURE:
+// - Vertex Shader: Updates Z position with looping (mod 3200)
+// - Speed calculation: aZStart + uTime * uSpeed * aSpeedOffset
+// - Range: -3000 to +200 (total 3200 units)
+// - Opacity: Depth-based fade (far = 0, near = 0.15)
+//
+// ANIMATION STATES:
+// Normal: speed=0.5, rotationSpeed=0.001, FOV=70
+// Transition Warp: speed=±140, rotationSpeed=-0.5, FOV=120
+// Camera Shake: rotation.z/y animated during warp
+//
+// TRANSITION PATTERN (GSAP Timeline):
+// 1. Warp In: Speed ramps to ±140, FOV expands to 120
+// 2. Camera Rotation: Shake effect (z: -0.4, y: -0.8)
+// 3. Color Shift: Update instanceColor based on sectionIndex
+// 4. Warp Out: Speed/FOV return to normal
+//
+// LIFECYCLE:
+// - Setup: Create scene, camera, renderer, mesh
+// - Animation: RAF loop updates uniforms + renders
+// - Cleanup: Dispose geometries, materials, renderer
+// - Observers: IntersectionObserver + resize listener
+//
+// CRITICAL DECISIONS:
+// - GPU looping (mod in shader): Zero CPU cost for infinite tunnel
+// - InstancedMesh: Efficient for 600 particles
+// - No WeakSet needed: Single disposal on unmount
+//
+// EVIDENCE: Three.js patterns per ARCHITECTURE_MEMORY.txt, Tunnel Experience route
+// ============================================================================
+
 "use client";
 
 import { useEffect, useRef } from "react";
@@ -141,7 +189,9 @@ export default function TunnelBackground({ sectionIndex }: TunnelBackgroundProps
         scene.add(mesh);
         meshRef.current = mesh;
 
-        // --- ANIMATION ---
+        // ARCHITECTURAL PATTERN: Demand Rendering
+        // RAF runs ONLY when: visible AND page active
+        // Similar to NineDimensionsBackground demand rendering
         const animate = () => {
             if (!isVisible.current || !isPageActive) {
                 animationFrameIdRef.current = 0;

@@ -1,3 +1,31 @@
+// ============================================================================
+// ARCHITECTURAL INTENT: Custom Arrow Cursor Implementation
+// ============================================================================
+// Replaces default cursor with animated arrow that follows mouse.
+//
+// VISUAL BEHAVIOR:
+// - Arrow rotates to follow mouse direction
+// - Smooth 250ms transition for position/rotation
+// - Anchor point shifts based on rotation quadrant (keeps tip at pointer)
+//
+// MATH LOGIC:
+// - atan() calculates angle from dx/dy deltas
+// - Quadrant detection (4 cases) determines anchor point offset
+// - angleDisplace accumulates to handle 360° wrapping
+//
+// PERFORMANCE:
+// - Passive event listener (browser can optimize)
+// - Direct style manipulation (no React re-renders)
+// - Only runs on desktop (wrapper guards touch devices)
+//
+// GOTCHA: Global cursor override
+// - CSS: * { cursor: none !important }
+// - Only applies on (pointer: fine) media query
+// - Hides ALL native cursors (let custom arrow replace them)
+//
+// EVIDENCE: Part of UX enhancements, documented in ARCHITECTURE_MEMORY.txt
+// ============================================================================
+
 "use client";
 
 import { useEffect, useRef } from "react";
@@ -6,7 +34,9 @@ export default function ArrowCursor() {
     const cursorRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        // We can keep these checks as a fallback, although the wrapper handles it.
+        // ARCHITECTURAL GUARD: Double-check capabilities
+        // Wrapper component (Cursor.tsx) already filtered for desktop,
+        // but check again as defensive programming
         const coarse = window.matchMedia("(pointer: coarse)").matches;
         const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         if (coarse || reduce) return;

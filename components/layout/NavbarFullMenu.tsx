@@ -1,3 +1,26 @@
+// ============================================================================
+// ARCHITECTURAL INTENT: Full-Screen Overlay Navigation Menu
+// ============================================================================
+// Classic pattern: Always-visible navbar + fullscreen menu overlay.
+//
+// UX FLOW:
+// 1. User clicks "Menu" button → setIsOpen(true)
+// 2. Fullscreen overlay fades in (GSAP)
+// 3. Menu links stagger animate in
+// 4. Body scroll locked (overflow: hidden)
+// 5. User clicks link or close → setIsOpen(false)
+// 6. Overlay fades out, scroll restored
+//
+// KEY FEATURES:
+// - Body scroll lock (prevents background scroll)
+// - GSAP stagger animation (links appear sequentially)
+// - Anchor link support (smooth scroll after menu closes)
+//
+// CLEANUP:
+// - GSAP animations are short-lived (no context needed)
+// - Body overflow restored on menu close
+// ============================================================================
+
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -11,6 +34,9 @@ export default function NavbarFullMenu() {
     const menuRef = useRef<HTMLDivElement>(null);
     const linksRef = useRef<HTMLDivElement>(null);
 
+    // ARCHITECTURAL PATTERN: Body Scroll Lock
+    // When menu is open, prevent background page from scrolling
+    // Critical for mobile UX (prevents scroll-through)
     useEffect(() => {
         if (isOpen) {
             // Prevent body scroll when menu is open

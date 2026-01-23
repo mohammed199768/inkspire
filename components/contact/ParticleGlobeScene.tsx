@@ -1,9 +1,46 @@
+// ============================================================================
+// ARCHITECTURAL INTENT: 3D Particle Globe Background
+// ============================================================================
+// Three.js particle globe for Contact page visual interest.
+//
+// CORE TECHNOLOGY:
+// - @react-three/fiber (React renderer for Three.js)
+// - @react-three/drei (helper components: Points, Float)
+// - Native sphere point generation (no external libs)
+//
+// PERFORMANCE STRATEGY:
+// - 5000 particles on globe surface (sphere)
+// - 500 ambient outer particles (scattered)
+// - DPR capped at 1.5 (prevents excessive resolution)
+// - frameloop="always" (continuous rendering - could optimize)
+//
+// ANIMATION:
+// - useFrame hook: Rotates globe (y: delta/10, x: delta/20)
+// - Outer particles counter-rotate (y: -delta/15)
+// - Float component: Slow drift (speed=1, low intensity)
+//
+// VISUAL LAYERS:
+// 1. Globe particles (#f2e9ff, 0.6 opacity)
+// 2. Outer particles (#ffffff, 0.2 opacity)
+// 3. Fog effect (FogExp2, matches site bg)
+// 4. Purple ambient glow (CSS, z-[-1])
+// 5. Scanline effect (overlay)
+//
+// TRADE-OFFS:
+// - Always rendering (no demand rendering like NineDimensionsBackground)
+// - Simpler than NineDimensionsBackground (no morphing, no visibility gating)
+// - Good for static contact page (not performance-critical like home)
+//
+// EVIDENCE: Used in Contact page, Three.js patterns per ARCHITECTURE_MEMORY.txt
+// ============================================================================
+
 "use client";
 
 import React, { useState, useRef, Suspense } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Points, PointMaterial, Float } from "@react-three/drei";
 import * as THREE from "three";
+import { usePageVisibility } from "@/hooks/usePageVisibility";
 
 function ParticleGlobe(props: any) {
     const ref = useRef<any>();
@@ -70,12 +107,16 @@ function ParticleGlobe(props: any) {
 }
 
 export default function ParticleGlobeScene() {
+    // PERFORMANCE OPTIMIZATION: Use Page Visibility API to pause when hidden
+    // Matches NineDimensionsBackground demand rendering pattern
+    const isPageActive = usePageVisibility();
+
     return (
         <div className="w-full h-full relative group">
             <Canvas 
                 camera={{ position: [0, 0, 2.5] }} 
                 dpr={[1, 1.5]}
-                frameloop="always" // We'll keep always but cap it or use visibility
+                frameloop={isPageActive ? "always" : "never"} // Pause when tab hidden
                 onCreated={(state) => {
                     state.scene.fog = new THREE.FogExp2(0x09060f, 0.3);
                 }}

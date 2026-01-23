@@ -1,3 +1,32 @@
+// ============================================================================
+// ARCHITECTURAL INTENT: Hero Section Orchestrator
+// ============================================================================
+// First section in 9 Dimensions system (Genesis/Chaos).
+//
+// RESPONSIBILITY:
+// - Renders hero visual composition (glassmorphism + CTA + reveal grid)
+// - Delegates GSAP entrance animations to useHeroAnimation hook
+// - Displays typewriter tagline with glassmorphism capsule
+//
+// DATA FLOW:
+// - INPUT: siteContent.hero (static data)
+// - OUTPUT: Fully animated hero section with layered visuals
+// - ANIMATION: useHeroAnimation (Tier 1 hook) handles GSAP timeline
+//
+// PERFORMANCE OPTIMIZATIONS:
+// - Safari detection for backdrop-filter optimization
+// - CinematicRevealGrid handles image loading priority (LCP)
+// - Tablet-only readability veil for text contrast
+//
+// VISUAL ARCHITECTURE:
+// Layer 0: CinematicRevealGrid (background, z-10)
+// Layer 1: Tablet readability veil (z-20)
+// Layer 2: Glassmorphism capsule + typewriter text (z-30)
+// Layer 3: Elite CTA button (z-60)
+//
+// EVIDENCE: Part of 9D system, documented in ARCHITECTURE_MEMORY.txt:346
+// ============================================================================
+
 "use client";
 
 import { useRef } from "react";
@@ -14,18 +43,16 @@ export default function HeroScene() {
     const ctaRef = useRef<HTMLAnchorElement>(null);
     const scrollLabelRef = useRef<HTMLDivElement>(null);
 
-    // Use the custom hook for animations
+    // ARCHITECTURAL PATTERN: Animation Delegation
+    // Hook handles all GSAP entrance timeline (documented in Tier 1)
+    // Refs passed for timeline targets: container, title, CTA, scroll label
     useHeroAnimation(containerRef, titleRef, ctaRef, scrollLabelRef);
-
-    // Safari detection for performance optimization
-    const isSafari = typeof navigator !== 'undefined' && 
-                     /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
     return (
         <section 
             ref={containerRef}
             id="home"
-            className="relative min-h-[100svh] flex flex-col justify-start lg:justify-end items-center pt-[calc(env(safe-area-inset-top)+64px)] sm:pt-20 md:pt-[4.5rem] pb-16 md:pb-24 lg:pb-32 overflow-hidden scroll-mt-24"
+            className="relative min-h-[100svh] flex flex-col justify-center lg:justify-end items-center pt-20 pb-16 md:pb-24 lg:pb-32 overflow-hidden scroll-mt-24"
             style={{ paddingLeft: 'var(--container-padding)', paddingRight: 'var(--container-padding)' }}
         >
             {/* Tablet-only readability veil background */}
@@ -36,7 +63,7 @@ export default function HeroScene() {
                 <CinematicRevealGrid />
             </div>
 
-            {/* Main Title Container with Glassmorphism - Positioned close to the top on mobile/tablet */}
+            {/* Main Title Container with Glassmorphism - Centered on mobile/tablet */}
             <div ref={titleRef} className="relative z-30 flex flex-col items-center text-center max-w-[95vw] md:max-w-7xl mx-auto mb-4 md:mb-6 mt-0 lg:translate-y-12">
                 {/* Premium Clean Glass Capsule (No Blur) - Visual depth via layered transparency */}
                 <div className="relative px-8 py-8 md:px-12 md:py-10 rounded-full overflow-hidden w-full"

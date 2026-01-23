@@ -1,3 +1,20 @@
+// ============================================================================
+// ARCHITECTURAL INTENT: Statistics Display Section
+// ============================================================================
+// Displays animated statistics using AnimatedCounter component.
+//
+// SIMPLICITY: Minimal logic - pure composition
+// - Uses AnimatedCounter (Tier 1 hook: useAnimatedCounter)
+// - Static data mapping (stats array)
+// - Grid layout (1-4 columns responsive)
+//
+// ANIMATION: Delegated to AnimatedCounter component
+// - Scroll-triggered counting (proxy pattern)
+// - GSAP-powered number animation
+//
+// EVIDENCE: Simple section, delegates to Tier 1 components
+// ============================================================================
+
 import { stats } from "@/data/staticData";
 import AnimatedCounter from "@/components/ui/AnimatedCounter";
 import SectionTitle from "@/components/ui/SectionTitle";

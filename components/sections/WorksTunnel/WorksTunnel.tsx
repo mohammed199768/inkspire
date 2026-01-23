@@ -1,3 +1,52 @@
+// ============================================================================
+// ARCHITECTURAL INTENT: 3D CSS Portfolio Tunnel
+// ============================================================================
+// Interactive 3D tunnel of project images using CSS 3D transforms.
+//
+// CORE TECHNOLOGY:
+// - Pure CSS 3D transforms (no Three.js)
+// - RAF animation loop for smooth rotation
+// - Scroll-based depth navigation
+//
+// DATA FLOW:
+// - INPUT: projects (static data, tripled for density)
+// - STATE: Scroll progress mapped to tunnel depth position
+// - OUTPUT: Rotating rings of project cards
+// - INTERACTION: Click opens popup (usePopup integration)
+//
+// PERFORMANCE STRATEGY:
+// - Demand rendering: RAF pauses when not visible OR page inactive
+// - IntersectionObserver: Tracks section visibility
+// - usePageVisibility: Pauses when tab hidden
+// - Smooth interpolation: pSmoothRef lerps scroll position
+// - Reduced motion support: Slower animation speeds
+//
+// ANIMATION ARCHITECTURE:
+// - Auto-rotation: timeRef increments every frame (AUTO_SPEED)
+// - Scroll-driven: Maps scroll progress to Z-position in tunnel
+// - Alternating rings: Even/odd rings rotate opposite directions
+// - Depth scaling: Rings near center scale up (1.15x)
+// - Card culling: Back-facing cards fade (opacity 0.3, z-index 0)
+//
+// LAYOUT GEOMETRY:
+// - IMAGES_PER_RING: 6 cards per ring
+// - Radius: 300px desktop, 160px mobile
+// - Ring spacing: 280px desktop, 200px mobile
+// - Tilt: 12deg rotateX for perspective
+//
+// LIFECYCLE:
+// - Setup: IntersectionObserver + resize listener
+// - Animation: RAF loop (tick function)
+// - Cleanup: Remove listeners, cancel RAF
+//
+// CRITICAL DECISIONS:
+// - CSS 3D not WebGL: Simpler, better layer compatibility
+// - Triple project data: Creates visual density
+// - Popup integration: Replaced overlay with global popup system
+//
+// EVIDENCE: Portfolio tunnel effect, follows demand rendering pattern
+// ============================================================================
+
 "use client";
 
 import React, { useEffect, useRef, useState, useMemo } from 'react';
@@ -106,6 +155,9 @@ const WorksTunnel: React.FC = () => {
         window.addEventListener('resize', handleResize);
 
         const tick = () => {
+            // ARCHITECTURAL PATTERN: Demand Rendering Gate
+            // Stop RAF when: not visible OR page inactive
+            // Prevents CPU/GPU waste on hidden sections
             if (!containerRef.current || !stackRef.current || !isPageActive) {
                 requestRef.current = undefined;
                 return;
