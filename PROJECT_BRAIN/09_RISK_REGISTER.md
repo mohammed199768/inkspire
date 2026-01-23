@@ -88,6 +88,28 @@
 
 ---
 
+## 8. External Hydration Interference
+
+**SEVERITY**: LOW
+**CONTEXT**: Browser extensions injecting attributes (e.g., `fdprocessedid`).
+**RISK**: React hydration warnings polluting console.
+**MITIGATION**:
+- **Scoped Suppression**: `suppressHydrationWarning` on specific interactive elements (Buttons in Navbar).
+- **Ref**: `components/layout/NavbarFullMenu.tsx`.
+
+---
+
+## 9. WebGL Context Loss
+
+**SEVERITY**: LOW
+**CONTEXT**: GPU crash or system sleep.
+**RISK**: Canvas freezes or disappears without recovery.
+**MITIGATION**:
+- **Event Listeners**: `webglcontextlost` (stop loop) + `webglcontextrestored` (reload/re-init).
+- **Ref**: `components/nine-dimensions/NineDimensionsBackground.tsx`.
+
+---
+
 ## SUMMARY
 
 **Top Priority**: Ensure `safeDispose` and RAF cleanup are NEVER missed in new 3D components.

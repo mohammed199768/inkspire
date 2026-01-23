@@ -41,6 +41,7 @@
 - **CSS Visibility**: Added `.fade-up` override in `tablet.css` to prevent invisible sections on native scroll.
 - **Animated Counters**: Fixed `useAnimatedCounter` to use `IntersectionObserver` on small screens (native scroll fallback).
 - **Portfolio Visibility**: Refactored `.fade-up` behavior. Removed global `opacity: 0` CSS trap; moved initial state management to `useGSAPFade` hook.
+- **Console Hygiene**: Fixed `useSyncExternalStore` caching, suppressed `fdprocessedid` warnings, handled WebGL context loss.
 
 ---
 

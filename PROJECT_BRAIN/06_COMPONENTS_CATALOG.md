@@ -60,7 +60,7 @@ Components documented inline via 32 files (Tier 1-3B). Full catalog deferred to 
 **FILES**:
 - components/tunnel/TunnelExperience.tsx - Orchestrator
 - components/tunnel/TunnelBackground.tsx - Three.js shader tunnel
-- components/sections/WorksTunnel/WorksTunnel.tsx - CSS 3D tunnel
+- components/sections/WorksTunnel/WorksTunnel.tsx - CSS 3D tunnel (Hardened: ErrorBoundary + Syntax Safety)
 
 **DOCUMENTATION**: See TIER3B_TUNNEL_CHECKPOINT.md
 

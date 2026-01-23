@@ -94,7 +94,7 @@ let cleanupFn: (() => void) | null = null;
 //
 // WITHOUT THIS: React hydration error (server HTML ≠ client HTML)
 // ============================================================================
-const getServerSnapshot = (): ResponsiveMode => ({
+const SERVER_SNAPSHOT: ResponsiveMode = {
   isHydrated: false, // CRITICAL: false on server, signals "don't trust other values yet"
   isMobile: false,
   isTablet: false,
@@ -106,7 +106,9 @@ const getServerSnapshot = (): ResponsiveMode => ({
   scrollMode: "cinematic",
   render3D: true,
   deviceCapable: true,
-});
+};
+
+const getServerSnapshot = (): ResponsiveMode => SERVER_SNAPSHOT;
 
 // ============================================================================
 // CLIENT STATE COMPUTATION

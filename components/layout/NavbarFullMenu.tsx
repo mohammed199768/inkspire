@@ -113,6 +113,7 @@ export default function NavbarFullMenu() {
 
                 <button
                     onClick={() => setIsOpen(true)}
+                    suppressHydrationWarning
                     className="relative z-10 text-sm font-medium uppercase tracking-widest text-white hover:text-inkspirePurple transition-all interactive"
                 >
                     Menu
@@ -127,6 +128,7 @@ export default function NavbarFullMenu() {
                 {/* Close Button */}
                 <button
                     onClick={() => setIsOpen(false)}
+                    suppressHydrationWarning
                     className="absolute top-6 right-6 text-white text-sm font-medium uppercase tracking-widest hover:scale-110 transition-all interactive group"
                 >
                     <span className="mr-2">✕</span>

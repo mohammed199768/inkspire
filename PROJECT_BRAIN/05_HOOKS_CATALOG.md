@@ -210,10 +210,11 @@
 **CATEGORY**: Animation / GSAP  
 **PURPOSE**: Page transition effects
 
-**USED BY**: app/portfolio/page.tsx, app/contact/page.tsx
+**USED BY**: app/portfolio/page.tsx, app/contact/page.tsx  
+**NOTE**: Supports `scope` ref to isolate animations (prevents cross-page conflicts).
 
 **STATUS**: ACTIVE  
-**EVIDENCE**: grep search shows 2 imports
+**EVIDENCE**: hooks/useCinematicTransitions.ts
 
 ---
 

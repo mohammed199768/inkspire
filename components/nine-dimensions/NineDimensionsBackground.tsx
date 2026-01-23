@@ -493,8 +493,24 @@ export default function NineDimensionsBackground({
     );
     observer.observe(containerRef.current);
 
+    // Context Loss Handling
+    const canvas = renderer.domElement;
+    const handleContextLost = (event: Event) => {
+        event.preventDefault(); // allow restoration
+        cancelAnimationFrame(reqIdRef.current!);
+    };
+    const handleContextRestored = () => {
+        // Simple reload strategy for robustness
+        window.location.reload(); 
+    };
+
+    canvas.addEventListener("webglcontextlost", handleContextLost, false);
+    canvas.addEventListener("webglcontextrestored", handleContextRestored, false);
+
     return () => {
       window.removeEventListener("resize", handleResize);
+      canvas.removeEventListener("webglcontextlost", handleContextLost);
+      canvas.removeEventListener("webglcontextrestored", handleContextRestored);
       observer.disconnect();
       cleanup();
     };

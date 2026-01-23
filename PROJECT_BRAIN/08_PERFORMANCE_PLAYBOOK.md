@@ -75,6 +75,8 @@
   - **EVIDENCE**: `hooks/useHeroAnimation.ts`
 - **Ticker Cleanups**: Must use reference to function, not inline closure.
   - **EVIDENCE**: `hooks/useCinematicScroll.ts`
+- **Context Loss Handling**: Listen for `webglcontextlost` and `webglcontextrestored`.
+  - **EVIDENCE**: `components/nine-dimensions/NineDimensionsBackground.tsx`
 
 ---
 
