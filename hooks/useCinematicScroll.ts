@@ -48,19 +48,26 @@ interface UseCinematicScrollReturn {
 // ============================================================================
 // DEFAULT EXCLUDED PATHS
 // ============================================================================
-// EXCLUDED: "/" (home) and "/experience"
+// EXCLUDED: "/" (home), "/experience", and "/portfolio"
 //
 // WHY HOME IS EXCLUDED:
 // - Home uses NineDimensionsLayout with custom section navigation
-// - Desktop home has fixed viewport with AnimatePresence transitions  // - Lenis smooth scroll would conflict with section-by-section animation
+// - Desktop home has fixed viewport with AnimatePresence transitions
+// - Lenis smooth scroll would conflict with section-by-section animation
 //
 // WHY "/experience" IS EXCLUDED:
 // - Likely contains custom 3D navigation or scroll-jacking
 //
-// OTHER PATHS (contact, portfolio, portfolio/[slug]):
+// WHY "/portfolio" IS EXCLUDED (Added: 2026-01-23T22:31:09+03:00):
+// - Architectural isolation: Portfolio system has independent boundary
+// - Uses native scroll for better compatibility with WorksTunnel animations
+// - Reduces coupling with global scroll lifecycle
+// - Follows same pattern as home (custom interaction model)
+//
+// OTHER PATHS (contact, etc.):
 // - USE Lenis for smooth, cinematic scroll experience
 // ============================================================================
-const DEFAULT_EXCLUDED_PATHS = ["/", "/experience"];
+const DEFAULT_EXCLUDED_PATHS = ["/", "/experience", "/portfolio"];
 
 // ============================================================================
 // THE HOOK

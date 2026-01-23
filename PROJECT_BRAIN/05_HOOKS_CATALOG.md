@@ -26,7 +26,7 @@
 **CATEGORY**: Controller  
 **PURPOSE**: Lenis smooth scroll lifecycle management
 
-**INPUTS**: excludePaths (default: ["/", "/experience"])  
+**INPUTS**: excludePaths (default: ["/", "/experience", "/portfolio"])  
 **OUTPUTS**: Lenis instance (stored in ref)
 
 **SIDE EFFECTS**:

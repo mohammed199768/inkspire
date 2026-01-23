@@ -15,6 +15,13 @@
 - Use `safeDispose` for WebGL resources.
 - **Rule**: Never use inline functions for `gsap.ticker.add()`.
 
+**SCROLL IMPULSE UPDATE** (2026-01-23):
+- Scroll impulse feature added RAF-based decay mechanism in `useNineDimensionsController`
+- **ZERO new event listeners added** (reuses existing wheel/keyboard handlers)
+- Decay RAF cleanup: `cancelAnimationFrame(impulseDecayRef.current)` in unmount
+- Self-terminating: decay loop stops when `impulse < epsilon`
+- **EVIDENCE**: `hooks/useNineDimensionsController.ts:100-107` (cleanup), `144-177` (decay logic)
+
 ---
 
 ## 2. Hydration Mismatches
@@ -107,6 +114,34 @@
 **MITIGATION**:
 - **Event Listeners**: `webglcontextlost` (stop loop) + `webglcontextrestored` (reload/re-init).
 - **Ref**: `components/nine-dimensions/NineDimensionsBackground.tsx`.
+
+---
+
+## 10. RAF Loop Resume Failure After Tab Switch
+
+**SEVERITY**: MEDIUM  
+**CONTEXT**: Animation loops gated by Page Visibility API.  
+**RISK**: RAF loop doesn't restart when user returns to tab, leaving animations frozen.  
+**CAUSE**: IntersectionObserver only fires on scroll changes, not when tab visibility changes.  
+**SYMPTOMS**: Particles frozen mid-morph, incorrect shapes displayed after tab switch.  
+**MITIGATION**:  
+- **Visibility Resume Bridge**: Dedicated `useEffect` watching `isPageActive`.
+- When page becomes active: check if should animate (`isVisible && (isTransitioning || progress !== 0)`).
+- If conditions met and RAF not running: call `animateRef.current()` to restart.
+- When page becomes inactive: defensively cancel RAF.
+- **Ref**: `components/nine-dimensions/NineDimensionsBackground.tsx:518-553`.
+
+---
+
+## 11. Privacy/Tracking Configuration Drift
+
+**SEVERITY**: MEDIUM
+**CONTEXT**: GTM allows adding tags/pixels without code changes.
+**RISK**: GTM container configuration might drift from privacy policy (e.g., adding marketing pixels) without dev knowledge.
+**MITIGATION**:
+- **Environment Gating**: ID managed via `.env` (can swap containers).
+- **Documentation**: Clear ownership defined in `16_TRACKING_SYSTEM.md`.
+- **Constraint**: No custom events in code – limits "accidental" data leaks.
 
 ---
 

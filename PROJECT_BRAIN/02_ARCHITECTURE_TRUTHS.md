@@ -64,6 +64,25 @@
 
 **EVIDENCE**: components/nine-dimensions/NineDimensionsBackground.tsx:47-85 (vertex shader code)
 
+## FACT: Scroll Impulse Illusion Layer
+
+**TRUTH**: Transient particle displacement on scroll attempts, vertex shader only  
+**MECHANISM**:  
+- Controller triggers impulse (0→1) on wheel/keyboard events
+- Impulse decays via RAF (× 0.88 per frame, self-terminates at epsilon)
+- Vertex shader adds displacement: `finalPos += vec3(wave, jitter) * uImpulse`
+
+**DEMAND RENDERING COMPLIANCE**:  
+- Gate extended: RAF runs if `impulse > epsilon` (in addition to transition/progress)
+- Brief activity per scroll: ~300-600ms, then auto-stops
+- **Zero new event listeners** (reuses existing wheel/keyboard handlers)
+
+**COMPATIBILITY**:  
+- Ignored if `prefersReducedMotion` or `profile.count === 0`
+- No fragment shader changes (visual layer only)
+
+**EVIDENCE**: hooks/useNineDimensionsController.ts:144-177, components/nine-dimensions/NineDimensionsBackground.tsx:450-490
+
 ## FACT: Tiered Performance Profiles
 
 **TRUTH**: Different particle counts by device capability  

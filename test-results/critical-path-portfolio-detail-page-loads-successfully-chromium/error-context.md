@@ -1,0 +1,86 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - img "Inkspire Logo" [ref=e7]
+    - generic [ref=e11]:
+      - generic [ref=e12]: Loading
+      - generic [ref=e13]: 10%
+  - navigation [ref=e14]:
+    - link "Inkspire" [ref=e16] [cursor=pointer]:
+      - /url: /
+      - img "Inkspire" [ref=e17]
+    - button "Menu" [ref=e18] [cursor=pointer]
+  - generic:
+    - button "✕Close"
+    - generic:
+      - link "Home":
+        - /url: /
+        - text: Home
+      - link "portfolio":
+        - /url: /portfolio
+        - text: portfolio
+      - link "Contact":
+        - /url: /contact
+        - text: Contact
+    - generic: © 2025 Inkspire Agency. All rights reserved.
+  - main [ref=e20]:
+    - navigation:
+      - link "Exit Archive" [ref=e22] [cursor=pointer]:
+        - /url: /portfolio
+        - img [ref=e24]
+        - generic [ref=e26]: Exit Archive
+      - button "Share Project" [ref=e28] [cursor=pointer]:
+        - img [ref=e29]
+    - generic [ref=e35]:
+      - generic [ref=e36]:
+        - generic [ref=e39]:
+          - generic [ref=e41]: Neon Cybernetic Ent
+          - generic [ref=e42]: Digital Art / Branding
+        - generic [ref=e48]: "N"
+      - generic [ref=e53]:
+        - generic [ref=e54]:
+          - generic [ref=e55]:
+            - generic [ref=e56]:
+              - generic [ref=e57]: "01"
+              - generic [ref=e59]: Mission Intel
+            - paragraph [ref=e60]: A futuristic exploration of neon aesthetics and cybernetic enhancements, creating a vivid digital experience.
+          - generic [ref=e61]:
+            - generic [ref=e62]:
+              - img [ref=e64]
+              - generic [ref=e67]:
+                - generic [ref=e68]: Strategic Patron
+                - generic [ref=e69]: Cybernetic
+            - generic [ref=e70]:
+              - img [ref=e72]
+              - generic [ref=e76]:
+                - generic [ref=e77]: Era Released
+                - generic [ref=e78]: "2024"
+            - generic [ref=e79]:
+              - generic [ref=e80]: Augmented Services
+              - generic [ref=e81]:
+                - generic [ref=e82]:
+                  - img [ref=e83]
+                  - text: DIGITAL ART
+                - generic [ref=e85]:
+                  - img [ref=e86]
+                  - text: BRANDING
+          - generic [ref=e89]:
+            - link "Instagram" [ref=e90] [cursor=pointer]:
+              - /url: "#"
+              - img [ref=e91]
+            - link "Behance" [ref=e94] [cursor=pointer]:
+              - /url: "#"
+              - img [ref=e95]
+        - generic [ref=e100]:
+          - generic [ref=e101]:
+            - generic [ref=e102]: "02"
+            - generic [ref=e104]: Visual Evidence
+          - generic [ref=e105]:
+            - img "Neon Cybernetic Ent" [ref=e108]
+            - generic [ref=e110]:
+              - img [ref=e111]
+              - text: FULL_HD_ARCHIVE_SRC
+  - alert [ref=e116]
+```

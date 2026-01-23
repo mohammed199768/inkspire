@@ -47,6 +47,8 @@ interface UseNineDimensionsControllerReturn {
   navigate: (index: number) => void;
   /** Whether the controller is ready (SSR-safe) */
   isReady: boolean;
+  /** Scroll impulse value (0-1, triggers brief particle response) */
+  scrollImpulse: number;
 }
 
 // ============================================================================
@@ -78,6 +80,7 @@ export function useNineDimensionsController(
   const [currentSection, setCurrentSection] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isReady, setIsReady] = useState(false);
+  const [scrollImpulse, setScrollImpulse] = useState(0);
   
   // ============================================================================
   // ANIMATION TIMEOUT REF - Cleanup on unmount
@@ -86,6 +89,15 @@ export function useNineDimensionsController(
   // MUST be cleared on unmount to prevent setState on unmounted component.
   // ============================================================================
   const animationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  
+  // ============================================================================
+  // SCROLL IMPULSE DECAY - RAF-based self-terminating decay
+  // ============================================================================
+  // Impulse spikes to 1.0 on scroll attempt, then decays to 0.
+  // Decay RAF self-terminates when impulse < epsilon (demand pattern).
+  // No cleanup needed beyond RAF cancellation (ref tracks ID).
+  // ============================================================================
+  const impulseDecayRef = useRef<number | null>(null);
 
   // ============================================================================
   // HYDRATION SAFETY - Mark ready after client mount
@@ -102,6 +114,9 @@ export function useNineDimensionsController(
     return () => {
       if (animationTimeoutRef.current) {
         clearTimeout(animationTimeoutRef.current);
+      }
+      if (impulseDecayRef.current) {
+        cancelAnimationFrame(impulseDecayRef.current);
       }
     };
   }, []);
@@ -143,6 +158,41 @@ export function useNineDimensionsController(
   );
 
   // ============================================================================
+  // TRIGGER SCROLL IMPULSE - Spikes impulse to 1.0 and starts decay
+  // ============================================================================
+  // Called by wheel and keyboard handlers to create visual feedback pulse.
+  // Decay multiplies impulse by 0.88 per frame (~40fps half-life ~1.2s).
+  // Self-terminates when impulse < 0.01 (epsilon).
+  // ============================================================================
+  const triggerImpulse = useCallback(() => {
+    setScrollImpulse(1.0);
+
+    // Cancel existing decay RAF if running
+    if (impulseDecayRef.current) {
+      cancelAnimationFrame(impulseDecayRef.current);
+    }
+
+    // Start decay loop
+    const decay = () => {
+      setScrollImpulse((prev) => {
+        const next = prev * 0.88;
+        
+        // Self-terminate when below epsilon
+        if (next < 0.01) {
+          impulseDecayRef.current = null;
+          return 0;
+        }
+        
+        // Continue decay
+        impulseDecayRef.current = requestAnimationFrame(decay);
+        return next;
+      });
+    };
+
+    impulseDecayRef.current = requestAnimationFrame(decay);
+  }, []);
+
+  // ============================================================================
   // NAVIGATION EVENT HANDLERS
   // Only active in cinematic mode and when enabled
   // ============================================================================
@@ -165,6 +215,9 @@ export function useNineDimensionsController(
     const handleWheel = (e: WheelEvent) => {
       if (isAnimating) return; // Animation lock check
       if (Math.abs(e.deltaY) < 30) return; // Noise filter: ignore tiny scrolls
+
+      // Trigger impulse for visual feedback (even if navigation blocked)
+      triggerImpulse();
 
       if (e.deltaY > 0) {
         navigate(currentSection + 1); // Scroll down → next
@@ -193,11 +246,13 @@ export function useNineDimensionsController(
         case "ArrowDown":
         case "ArrowRight":
           e.preventDefault(); // Block default scroll
+          triggerImpulse(); // Visual feedback
           navigate(currentSection + 1);
           break;
         case "ArrowUp":
         case "ArrowLeft":
           e.preventDefault(); // Block default scroll
+          triggerImpulse(); // Visual feedback
           navigate(currentSection - 1);
           break;
       }
@@ -267,12 +322,13 @@ export function useNineDimensionsController(
       window.removeEventListener("touchstart", handleTouchStart);
       window.removeEventListener("touchend", handleTouchEnd);
     };
-  }, [enabled, scrollMode, isAnimating, currentSection, navigate]);
+  }, [enabled, scrollMode, isAnimating, currentSection, navigate, triggerImpulse]);
 
   return {
     currentSection,
     isAnimating,
     navigate,
     isReady,
+    scrollImpulse,
   };
 }

@@ -1,6 +1,6 @@
 # ENTRYPOINT INDEX
 
-**Last Updated**: 2026-01-23T16:50:00+03:00
+**Last Updated**: 2026-01-23T22:18:00+03:00
 
 ---
 
@@ -25,10 +25,17 @@
 | **"Is this a known risk?"** | `09_RISK_REGISTER.md` |
 | **"Can I delete this?"** | `11_DEAD_CODE_AUDIT.md` |
 | **"How do I modify code safely?"** | `10_CHANGE_PROTOCOL.md` |
+| **"How do I run tests?"** | `14_TESTING_SYSTEM.md` |
+
+**→ Testing Coverage**: Critical-path E2E tests (all 4 routes + desktop/mobile modes) + deterministic unit tests. See `14_TESTING_SYSTEM.md:L151-L227` for full route coverage table.
 
 ### 📂 DEEP DIVES
 For line-by-line understanding of critical files, check the **`FILE_CONTEXT/`** folder.
 - `NineDimensionsBackground` details? → `FILE_CONTEXT/FILE__components__nine-dimensions__NineDimensionsBackground.tsx.md`
+
+### 📚 WALKTHROUGHS
+Recent significant changes with proof of work:
+- `15_WALKTHROUGH_TESTING_EXPANSION.md` → Critical-path testing expansion (2026-01-23)
 
 ### ⚠️ GLOBAL RULE
 **If a file is EMPTY**: It means "Not Documented Yet" or "Not Applicable".

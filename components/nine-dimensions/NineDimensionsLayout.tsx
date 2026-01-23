@@ -117,7 +117,7 @@ export default function NineDimensionsLayout() {
     useResponsiveMode();
 
   // Section navigation controller (only active in cinematic mode)
-  const { currentSection, isAnimating, navigate, isReady } =
+  const { currentSection, isAnimating, navigate, isReady, scrollImpulse } =
     useNineDimensionsController(totalSections, {
       enabled: isHydrated && scrollMode === "cinematic",
     });
@@ -156,7 +156,7 @@ export default function NineDimensionsLayout() {
         {/* Background Layer */}
         {render3D && isTablet ? (
           // Tablet with capable device: Lite 3D background
-          <NineDimensionsBackground targetShapeIndex={0} lite />
+          <NineDimensionsBackground targetShapeIndex={0} lite scrollImpulse={scrollImpulse} />
         ) : (
           // Mobile or incapable tablet: Static gradient
           <div className="fixed inset-0 z-0 bg-gradient-to-b from-[#0d0e22] to-[#09060f] pointer-events-none" />
@@ -200,7 +200,7 @@ export default function NineDimensionsLayout() {
     <main className="overflow-hidden fixed inset-0 w-full h-full">
       {/* 1. 3D Background Layer */}
       {render3D && (
-        <NineDimensionsBackground targetShapeIndex={currentSection} />
+        <NineDimensionsBackground targetShapeIndex={currentSection} scrollImpulse={scrollImpulse} />
       )}
 
       {/* Fallback gradient if 3D is disabled (reduced motion) */}

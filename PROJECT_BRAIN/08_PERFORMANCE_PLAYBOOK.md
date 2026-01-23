@@ -44,6 +44,25 @@
 - **Visibility Gate**:
   - `IntersectionObserver` disconnects RAF when component leaves viewport.
   - **EVIDENCE**: `hooks/useCinematicScroll.ts`
+- **CRITICAL: Visibility Resume Bridge**:
+  - `IntersectionObserver` alone is **insufficient** for RAF resume after tab switches.
+  - Page visibility changes (tab switches) do NOT fire IntersectionObserver callbacks.
+  - **REQUIRED**: Add dedicated `useEffect` watching `isPageActive` to restart RAF.
+  - **EVIDENCE**: `components/nine-dimensions/NineDimensionsBackground.tsx:518-553`
+
+**SCROLL IMPULSE EXTENSION** (Added: 2026-01-23):
+- **Gate Logic**: RAF now runs if `impulse > epsilon` (in addition to transition/progress checks)
+  ```typescript
+  const epsilon = 0.01;
+  if (!isVisible || !isPageActive || 
+      (!isTransitioning && progress === 0 && impulse < epsilon)) {
+    // Stop RAF
+  }
+  ```
+- **Duration**: Brief RAF activity during scroll impulse decay (~300-600ms per scroll attempt)
+- **Self-Terminating**: Impulse decays (× 0.88 per frame), RAF auto-stops at epsilon
+- **Compatibility**: Impulse ignored if `prefersReducedMotion` or `profile.count === 0`
+- **EVIDENCE**: `components/nine-dimensions/NineDimensionsBackground.tsx:450-490`
 
 ---
 

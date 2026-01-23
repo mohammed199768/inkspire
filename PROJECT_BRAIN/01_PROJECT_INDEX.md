@@ -1,6 +1,6 @@
 # PROJECT INDEX
 
-**Last Updated**: 2026-01-23T16:32:52+03:00  
+**Last Updated**: 2026-01-23T22:18:00+03:00  
 **Status**: FROZEN - Update only if architecture contradicts. Always include EVIDENCE.
 
 ## Project Identity
@@ -68,6 +68,22 @@
 - Custom components (no external UI library)
 
 **EVIDENCE**: package.json:25-27
+
+**EVIDENCE**: package.json:25-27
+
+### Tracking
+- Google Tag Manager (GTM)
+- Google Analytics 4 (via GTM)
+- Strategy: Privacy-friendly, container-only injection
+
+**EVIDENCE**: app/layout.tsx:105-123, 16_TRACKING_SYSTEM.md
+
+### Testing
+- Vitest 2.1.9 (unit/component tests)
+- Playwright 1.48.2 (E2E tests, Chromium only)
+- Coverage: Critical-path routes only (presence-based, non-animation)
+
+**EVIDENCE**: package.json:10-13, 14_TESTING_SYSTEM.md:L151-L227
 
 ## Deployment Intent
 

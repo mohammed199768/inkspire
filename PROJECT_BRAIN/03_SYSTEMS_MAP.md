@@ -1,6 +1,6 @@
 ﻿# SYSTEMS MAP
 
-**Last Updated**: 2026-01-23T16:36:31+03:00
+**Last Updated**: 2026-01-23T22:31:09+03:00
 
 ---
 
@@ -98,7 +98,8 @@
 
 **CLEANUP PATTERN**: 
 - Short animations (<1s): No context needed
-- Long animations: gsap.context() + evert()
+- Long animations: gsap.context() + 
+evert()
 - Ticker callbacks: 	icker.remove(callbackRef.current) (MUST use ref)
 - ScrollTrigger: ScrollTrigger.getAll().forEach(t => t.kill())
 
@@ -178,6 +179,29 @@
 
 **EVIDENCE**: hooks/usePopup.tsx, multiple component imports
 
+
+---
+
+## Tracking System
+
+**PURPOSE**: Privacy-friendly analytics (GTM + GA4)
+
+**KEY FILES**:
+- app/layout.tsx (Script injection + noscript fallback)
+- .env.local (GTM ID configuration)
+- PROJECT_BRAIN/16_TRACKING_SYSTEM.md
+
+**DATA FLOW**:
+- Container loaded from Google servers
+- Events pushed to `window.dataLayer`
+- Processing happens on Google side (no local processing code)
+
+**PRIVACY**:
+- No cookie banner (users implicit consent assumption)
+- No custom event tracking in code (managed in GTM)
+
+**EVIDENCE**: app/layout.tsx:105-123
+
 ---
 
 ## Responsive/Capability Gating System
@@ -207,6 +231,47 @@
 **CLEANUP**: Reference counting, removes listeners when last subscriber unmounts
 
 **EVIDENCE**: hooks/useResponsiveMode.ts (entire file)
+
+---
+
+## Portfolio Boundary System
+
+**PURPOSE**: Architectural isolation of Portfolio routes from global lifecycle systems
+
+**KEY FILES**:
+- app/portfolio/layout.tsx (boundary layer)
+- hooks/useCinematicScroll.ts (path exclusion at L69)
+
+**ROUTES AFFECTED**:
+- /portfolio (index page)
+- /portfolio/[slug] (project detail pages)
+
+**ISOLATION SCOPE**:
+- **EXCLUDED**: Lenis smooth scroll (uses native browser scroll)
+- **EXCLUDED**: Global GSAP ScrollTrigger animations
+- **INHERITED**: PopupProvider (for WorksTunnel project clicks)
+- **INHERITED**: NavbarFullMenu (global navigation)
+- **INHERITED**: Cursor component
+- **INHERITED**: Theme (CSS variables, fonts)
+- **INHERITED**: MotionLayout (Framer Motion page transitions)
+
+**SCROLL MODE**: Native browser scroll (excluded from cinematic mode)
+
+**RATIONALE**:
+- Reduces coupling with global scroll lifecycle
+- Provides extension point for Portfolio-specific providers
+- Follows same pattern as home page (custom navigation model)
+- Better compatibility with WorksTunnel 3D animations
+
+**LIFECYCLE**: 
+- Portfolio layout mounts → inherits global providers
+- Scroll system detects `/portfolio` path → skips Lenis initialization
+- Portfolio uses native scroll alongside scoped Framer Motion animations
+
+**EVIDENCE**: 
+- app/portfolio/layout.tsx:1-48 (boundary definition)
+- hooks/useCinematicScroll.ts:L69 (path exclusion)
+- Tests: tests/e2e/critical-path.spec.ts:L38-L64 (verified functional)
 
 ---
 

@@ -51,7 +51,7 @@ export default function AboutSection() {
                     <div className="fade-up relative rounded-[1rem] md:rounded-[1.5rem] overflow-hidden shadow-2xl shadow-purple-900/10 aspect-video lg:aspect-square xl:aspect-video grayscale hover:grayscale-0 transition-all duration-700 w-full group isolate max-h-[25vh] lg:max-h-none">
                         <video
                             className="w-full h-full object-cover scale-105 group-hover:scale-100 transition-transform duration-1000"
-                            src="/1_2.mp4"
+                            src="/1_2.webm"
                             autoPlay
                             muted
                             loop

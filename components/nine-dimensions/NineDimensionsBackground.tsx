@@ -43,6 +43,8 @@ interface NineDimensionsBackgroundProps {
   targetShapeIndex: number;
   /** Lite mode for tablets: reduced particles, no post-fx */
   lite?: boolean;
+  /** Scroll impulse value (0-1) for transient particle displacement */
+  scrollImpulse?: number;
 }
 
 // ============================================================================
@@ -87,6 +89,7 @@ const PROFILES: Record<string, PerformanceProfile> = {
 const vertexShader = `
     uniform float uTime;
     uniform float uProgress;
+    uniform float uImpulse;
     attribute vec3 aPosStart;
     attribute vec3 aPosEnd;
     attribute float aRandom;
@@ -102,7 +105,14 @@ const vertexShader = `
         float drift = sin(uTime * 0.2 + aRandom) * 2.0;
         vec3 finalPos = morphedPos + vec3(drift * 0.5, drift, drift * 0.3);
         
-        // 3. Transform
+        // 3. SCROLL IMPULSE - Transient displacement (surgical addition)
+        if (uImpulse > 0.01) {
+            float wave = sin(uTime * 1.5 + aRandom * 5.0) * uImpulse;
+            float jitter = (aRandom - 0.5) * uImpulse * 3.0;
+            finalPos += vec3(wave, wave * 1.2, jitter) * 2.0;
+        }
+        
+        // 4. Transform
         vec4 mvPosition = modelViewMatrix * instanceMatrix * vec4(finalPos + position * 1.1, 1.0);
         gl_Position = projectionMatrix * mvPosition;
         
@@ -140,6 +150,7 @@ const fragmentShader = `
 export default function NineDimensionsBackground({
   targetShapeIndex,
   lite = false,
+  scrollImpulse = 0,
 }: NineDimensionsBackgroundProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const isPageActive = usePageVisibility();
@@ -165,12 +176,19 @@ export default function NineDimensionsBackground({
   const animateRef = useRef<() => void>(() => {});
 
   // State management
-  // State management
   const isVisible = useRef(true);
   const isTransitioning = useRef(false);
   const currentShapeIndexRef = useRef(0);
   const targetShapeIndexRef = useRef(0);
   const animParams = useRef({ progress: 0 });
+  
+  // ============================================================================
+  // SCROLL IMPULSE INTERNAL STATE
+  // ============================================================================
+  // Tracks decayed impulse value for demand rendering gate.
+  // Smoothly interpolates toward prop value for visual continuity.
+  // ============================================================================
+  const impulseRef = useRef(0);
 
   // ============================================================================
   // PRE-CALCULATE SHAPES
@@ -406,6 +424,7 @@ export default function NineDimensionsBackground({
       uniforms: {
         uTime: { value: 0 },
         uProgress: { value: 0 },
+        uImpulse: { value: 0 },
       },
       vertexShader,
       fragmentShader,
@@ -443,13 +462,20 @@ export default function NineDimensionsBackground({
     // RAF loop runs ONLY when:
     // 1. isVisible.current === true (IntersectionObserver)
     // 2. isPageActive === true (Page Visibility API)
-    // 3. isTransitioning.current === true OR progress !== 0
+    // 3. isTransitioning.current === true OR progress !== 0 OR impulse > epsilon
     //
     // WHY: Saves CPU/GPU when background not visible or static
+    // IMPULSE EXTENSION: Brief RAF activity during scroll impulse decay (~300-600ms)
     // Animation loop with Demand Rendering logic
     const animate = () => {
-      // Demand Gating: Render only if visible, active, or transitioning
-      if (!isVisible.current || !isPageActive || (!isTransitioning.current && animParams.current.progress === 0)) {
+      const epsilon = 0.01;
+      
+      // Demand Gating: Render only if visible, active, transitioning, or impulse active
+      if (
+        !isVisible.current || 
+        !isPageActive || 
+        (!isTransitioning.current && animParams.current.progress === 0 && impulseRef.current < epsilon)
+      ) {
         reqIdRef.current = null;
         return;
       }
@@ -462,6 +488,25 @@ export default function NineDimensionsBackground({
       if (materialRef.current) {
         materialRef.current.uniforms.uTime.value = time;
         materialRef.current.uniforms.uProgress.value = animParams.current.progress;
+        
+        // Update impulse with smoothing and decay
+        // Compatibility: Ignore impulse if prefersReducedMotion or no particles
+        if (!prefersReducedMotion && profile.count > 0) {
+          // Smooth interpolation toward prop value
+          impulseRef.current += (scrollImpulse - impulseRef.current) * 0.15;
+          
+          // Apply internal decay (aggressive: approaches epsilon in ~300-600ms)
+          impulseRef.current *= 0.88;
+          
+          // Clamp to epsilon to allow gate to stop RAF
+          if (impulseRef.current < epsilon) {
+            impulseRef.current = 0;
+          }
+        } else {
+          impulseRef.current = 0;
+        }
+        
+        materialRef.current.uniforms.uImpulse.value = impulseRef.current;
       }
 
       renderer.render(scene, camera);
@@ -515,6 +560,45 @@ export default function NineDimensionsBackground({
       cleanup();
     };
   }, [profile, shapes, isPageActive, cleanup]);
+
+  // ============================================================================
+  // VISIBILITY RESUME BRIDGE
+  // ============================================================================
+  // ARCHITECTURAL PATTERN: Page Visibility Resume
+  // 
+  // PROBLEM: IntersectionObserver only fires on scroll changes, NOT tab switches.
+  // When user switches tabs:
+  // - isPageActive becomes false → RAF stops (line 452)
+  // - User returns → isPageActive becomes true
+  // - BUT: IntersectionObserver doesn't fire (no scroll happened)
+  // - RESULT: RAF never restarts
+  //
+  // SOLUTION: Dedicated effect watching isPageActive
+  // - When page becomes active: check if should animate, restart RAF
+  // - When page becomes inactive: defensively cancel RAF
+  //
+  // DEMAND RENDERING PRESERVED:
+  // Still respects: isVisible && (isTransitioning || progress !== 0)
+  // Only adds: explicit restart trigger on page visibility restore
+  //
+  // EVIDENCE: Fixes "frozen particles after tab switch" bug
+  // ============================================================================
+  useEffect(() => {
+    if (isPageActive) {
+      // Page became active: check if we should be animating
+      const shouldAnimate = isVisible.current && (isTransitioning.current || animParams.current.progress !== 0);
+      
+      if (shouldAnimate && !reqIdRef.current) {
+        animateRef.current();
+      }
+    } else {
+      // Page inactive: ensure RAF is stopped (defensive)
+      if (reqIdRef.current) {
+        cancelAnimationFrame(reqIdRef.current);
+        reqIdRef.current = null;
+      }
+    }
+  }, [isPageActive]);
 
   // ============================================================================
   // SHAPE TRANSITION EFFECT (GSAP)

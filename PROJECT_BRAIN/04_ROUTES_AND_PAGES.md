@@ -1,6 +1,6 @@
 # ROUTES AND PAGES
 
-**Last Updated**: 2026-01-23T16:40:23+03:00
+**Last Updated**: 2026-01-23T22:31:09+03:00
 
 ---
 
@@ -57,34 +57,51 @@
 ## Route: `/portfolio`
 
 **ENTRY FILE**: app/portfolio/page.tsx  
+**LAYOUT FILE**: app/portfolio/layout.tsx (isolation boundary)  
 **COMPONENTS**:
 - WorksTunnel (CSS 3D tunnel effect)
 - Portfolio grid layout
 
 **PURPOSE**: Interactive portfolio display
 
+**SCROLL MODE**: Native browser scroll (excluded from Lenis smooth scroll)
+
 **DATA SOURCES**:
 - projects.ts (tripled for visual density)
 
 **INTERACTION**: Click project → opens popup (usePopup)
 
-**EVIDENCE**: app/portfolio/page.tsx, components/sections/WorksTunnel/WorksTunnel.tsx:59-62
+**ARCHITECTURE**: Portfolio has independent boundary layer isolating it from global scroll lifecycle
+
+**EVIDENCE**:  
+- app/portfolio/layout.tsx:1-48 (boundary implementation)  
+- app/portfolio/page.tsx (page implementation)  
+- hooks/useCinematicScroll.ts:L69 (scroll exclusion)  
+- components/sections/WorksTunnel/WorksTunnel.tsx:59-62
 
 ---
 
 ## Route: `/portfolio/[slug]`
 
 **ENTRY FILE**: app/portfolio/[slug]/page.tsx  
+**LAYOUT FILE**: app/portfolio/layout.tsx (inherits parent boundary)  
 **DYNAMIC PARAM**: slug (project identifier)
 
 **PURPOSE**: Individual project detail pages
+
+**SCROLL MODE**: Native browser scroll (inherited from parent exclusion)
 
 **DATA RESOLUTION**:
 - projects.ts filtered by slug
 - Static generation at build time
 - All slugs pre-rendered
 
-**EVIDENCE**: app/portfolio/[slug]/page.tsx, data/projects.ts
+**ARCHITECTURE**: Inherits Portfolio boundary isolation from parent layout
+
+**EVIDENCE**:  
+- app/portfolio/[slug]/page.tsx (page implementation)  
+- app/portfolio/layout.tsx (parent boundary)  
+- data/projects.ts (data source)
 
 ---
 

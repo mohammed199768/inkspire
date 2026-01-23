@@ -475,9 +475,13 @@ h6 { font-size: var(--fs-sm); text-transform: uppercase; letter-spacing: 0.2em; 
 }
 
 /* Base state for GSAP Fade Up to prevent flickering */
+/* Base state for GSAP Fade Up - VISIBLE BY DEFAULT (Safety) */
+/* RATIONALE: We delegate hiding to the JS hook (useGSAPFade) to prevent 
+   permanently invisible content if JS fails or the hook is missing. */
 .fade-up {
-  opacity: 0;
-  visibility: hidden;
+  /* opacity: 0;  <-- REMOVED: Managed by useGSAPFade.ts */
+  /* visibility: hidden; <-- REMOVED: Managed by useGSAPFade.ts */
+  transform: translateZ(0); /* Prepare layer for animation */
 }
 
 
@@ -784,29 +788,44 @@ FILE: .\app\portfolio\page.tsx
 
 "use client";
 
+import { useRef } from "react";
 import dynamic from "next/dynamic";
 import PageHero from "@/components/hero/PageHero";
 import { useCinematicTransitions } from "@/hooks/useCinematicTransitions";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 
 // Dynamic imports for better performance
 const WorksTunnel = dynamic(() => import("@/components/sections/WorksTunnel/WorksTunnel"), {
-    loading: () => <div className="min-h-screen" />
+    loading: () => (
+        <div className="min-h-[60vh] flex items-center justify-center">
+            <div className="text-white/50 animate-pulse text-lg tracking-widest uppercase font-light">Loading Gallery...</div>
+        </div>
+    )
 });
 const FinalCTA = dynamic(() => import("@/components/sections/FinalCTA"));
 
 export default function PortfolioPage() {
-    useCinematicTransitions();
+    const mainRef = useRef<HTMLElement>(null);
+    
+    // Pass scope to isolate animations to this page
+    useCinematicTransitions(mainRef);
 
     return (
-        <main className="flex flex-col w-full min-h-screen">
+        <main ref={mainRef} className="flex flex-col w-full min-h-screen">
             <PageHero
                 title="Our Work"
                 subtitle="A curated selection of our finest digital creations."
             />
-            <div className="cinematic-section">
-                <WorksTunnel />
+            <div className="cinematic-section relative z-10">
+                <ErrorBoundary fallback={
+                    <div className="min-h-[50vh] flex items-center justify-center text-white/50">
+                        Gallery unavailable. Please refresh.
+                    </div>
+                }>
+                    <WorksTunnel />
+                </ErrorBoundary>
             </div>
-            <div className="cinematic-section">
+            <div className="cinematic-section relative z-10">
                 <FinalCTA />
             </div>
         </main>
@@ -2159,6 +2178,7 @@ export default function NavbarFullMenu() {
 
                 <button
                     onClick={() => setIsOpen(true)}
+                    suppressHydrationWarning
                     className="relative z-10 text-sm font-medium uppercase tracking-widest text-white hover:text-inkspirePurple transition-all interactive"
                 >
                     Menu
@@ -2173,6 +2193,7 @@ export default function NavbarFullMenu() {
                 {/* Close Button */}
                 <button
                     onClick={() => setIsOpen(false)}
+                    suppressHydrationWarning
                     className="absolute top-6 right-6 text-white text-sm font-medium uppercase tracking-widest hover:scale-110 transition-all interactive group"
                 >
                     <span className="mr-2">✕</span>
@@ -2978,12 +2999,67 @@ export default function NineDimensionsBackground({
     );
     observer.observe(containerRef.current);
 
+    // Context Loss Handling
+    const canvas = renderer.domElement;
+    const handleContextLost = (event: Event) => {
+        event.preventDefault(); // allow restoration
+        cancelAnimationFrame(reqIdRef.current!);
+    };
+    const handleContextRestored = () => {
+        // Simple reload strategy for robustness
+        window.location.reload(); 
+    };
+
+    canvas.addEventListener("webglcontextlost", handleContextLost, false);
+    canvas.addEventListener("webglcontextrestored", handleContextRestored, false);
+
     return () => {
       window.removeEventListener("resize", handleResize);
+      canvas.removeEventListener("webglcontextlost", handleContextLost);
+      canvas.removeEventListener("webglcontextrestored", handleContextRestored);
       observer.disconnect();
       cleanup();
     };
   }, [profile, shapes, isPageActive, cleanup]);
+
+  // ============================================================================
+  // VISIBILITY RESUME BRIDGE
+  // ============================================================================
+  // ARCHITECTURAL PATTERN: Page Visibility Resume
+  // 
+  // PROBLEM: IntersectionObserver only fires on scroll changes, NOT tab switches.
+  // When user switches tabs:
+  // - isPageActive becomes false → RAF stops (line 452)
+  // - User returns → isPageActive becomes true
+  // - BUT: IntersectionObserver doesn't fire (no scroll happened)
+  // - RESULT: RAF never restarts
+  //
+  // SOLUTION: Dedicated effect watching isPageActive
+  // - When page becomes active: check if should animate, restart RAF
+  // - When page becomes inactive: defensively cancel RAF
+  //
+  // DEMAND RENDERING PRESERVED:
+  // Still respects: isVisible && (isTransitioning || progress !== 0)
+  // Only adds: explicit restart trigger on page visibility restore
+  //
+  // EVIDENCE: Fixes "frozen particles after tab switch" bug
+  // ============================================================================
+  useEffect(() => {
+    if (isPageActive) {
+      // Page became active: check if we should be animating
+      const shouldAnimate = isVisible.current && (isTransitioning.current || animParams.current.progress !== 0);
+      
+      if (shouldAnimate && !reqIdRef.current) {
+        animateRef.current();
+      }
+    } else {
+      // Page inactive: ensure RAF is stopped (defensive)
+      if (reqIdRef.current) {
+        cancelAnimationFrame(reqIdRef.current);
+        reqIdRef.current = null;
+      }
+    }
+  }, [isPageActive]);
 
   // ============================================================================
   // SHAPE TRANSITION EFFECT (GSAP)
@@ -3688,7 +3764,7 @@ export default function AboutSection() {
                     <div className="fade-up relative rounded-[1rem] md:rounded-[1.5rem] overflow-hidden shadow-2xl shadow-purple-900/10 aspect-video lg:aspect-square xl:aspect-video grayscale hover:grayscale-0 transition-all duration-700 w-full group isolate max-h-[25vh] lg:max-h-none">
                         <video
                             className="w-full h-full object-cover scale-105 group-hover:scale-100 transition-transform duration-1000"
-                            src="/1_2.mp4"
+                            src="/1_2.webm"
                             autoPlay
                             muted
                             loop
@@ -6416,6 +6492,7 @@ import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import gsap from 'gsap';
 import { usePageVisibility } from '@/hooks/usePageVisibility';
+import { useResponsiveMode } from '@/hooks/useResponsiveMode';
 
 // --- UTILS ---
 function cn(...inputs: ClassValue[]) {
@@ -6437,6 +6514,7 @@ const WorksTunnel: React.FC = () => {
     const router = useRouter();
     const { openPopup } = usePopup();
     const isPageActive = usePageVisibility();
+    const { isMobile } = useResponsiveMode();
     // --- STATE ---
     const [isSceneVisible, setIsSceneVisible] = useState(false);
 
@@ -6497,18 +6575,13 @@ const WorksTunnel: React.FC = () => {
         ringRefs.current = ringRefs.current.slice(0, numRings);
         cardRefs.current = cardRefs.current.slice(0, numRings);
 
-        const handleResize = () => {
-            if (typeof window === 'undefined') return;
-            const isMobile = window.innerWidth < 520;
-            dims.current.radius = isMobile ? 160 : 300;
-            dims.current.ringSpacing = isMobile ? 200 : 280;
+        // Update dims based on responsive mode
+        dims.current.radius = isMobile ? 160 : 300;
+        dims.current.ringSpacing = isMobile ? 200 : 280;
 
-            ringRefs.current.forEach(r => {
-                if (r) r.style.setProperty('--radius', `${dims.current.radius}px`);
-            });
-        };
-        handleResize();
-        window.addEventListener('resize', handleResize);
+        ringRefs.current.forEach(r => {
+            if (r) r.style.setProperty('--radius', `${dims.current.radius}px`);
+        });
 
         const tick = () => {
             // ARCHITECTURAL PATTERN: Demand Rendering Gate
@@ -6602,10 +6675,9 @@ const WorksTunnel: React.FC = () => {
         }
 
         return () => {
-            window.removeEventListener('resize', handleResize);
             if (requestRef.current) cancelAnimationFrame(requestRef.current);
         };
-    }, [numRings, centerIndex, isSceneVisible, isPageActive]);
+    }, [numRings, centerIndex, isSceneVisible, isPageActive, isMobile]);
 
 
     return (
@@ -7371,6 +7443,28 @@ export default function ArrowCursor() {
       `}</style>
         </>
     );
+}
+
+
+
+================================================================================
+FILE: .\components\ui\ErrorBoundary.tsx
+================================================================================
+
+"use client";
+import React from "react";
+
+export class ErrorBoundary extends React.Component<{children: React.ReactNode, fallback: React.ReactNode}, {hasError: boolean}> {
+  constructor(props: {children: React.ReactNode, fallback: React.ReactNode}) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() { return { hasError: true }; }
+  componentDidCatch(error: any) { console.error("TunnelErrorBoundary:", error); }
+  render() {
+    if (this.state.hasError) return this.props.fallback;
+    return this.props.children;
+  }
 }
 
 
@@ -8262,59 +8356,81 @@ export function useAnimatedCounter(
         el.innerText = "0" + suffix;
 
         // ====================================================================
-        // GSAP CONTEXT - Scoped animation cleanup
+        // DEVICE DETECTION - Use Native Observer on Small Screens
         // ====================================================================
-        // Benefits:
-        // - All animations created inside are tracked
-        // - ctx.revert() removes ALL at once
-        // - Prevents ScrollTrigger memory leaks
-        const ctx = gsap.context(() => {
-            // ================================================================
-            // CONTAINER REVEAL ANIMATION
-            // ================================================================
-            gsap.from(container, {
-                scrollTrigger: {
-                    trigger: container,
-                    start: "top 70%",  // When container's top hits 70% of viewport
-                    once: true          // Only trigger once, not on re-scroll
-                },
-                y: 40,            // Slide up from 40px below
-                opacity: 0,       // Fade in
-                scale: 0.95,      // Slight zoom in
-                duration: 0.6,
-                ease: "power3.out"
-            });
+        // WHY: ScrollTrigger behaves differently in native scroll mode (mobile).
+        // IntersectionObserver is reliable for native scrolling.
+        const isSmallScreen = window.matchMedia("(max-width: 1023px)").matches;
+        let observer: IntersectionObserver | null = null;
+        let ctx: gsap.Context | null = null;
 
-            // ================================================================
-            // NUMBER COUNTING ANIMATION - Proxy pattern
-            // ================================================================
-            // PATTERN: Animate plain object, update DOM in onUpdate
-            // WHY: GSAP cannot directly animate DOM text properties
-            const proxy = { val: 0 };  // Proxy object (0 → numValue)
-            gsap.to(proxy, {
-                val: numValue,
-                duration: 2.5,
-                ease: "power2.out",
-                scrollTrigger: {
-                    trigger: container,
-                    start: "top 70%",
-                    once: true,
-                },
-                onUpdate: () => {
-                    // Read proxy.val (interpolated value) and update DOM
-                    el.innerText = Math.ceil(proxy.val) + suffix;
+        // Function to run the animation logic
+        const runAnimation = () => {
+             ctx = gsap.context(() => {
+                // ================================================================
+                // CONTAINER REVEAL ANIMATION
+                // ================================================================
+                // CONDITIONAL TRIGGER:
+                // - Desktop: Uses ScrollTrigger properties
+                // - Mobile: Triggered imperatively by Observer (no ScrollTrigger prop)
+                gsap.from(container, {
+                    ...(isSmallScreen ? {} : {
+                        scrollTrigger: {
+                            trigger: container,
+                            start: "top 70%",
+                            once: true
+                        }
+                    }),
+                    y: 40,
+                    opacity: 0,
+                    scale: 0.95,
+                    duration: 0.6,
+                    ease: "power3.out"
+                });
+
+                // ================================================================
+                // NUMBER COUNTING ANIMATION - Proxy pattern
+                // ================================================================
+                const proxy = { val: 0 };
+                gsap.to(proxy, {
+                    val: numValue,
+                    duration: 2.5,
+                    ease: "power2.out",
+                    ...(isSmallScreen ? {} : {
+                        scrollTrigger: {
+                            trigger: container,
+                            start: "top 70%",
+                            once: true,
+                        }
+                    }),
+                    onUpdate: () => {
+                        el.innerText = Math.ceil(proxy.val) + suffix;
+                    }
+                });
+            }, container);
+        };
+
+        if (isSmallScreen) {
+            // NATIVE TRIGGER (Mobile/Tablet)
+            observer = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting) {
+                    runAnimation();
+                    observer?.disconnect(); // Run once
                 }
-            });
-        }, container); // Scope to container
+            }, { threshold: 0.35 }); // Trigger when 35% visible
+            observer.observe(container);
+        } else {
+            // SCROLLTRIGGER (Desktop) - Run immediately, logic handles trigger
+            runAnimation();
+        }
 
         // ====================================================================
-        // CLEANUP - Revert ALL animations in context
+        // CLEANUP
         // ====================================================================
-        // Removes:
-        // - Both gsap.from and gsap.to animations
-        // - Both ScrollTrigger instances
-        // - Restores DOM to pre-animation state
-        return () => ctx.revert();
+        return () => {
+            if (ctx) ctx.revert();
+            if (observer) observer.disconnect();
+        };
     }, [containerRef, countRef, numValue, suffix, isPageActive]);
 
     return { suffix }; // Expose suffix for consumer if needed
@@ -8844,59 +8960,64 @@ FILE: .\hooks\useCinematicTransitions.ts
 import { useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useResponsiveMode } from "./useResponsiveMode";
 
-export function useCinematicTransitions() {
+export function useCinematicTransitions(scope?: React.RefObject<HTMLElement>) {
+    const { isDesktop } = useResponsiveMode();
     useEffect(() => {
         gsap.registerPlugin(ScrollTrigger);
 
-        // Get all major sections
-        const sections = gsap.utils.toArray<HTMLElement>(".cinematic-section");
+        const ctx = gsap.context(() => {
+            // Scope awareness: search within scope if provided, otherwise global
+            // Note: gsap.utils.toArray uses document if no scope, but we want implicit scoping
+            // if we are inside a context.
+            if (!isDesktop) return;
 
-        sections.forEach((section, index) => {
-            // Fade and scale in effect as section enters
-            gsap.fromTo(
-                section,
-                {
-                    opacity: 0,
-                    scale: 0.95,
-                    y: 50,
-                },
-                {
-                    opacity: 1,
-                    scale: 1,
-                    y: 0,
-                    duration: 1.5,
-                    ease: "power3.out",
-                    scrollTrigger: {
-                        trigger: section,
-                        start: "top 80%",
-                        end: "top 20%",
-                        toggleActions: "play none none reverse",
-                        // markers: true, // Uncomment for debugging
+            const sections = gsap.utils.toArray<HTMLElement>(".cinematic-section", scope?.current || undefined);
+
+            sections.forEach((section, index) => {
+                // Fade and scale in effect as section enters
+                gsap.fromTo(
+                    section,
+                    {
+                        opacity: 0,
+                        scale: 0.95,
+                        y: 50,
                     },
+                    {
+                        opacity: 1,
+                        scale: 1,
+                        y: 0,
+                        duration: 1.5,
+                        ease: "power3.out",
+                        scrollTrigger: {
+                            trigger: section,
+                            start: "top 80%",
+                            end: "top 20%",
+                            toggleActions: "play none none reverse",
+                        },
+                    }
+                );
+
+                // Parallax effect on section content
+                const content = section.querySelector(".parallax-content");
+                if (content) {
+                    gsap.to(content, {
+                        y: -50,
+                        ease: "none",
+                        scrollTrigger: {
+                            trigger: section,
+                            start: "top bottom",
+                            end: "bottom top",
+                            scrub: 1,
+                        },
+                    });
                 }
-            );
+            });
+        }, scope); // GSAP Context attached to scope for easy cleanup
 
-            // Parallax effect on section content
-            const content = section.querySelector(".parallax-content");
-            if (content) {
-                gsap.to(content, {
-                    y: -50,
-                    ease: "none",
-                    scrollTrigger: {
-                        trigger: section,
-                        start: "top bottom",
-                        end: "bottom top",
-                        scrub: 1,
-                    },
-                });
-            }
-        });
-
-        return () => {
-            ScrollTrigger.getAll().forEach((t) => t.kill());
-        };
-    }, []);
+        return () => ctx.revert();
+    }, [scope, isDesktop]);
 }
 
 
@@ -8930,35 +9051,31 @@ export function useGSAPFade() {
             }
             
             fadeElements.forEach((el, index) => {
-                gsap.fromTo(el,
-                    {
-                        opacity: 0,
-                        y: 30,
-                        scale: 0.95,
-                        visibility: "hidden"
+                // ARCHITECTURAL CHANGE: Explicitly set initial hidden state in JS
+                // This replaces the dangerous global CSS .fade-up { opacity: 0 }
+                gsap.set(el, { opacity: 0, y: 30, visibility: "hidden" });
+
+                gsap.to(el, {
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
+                    visibility: "visible",
+                    duration: 0.5,
+                    ease: "power3.out",
+                    scrollTrigger: {
+                        trigger: el,
+                        start: "top 70%",
+                        once: true,
+                        toggleActions: "play none none none"
                     },
-                    {
-                        opacity: 1,
-                        y: 0,
-                        scale: 1,
-                        visibility: "visible",
-                        duration: 0.5,
-                        ease: "power3.out",
-                        scrollTrigger: {
-                            trigger: el,
-                            start: "top 70%",
-                            once: true,
-                            toggleActions: "play none none none"
-                        },
-                        delay: (index % 4) * 0.08,
-                        onStart: () => {
-                            (el as HTMLElement).style.willChange = "transform, opacity";
-                        },
-                        onComplete: () => {
-                            (el as HTMLElement).style.willChange = "auto";
-                        }
+                    delay: (index % 4) * 0.08,
+                    onStart: () => {
+                        (el as HTMLElement).style.willChange = "transform, opacity";
+                    },
+                    onComplete: () => {
+                        (el as HTMLElement).style.willChange = "auto";
                     }
-                );
+                });
             });
         }, containerRef);
 
@@ -9905,7 +10022,7 @@ let cleanupFn: (() => void) | null = null;
 //
 // WITHOUT THIS: React hydration error (server HTML ≠ client HTML)
 // ============================================================================
-const getServerSnapshot = (): ResponsiveMode => ({
+const SERVER_SNAPSHOT: ResponsiveMode = {
   isHydrated: false, // CRITICAL: false on server, signals "don't trust other values yet"
   isMobile: false,
   isTablet: false,
@@ -9917,7 +10034,9 @@ const getServerSnapshot = (): ResponsiveMode => ({
   scrollMode: "cinematic",
   render3D: true,
   deviceCapable: true,
-});
+};
+
+const getServerSnapshot = (): ResponsiveMode => SERVER_SNAPSHOT;
 
 // ============================================================================
 // CLIENT STATE COMPUTATION
@@ -10829,6 +10948,19 @@ FILE: .\styles\tablet.css
   /* Readability guard */
   .tablet-text-veil {
     background: linear-gradient(to bottom, rgba(9, 6, 15, 0.85), rgba(9, 6, 15, 0.35));
+  }
+}
+
+/* Visibility Guard for Native Scroll (Mobile + Tablet) */
+/* RATIONALE: The .fade-up class (globals.css) hides elements by default (opacity: 0).
+   On desktop, GSAP handles the reveal. On mobile/tablet native scroll, we need
+   to Force visibility to ensure content isn't hidden if animation scripts 
+   are delayed or don't trigger correctly in the stacked layout. */
+@media (max-width: 1023px) {
+  .fade-up {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
   }
 }
 
