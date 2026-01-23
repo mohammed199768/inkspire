@@ -101,3 +101,20 @@ FILE_CONTEXT/
 **Usability**: Ready for standalone ChatGPT workspace use
 
 **Knowledge base is production-ready for immediate use.**
+
+## Deployment & GTM Diagnosis (2026-01-23)
+
+### GTM Fix Applied
+- **Change**: Moved GTM to `beforeInteractive` (highest priority in head).
+- **Safety**: Added strict `process.env.NEXT_PUBLIC_GTM_ID` check.
+- **Evidence**: `app/layout.tsx` (Lines 111-123).
+
+### Deployment Analysis
+- **Local Build**: **PASSED** (Verified `.env.local` contains `NEXT_PUBLIC_GTM_ID`).
+- **Vercel Status**: 
+  - If deployment fails with `Error: CRITICAL: NEXT_PUBLIC_GTM_ID is missing`, it confirms Vercel Environment Variables are improperly configured.
+  - If deployment passes but GTM is not detected, ensure `NEXT_PUBLIC_GTM_ID` is set in **Environment Variables** (not just .env).
+
+### Verification Steps (Post-Deploy)
+1. **Network**: Request to `gtm.js?id=GTM-NCFF8CVF` must return 200.
+2. **Console**: `window.dataLayer` must exist.
