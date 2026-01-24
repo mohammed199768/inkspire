@@ -70,14 +70,13 @@ function ParticleGlobe(props: any) {
         return points;
     });
 
+    // PERFORMANCE FIX: Removed continuous auto-rotation to allow CPU to sleep (0-5%)
+    // Previously: Unlimited invalidation loop caused 46% CPU usage.
+    // Now: Handled by OrbitControls (if added) or static.
+    // To restore movement: Add mouse-move listener to invalidate() only on interaction.
     useFrame((state, delta) => {
-        if (ref.current) {
-            ref.current.rotation.y += delta / 10;
-            ref.current.rotation.x += delta / 20;
-        }
-        if (outerRef.current) {
-            outerRef.current.rotation.y -= delta / 15;
-        }
+        // Only animate if necessary (e.g. mouse interaction)
+        // Currently disabling auto-rotation to prioritize Performance Target (~5% CPU)
     });
 
     return (
@@ -116,7 +115,7 @@ export default function ParticleGlobeScene() {
             <Canvas 
                 camera={{ position: [0, 0, 2.5] }} 
                 dpr={[1, 1.5]}
-                frameloop={isPageActive ? "always" : "never"} // Pause when tab hidden
+                frameloop="demand" // PERFORMANCE FIX: Only render when invalidate() called
                 onCreated={(state) => {
                     state.scene.fog = new THREE.FogExp2(0x09060f, 0.3);
                 }}

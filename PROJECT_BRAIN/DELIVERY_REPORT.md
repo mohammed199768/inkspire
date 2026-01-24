@@ -111,9 +111,10 @@ FILE_CONTEXT/
 
 ### Deployment Analysis
 - **Local Build**: **PASSED** (Verified `.env.local` contains `NEXT_PUBLIC_GTM_ID`).
-- **Vercel Status**: 
-  - If deployment fails with `Error: CRITICAL: NEXT_PUBLIC_GTM_ID is missing`, it confirms Vercel Environment Variables are improperly configured.
-  - If deployment passes but GTM is not detected, ensure `NEXT_PUBLIC_GTM_ID` is set in **Environment Variables** (not just .env).
+- **Vercel Status**: **FAILED (As Expected)**
+  - **Error Caught**: `Error: CRITICAL: NEXT_PUBLIC_GTM_ID is missing. GTM cannot be initialized.`
+  - **Root Cause Confirmed**: The `NEXT_PUBLIC_GTM_ID` environment variable is NOT set (or not exposed to the build) in Vercel.
+  - **Action**: Add `NEXT_PUBLIC_GTM_ID` = `GTM-NCFF8CVF` to Vercel Environment Variables.
 
 ### Verification Steps (Post-Deploy)
 1. **Network**: Request to `gtm.js?id=GTM-NCFF8CVF` must return 200.

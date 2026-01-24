@@ -164,6 +164,7 @@ const computeResponsiveMode = (): ResponsiveMode => {
   // Cinematic mode requires precise wheel control and powerful hardware.
   // Touch devices get native scroll for familiarity and performance.
   // ============================================================================
+ 
   const scrollMode: ScrollMode =
     isDesktop && hasFinePointer && !prefersReducedMotion
       ? "cinematic"
@@ -188,6 +189,7 @@ const computeResponsiveMode = (): ResponsiveMode => {
     }
     // Mobile: stays false, gets static gradient
   }
+
 
   return {
     isHydrated: true, // CRITICAL: true on client

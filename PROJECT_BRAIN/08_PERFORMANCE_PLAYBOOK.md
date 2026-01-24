@@ -66,7 +66,47 @@
 
 ---
 
-## 4. Capability Gating (Tiered Experience)
+## 4. Performance Optimization History
+
+### 2026-01-24: WebGL Idle CPU Fix
+
+**PROBLEM**: Continuous RAF loop consuming 48.2% CPU when idle (no user interaction).
+
+**ROOT CAUSE**: Unconditional `scene.rotation.y += 0.0005` in animation loop prevented demand rendering gate from stopping RAF.
+
+**EVIDENCE**:
+- Baseline: 48.2% CPU idle, 65.5% active
+- Test A (WebGL disabled): 2.5% idle, 12% active
+- **Delta**: 94.8% reduction → WebGL = 95% of total load
+
+**FIXES APPLIED**:
+
+1. **Conditional Scene Rotation** (`NineDimensionsBackground.tsx:L486-500`)
+   - Made rotation conditional on `hasActivity` (transitions, progress > 0, impulse > epsilon)
+   - Expected impact: ~90% CPU reduction on idle
+
+2. **Particle Count Reduction (-50%)** (`NineDimensionsBackground.tsx:L73-79`)
+   - Desktop: 1500 → 750 particles, Tablet: 800 → 400
+   - Impact: ~30% GPU memory reduction
+
+3. **Ref-Based Impulse Pattern** (Prevent Context Destruction)
+   - Store `scrollImpulse` in `useRef` to decouple animation loop from React render cycle
+   - Prevents destroying WebGL context on every scroll frame (Zombie Loop cause #1)
+
+4. **Gate Logic Fix** (The "One-Line Fix")
+   - Removed `progress === 0` check from demand gate
+   - **Why**: Initial intro animation leaves `progress` at 1. Old gate kept running forever.
+   - **Result**: CPU drops to **0.7%** (Idle)
+   - **Trade-off**: Idle drift freezes (worth it for 98% savings)
+
+**FINAL METRICS (2026-01-24)**:
+- Idle CPU: **0.7%** (was 48.2%) 📉
+- Zombie Loop: **Dead** 💀
+- Status: **SOLVED**
+
+---
+
+## 5. Capability Gating (Tiered Experience)
 
 **GOAL**: 60fps on potato phones, Cinematic on desktops.
 

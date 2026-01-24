@@ -107,6 +107,7 @@ export default function NavbarFullMenu() {
                         alt="Inkspire"
                         width={180}
                         height={60}
+                        priority={true}
                         className="w-auto h-10 md:h-14 object-contain"
                     />
                 </Link>
